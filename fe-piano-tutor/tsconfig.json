@@ -1,0 +1,11 @@
+{
+  "extends": "./node_modules/react-scripts/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "src",
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src"]
+}
