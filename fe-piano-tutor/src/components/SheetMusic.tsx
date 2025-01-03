@@ -1,11 +1,21 @@
 import React, {useEffect, useRef, useState} from 'react'
 import Vex from 'vexflow'
+import styled from 'styled-components'
+
+const MusicContainer = styled.div`
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ccc;
+`
 
 const SheetMusic: React.FC = () => {
   const musicRef = useRef<HTMLDivElement>(null)
   const [highlightedNote, setHighlightedNote] = useState<string | null>(null)
 
   useEffect(() => {
+    const expectedTimings = { 'c/4': 1000, 'd/4': 2000, 'e/4': 3000, 'f/4': 4000 }; // Example
+    let startTime = Date.now();
+
     // Initialize MIDI
     const initMidi = async () => {
       if (navigator.requestMIDIAccess) {
@@ -14,9 +24,21 @@ const SheetMusic: React.FC = () => {
           input.onmidimessage = (message) => {
             const [command, note] = message.data
             if (command === 144) {
-              // Note On
+              // Note On - Highlight Note
               const noteName = getNoteName(note)
+              console.log('Note name:', noteName)
               setHighlightedNote(noteName)
+
+
+              // Check timing
+              const playedAt = Date.now() - startTime;
+              if (Math.abs(playedAt - expectedTimings[noteName]) < 100) {
+                console.log(`${noteName} played on time`);
+              } else if (playedAt < expectedTimings[noteName]) {
+                console.log(`${noteName} played early`);
+              } else {
+                console.log(`${noteName} played late`);
+              }
             }
           }
         })
@@ -41,7 +63,9 @@ const SheetMusic: React.FC = () => {
       const renderer = new VF.Renderer(musicRef.current, VF.Renderer.Backends.SVG)
       renderer.resize(500, 200)
       const context = renderer.getContext()
-      context.setFont('Arial', 10, '').setBackgroundFillStyle('#fff')
+
+      // Clear the canvas
+      context.clearRect(0, 0, 500, 200)
 
       const stave = new VF.Stave(10, 40, 400)
       stave.addClef('treble').addTimeSignature('4/4')
@@ -50,25 +74,29 @@ const SheetMusic: React.FC = () => {
       const notes = [
         new VF.StaveNote({
           keys: ['c/4'],
-          duration: 'q',
-          style: highlightedNote === 'c/4' ? {fillStyle: 'green'} : undefined
+          duration: 'q'
         }),
         new VF.StaveNote({
           keys: ['d/4'],
-          duration: 'q',
-          style: highlightedNote === 'd/4' ? {fillStyle: 'green'} : undefined
+          duration: 'q'
         }),
         new VF.StaveNote({
           keys: ['e/4'],
-          duration: 'q',
-          style: highlightedNote === 'e/4' ? {fillStyle: 'green'} : undefined
+          duration: 'q'
         }),
         new VF.StaveNote({
           keys: ['f/4'],
-          duration: 'q',
-          style: highlightedNote === 'f/4' ? {fillStyle: 'green'} : undefined
+          duration: 'q'
         })
       ]
+
+      notes.forEach((note) => {
+        if (highlightedNote === note.getKeys()[0]) {
+          note.setStyle({fillStyle: 'green'})
+        } else {
+          note.setStyle({fillStyle: 'black'})
+        }
+      })
 
       const voice = new VF.Voice({num_beats: 4, beat_value: 4})
       voice.addTickables(notes)
@@ -78,7 +106,7 @@ const SheetMusic: React.FC = () => {
     }
   }, [highlightedNote])
 
-  return <div ref={musicRef}></div>
+  return <MusicContainer ref={musicRef}></MusicContainer>
 }
 
 export default SheetMusic
