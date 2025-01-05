@@ -3,10 +3,10 @@ import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
 import { Layout, Menu } from 'antd';
 import { FileTextOutlined, TrophyOutlined } from '@ant-design/icons';
 import { initMidi } from 'services/midiService';
-import SheetMusic from 'components/SheetMusic';
+import SheetMusicRenderer from 'common/SheetMusicRenderer';
+import LearnMusicNotes from 'pages/LearnMusicNotes'
 
 // Placeholder components for the new menu items
-const LearnMusicNotes = () => <div><h2>Learn Music Notes</h2></div>;
 const PracticeSongs = () => <div><h2>Practice with Songs</h2></div>;
 const ChallengeYourself = () => <div><h2>Challenge Yourself</h2></div>;
 
@@ -47,7 +47,7 @@ function App() {
               <Route path="/practice-songs" element={<PracticeSongs />} />
               <Route path="/challenge-yourself" element={<ChallengeYourself />} />
               {/* Default route to SheetMusic as an example */}
-              <Route path="/" element={<SheetMusic />} />
+              <Route path="/" element={<SheetMusicRenderer />} />
             </Routes>
           </Content>
         </Layout>

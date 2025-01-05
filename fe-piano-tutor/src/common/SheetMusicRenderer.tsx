@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Vex from 'vexflow'
 import styled from 'styled-components'
 
@@ -8,7 +8,11 @@ const MusicContainer = styled.div`
     border: 1px solid #ccc;
 `
 
-const SheetMusic: React.FC = () => {
+interface SheetMusicRendererProps {
+  notes: Vex.Flow.StaveNote[]; // Accept an array of VexFlow StaveNotes
+}
+
+const SheetMusicRenderer: React.FC<SheetMusicRendererProps> = ({ notes }) => {
   const musicRef = useRef<HTMLDivElement>(null)
   const [highlightedNote, setHighlightedNote] = useState<string | null>(null)
 
@@ -28,7 +32,6 @@ const SheetMusic: React.FC = () => {
               const noteName = getNoteName(note)
               console.log('Note name:', noteName)
               setHighlightedNote(noteName)
-
 
               // Check timing
               const playedAt = Date.now() - startTime;
@@ -71,42 +74,53 @@ const SheetMusic: React.FC = () => {
       stave.addClef('treble').addTimeSignature('4/4')
       stave.setContext(context).draw()
 
-      const notes = [
-        new VF.StaveNote({
-          keys: ['c/4'],
-          duration: 'q'
-        }),
-        new VF.StaveNote({
-          keys: ['d/4'],
-          duration: 'q'
-        }),
-        new VF.StaveNote({
-          keys: ['e/4'],
-          duration: 'q'
-        }),
-        new VF.StaveNote({
-          keys: ['f/4'],
-          duration: 'q'
-        })
-      ]
+      // Split notes into smaller chunks to prevent exceeding the number of beats
+      const maxTicksPerVoice = 4; // Each voice can handle 4 beats (quarter notes)
+      let voiceNotes: Vex.Flow.StaveNote[][] = [];
+
+      // Split the notes into voices with at most maxTicksPerVoice
+      let currentVoiceNotes: Vex.Flow.StaveNote[] = [];
+      let currentTicks = 0;
 
       notes.forEach((note) => {
-        if (highlightedNote === note.getKeys()[0]) {
-          note.setStyle({fillStyle: 'green'})
-        } else {
-          note.setStyle({fillStyle: 'black'})
+        currentTicks++;
+        currentVoiceNotes.push(note);
+
+        // If the current voice exceeds the maximum ticks (4), start a new voice
+        if (currentTicks >= maxTicksPerVoice) {
+          voiceNotes.push(currentVoiceNotes);
+          currentVoiceNotes = [];
+          currentTicks = 0;
         }
-      })
+      });
 
-      const voice = new VF.Voice({num_beats: 4, beat_value: 4})
-      voice.addTickables(notes)
+      // If any remaining notes exist in the last voice, push them
+      if (currentVoiceNotes.length > 0) {
+        voiceNotes.push(currentVoiceNotes);
+      }
 
-      const formatter = new VF.Formatter().joinVoices([voice]).format([voice], 400)
-      voice.draw(context, stave)
+      // Render each voice separately
+      voiceNotes.forEach((voiceNotesSet) => {
+        const voice = new VF.Voice({ num_beats: voiceNotesSet.length, beat_value: 4 });
+        voice.addTickables(voiceNotesSet);
+
+        // Format and draw the voice
+        const formatter = new VF.Formatter().joinVoices([voice]).format([voice], 400);
+        voice.draw(context, stave);
+      });
+
+      // Highlight the notes that match the MIDI input
+      notes.forEach((note) => {
+        if (highlightedNote === note.getKeys()[0]) {
+          note.setStyle({ fillStyle: 'green' });
+        } else {
+          note.setStyle({ fillStyle: 'black' });
+        }
+      });
     }
-  }, [highlightedNote])
+  }, [highlightedNote, notes]);
 
-  return <MusicContainer ref={musicRef}></MusicContainer>
-}
+  return <MusicContainer ref={musicRef}></MusicContainer>;
+};
 
-export default SheetMusic
+export default SheetMusicRenderer;
