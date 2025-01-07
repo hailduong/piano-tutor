@@ -46,8 +46,6 @@ function App() {
               <Route path="/learn-music-notes" element={<LearnMusicNotes />} />
               <Route path="/practice-songs" element={<PracticeSongs />} />
               <Route path="/challenge-yourself" element={<ChallengeYourself />} />
-              {/* Default route to SheetMusic as an example */}
-              <Route path="/" element={<SheetMusicRenderer />} />
             </Routes>
           </Content>
         </Layout>

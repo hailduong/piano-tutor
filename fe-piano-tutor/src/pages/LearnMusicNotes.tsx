@@ -1,12 +1,13 @@
-import React, {useState} from 'react'
+import {useState, FC} from 'react'
 import {Button, List, Typography, Space} from 'antd'
 import {MusicNoteGeneratorService} from 'services/musicNoteGeneratorService'
-import SheetMusicRenderer from 'common/SheetMusicRenderer' // Import the service
+import SheetMusicRenderer from 'common/SheetMusicRenderer'
+import {StaveNote} from 'vexflow' // Import the service
 
-const LearnMusicNotes: React.FC = () => {
-  const [notes, setNotes] = useState<string[]>([])
+const LearnMusicNotes: FC = () => {
+  const [notes, setNotes] = useState<StaveNote[]>([])
   const [level, setLevel] = useState<number | null>(null)
-
+  console.log('notes', notes)
   const musicNoteGeneratorService = new MusicNoteGeneratorService() // Create an instance of the service
 
   // Function to handle level selection and generate notes

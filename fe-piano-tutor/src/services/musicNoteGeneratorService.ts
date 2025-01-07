@@ -17,13 +17,13 @@ export class MusicNoteGeneratorService {
     };
   }
 
-  generateNotes(level: number): Vex.Flow.StaveNote[] {
+  generateNotes(level: number): Vex.StaveNote[] {
     if (level < 1 || level > 7) {
       throw new Error("Level must be between 1 and 7.");
     }
 
     const notePool = this.levels[level];
-    const notes: Vex.Flow.StaveNote[] = [];
+    const notes: Vex.StaveNote[] = [];
 
     // Generate 100 random notes from the pool
     for (let i = 0; i < 100; i++) {
