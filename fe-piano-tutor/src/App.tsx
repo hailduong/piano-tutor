@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
 import { Layout, Menu } from 'antd';
 import { FileTextOutlined, TrophyOutlined } from '@ant-design/icons';
 import { initMidi } from 'services/midiService';
-import SheetMusicRenderer from 'common/SheetMusicRenderer';
-import LearnMusicNotes from 'pages/LearnMusicNotes'
+import LearnMusicNotes from 'pages/LearnMusicNotes';
+import VirtualPiano from 'components/VirtualPiano';
 
 // Placeholder components for the new menu items
 const PracticeSongs = () => <div><h2>Practice with Songs</h2></div>;
@@ -50,6 +50,7 @@ function App() {
           </Content>
         </Layout>
       </Layout>
+      <VirtualPiano />
     </Router>
   );
 }
