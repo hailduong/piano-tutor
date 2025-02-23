@@ -1,34 +1,41 @@
-import { useState, FC } from 'react';
-import { Button, Typography, Space } from 'antd';
+import {useState, FC, useEffect} from 'react'
+import { Button, Typography, Space, notification } from 'antd';
 import { MusicNoteGeneratorService } from 'services/musicNoteGeneratorService';
 import SheetMusicRenderer from 'common/SheetMusicRenderer';
 import { StaveNote } from 'vexflow';
+import { useSelector } from 'react-redux';
+import { RootState } from 'store';
 
 const LearnMusicNotes: FC = () => {
   const [notes, setNotes] = useState<StaveNote[]>([]);
   const [level, setLevel] = useState<number | null>(null);
   const musicNoteGeneratorService = new MusicNoteGeneratorService();
+  const { score } = useSelector((state: RootState) => state.musicNotes);
 
-  // Remove the first note that matches the played note (case-insensitive)
-  const handleNotePlayed = (playedNote: string) => {
-    setNotes((prevNotes) => {
-      const noteIndex = prevNotes.findIndex((note) => {
-        // Comparing lower-case versions to be case-insensitive
-        return note.getKeys()[0].toLowerCase() === playedNote.toLowerCase();
-      });
-      if (noteIndex > -1) {
-        const updatedNotes = [...prevNotes];
-        updatedNotes.splice(noteIndex, 1); // Remove the played note
-        return updatedNotes;
-      }
-      return prevNotes;
-    });
+  // Remove the first note from the array (when correctly played)
+  const handleCorrectNote = () => {
+    debugger
+    const newNotes = notes.slice(1);
+    setNotes(newNotes);
   };
 
-  // Generate notes when a level is selected
+  console.log('notes: ', notes.length)
+
+  // Show final score when all notes are played.
+  useEffect(() => {
+    if (level !== null && notes.length === 0) {
+    notification.success({
+      message: 'Practice Complete',
+      description: `Your score is: ${score}`,
+      });
+      }
+  }, [notes, level, score]);
+
   const handleLevelSelect = (level: number) => {
+    console.log('Select Level')
     setLevel(level);
     const generatedNotes = musicNoteGeneratorService.generateNotes(level);
+    console.log('Generated NOtes', generatedNotes.length)
     setNotes(generatedNotes);
   };
 
@@ -55,7 +62,7 @@ const LearnMusicNotes: FC = () => {
             <Typography.Text>
               <strong>Selected Level: </strong> {level}
             </Typography.Text>
-            <SheetMusicRenderer notes={notes} onNotePlayed={handleNotePlayed} />
+            <SheetMusicRenderer notes={notes} onCorrectNote={handleCorrectNote} />
           </div>
         )}
       </Space>

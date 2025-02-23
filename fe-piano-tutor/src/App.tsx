@@ -5,6 +5,8 @@ import { FileTextOutlined, TrophyOutlined } from '@ant-design/icons';
 import { initMidi } from 'services/midiService';
 import LearnMusicNotes from 'pages/LearnMusicNotes';
 import VirtualPiano from 'components/VirtualPiano';
+import { Provider } from 'react-redux';
+import store from 'store';
 
 // Placeholder components for the new menu items
 const PracticeSongs = () => <div><h2>Practice with Songs</h2></div>;
@@ -18,6 +20,7 @@ function App() {
   }, []);
 
   return (
+    <Provider store={store}>
     <Router>
       <Layout style={{ minHeight: '100vh' }}>
         {/* Vertical Menu */}
@@ -52,6 +55,7 @@ function App() {
       </Layout>
       <VirtualPiano />
     </Router>
+    </Provider>
   );
 }
 

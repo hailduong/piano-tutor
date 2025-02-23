@@ -1,5 +1,8 @@
 import React, { useRef, useEffect } from 'react';
 import styled from 'styled-components';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from 'store';
+import { setCurrentNote } from 'slices/musicNotesSlice';
 
 // Styled components for the piano layout
 const PianoContainer = styled.div`
@@ -24,31 +27,44 @@ const WhiteKeysContainer = styled.div`
     display: flex;
 `;
 
-const WhiteKey = styled.div`
+interface KeyProps {
+  active?: boolean;
+  suggested?: boolean;
+}
+
+const WhiteKey = styled.div<KeyProps>`
     width: 40px;
     height: 150px;
-    background: white;
-    border: 1px solid #000;
+    background: ${({ active, suggested }) =>
+            active ? '#4caf50' : suggested ? '#2196F3' : 'white'};
+    border: 1px solid
+    ${({ active, suggested }) =>
+            active ? '#4caf50' : suggested ? '#2196F3' : '#000'};
     position: relative;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: flex-end;
     user-select: none;
+    transition: background 0.2s, border 0.2s;
 `;
 
-const BlackKey = styled.div<{ leftOffset: number }>`
+const BlackKey = styled.div<{ leftOffset: number } & KeyProps>`
     width: 25px;
     height: 90px;
-    background: black;
+    background: ${({ active, suggested }) =>
+            active ? '#4caf50' : suggested ? '#2196F3' : 'black'};
+    border: 1px solid
+    ${({ active, suggested }) =>
+            active ? '#4caf50' : suggested ? '#2196F3' : '#333'};
     position: absolute;
     left: ${({ leftOffset }) => leftOffset}px;
     top: 0;
-    border: 1px solid #333;
     border-radius: 0 0 3px 3px;
     cursor: pointer;
     z-index: 2;
     user-select: none;
+    transition: background 0.2s, border 0.2s;
 `;
 
 const KeyLabel = styled.span`
@@ -57,7 +73,7 @@ const KeyLabel = styled.span`
     pointer-events: none;
 `;
 
-// Base frequencies for the 4th octave.
+// Frequency helpers (using A4 = 440Hz as reference)
 const baseFrequencies: { [note: string]: number } = {
   C: 261.63,
   D: 293.66,
@@ -66,21 +82,20 @@ const baseFrequencies: { [note: string]: number } = {
   G: 392.00,
   A: 440.00,
   B: 493.88,
-  "C#": 277.18,
-  "D#": 311.13,
-  "F#": 369.99,
-  "G#": 415.30,
-  "A#": 466.16,
+  'C#': 277.18,
+  'D#': 311.13,
+  'F#': 369.99,
+  'G#': 415.30,
+  'A#': 466.16,
 };
 
-// Compute frequency for a given note and octave using A4 = 440Hz as reference.
 const getFrequency = (note: string, octave: number): number => {
   const base = baseFrequencies[note];
   if (!base) return 0;
   return base * Math.pow(2, octave - 4);
 };
 
-// Define white keys for one octave (in order: C, D, E, F, G, A, B)
+// White keys for one octave (C, D, E, F, G, A, B)
 interface WhiteKeyData {
   note: string;
   octave: number;
@@ -97,26 +112,27 @@ const createWhiteKeysForOctave = (octave: number): WhiteKeyData[] => {
   ];
 };
 
-// Black key mappings within one octave, with a left offset (in pixels) relative to the octave container.
-// White key width = 40px. Black keys are positioned roughly between white keys.
+// Black keys within one octave (positions relative to white keys)
 interface BlackKeyData {
   note: string;
   octave: number;
-  left: number; // pixel offset relative to the octave container
+  left: number;
 }
 const createBlackKeysForOctave = (octave: number): BlackKeyData[] => {
   return [
-    { note: 'C#', octave, left: 28 }, // between C (0) and D (40)
-    { note: 'D#', octave, left: 68 }, // between D (40) and E (80)
+    { note: 'C#', octave, left: 28 },
+    { note: 'D#', octave, left: 68 },
     // No black key between E and F
-    { note: 'F#', octave, left: 148 }, // between F (120) and G (160)
-    { note: 'G#', octave, left: 188 }, // between G (160) and A (200)
-    { note: 'A#', octave, left: 228 }, // between A (200) and B (240)
+    { note: 'F#', octave, left: 148 },
+    { note: 'G#', octave, left: 188 },
+    { note: 'A#', octave, left: 228 },
   ];
 };
 
 const VirtualPiano: React.FC = () => {
   const audioContextRef = useRef<AudioContext | null>(null);
+  const dispatch = useDispatch();
+  const { currentNote, suggestedNote } = useSelector((state: RootState) => state.musicNotes);
 
   useEffect(() => {
     if (!audioContextRef.current) {
@@ -125,6 +141,16 @@ const VirtualPiano: React.FC = () => {
   }, []);
 
   const playNote = (note: string, octave: number) => {
+    const noteData = {
+      note,
+      length: 'q', // default quarter note
+      timestamp: Date.now(),
+      octave,
+    };
+
+    // Dispatch the note info to Redux
+    dispatch(setCurrentNote(noteData));
+
     const frequency = getFrequency(note, octave);
     if (!frequency || !audioContextRef.current) return;
 
@@ -142,7 +168,7 @@ const VirtualPiano: React.FC = () => {
     oscillator.stop(audioContextRef.current.currentTime + 0.5);
   };
 
-  // We will render three octaves: lower (3), middle (4), upper (5).
+  // Render three octaves: lower (3), middle (4), upper (5)
   const octaves = [3, 4, 5];
 
   return (
@@ -150,32 +176,58 @@ const VirtualPiano: React.FC = () => {
       {octaves.map((octave) => (
         <OctaveContainer key={octave}>
           <WhiteKeysContainer>
-            {createWhiteKeysForOctave(octave).map((keyData, index) => (
-              <WhiteKey
-                key={`${keyData.note}${octave}`}
-                onClick={() => playNote(keyData.note, octave)}
-              >
-                <KeyLabel>
-                  {keyData.note}{octave}
-                </KeyLabel>
-              </WhiteKey>
-            ))}
+            {createWhiteKeysForOctave(octave).map((keyData) => {
+              // Determine if this key should be highlighted as active or suggested
+              const isActive =
+                currentNote &&
+                currentNote.note === keyData.note &&
+                currentNote.octave === keyData.octave;
+              const isSuggested =
+                suggestedNote &&
+                suggestedNote.note === keyData.note &&
+                suggestedNote.octave === keyData.octave;
+              return (
+                <WhiteKey
+                  key={`${keyData.note}${octave}`}
+                  onClick={() => playNote(keyData.note, octave)}
+                  active={isActive}
+                  suggested={isSuggested}
+                >
+                  <KeyLabel>
+                    {keyData.note}
+                    {octave}
+                  </KeyLabel>
+                </WhiteKey>
+              );
+            })}
           </WhiteKeysContainer>
-          {/* Render black keys */}
-          {createBlackKeysForOctave(octave).map((bk) => (
-            <BlackKey
-              key={`${bk.note}${octave}`}
-              leftOffset={bk.left}
-              onClick={(e) => {
-                e.stopPropagation();
-                playNote(bk.note, octave);
-              }}
-            >
-              <KeyLabel style={{ color: 'white' }}>
-                {bk.note}{octave}
-              </KeyLabel>
-            </BlackKey>
-          ))}
+          {createBlackKeysForOctave(octave).map((bk) => {
+            const isActive =
+              currentNote &&
+              currentNote.note === bk.note &&
+              currentNote.octave === bk.octave;
+            const isSuggested =
+              suggestedNote &&
+              suggestedNote.note === bk.note &&
+              suggestedNote.octave === bk.octave;
+            return (
+              <BlackKey
+                key={`${bk.note}${octave}`}
+                leftOffset={bk.left}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  playNote(bk.note, octave);
+                }}
+                active={isActive}
+                suggested={isSuggested}
+              >
+                <KeyLabel style={{ color: 'white' }}>
+                  {bk.note}
+                  {octave}
+                </KeyLabel>
+              </BlackKey>
+            );
+          })}
         </OctaveContainer>
       ))}
     </PianoContainer>
