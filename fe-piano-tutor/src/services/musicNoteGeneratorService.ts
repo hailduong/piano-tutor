@@ -1,6 +1,7 @@
 // musicNoteGeneratorService.ts
 
 import Vex from 'vexflow';
+import {USER_CONFIG} from 'config'
 
 export class MusicNoteGeneratorService {
   private levels: { [key: number]: string[] };
@@ -26,7 +27,7 @@ export class MusicNoteGeneratorService {
     const notes: Vex.StaveNote[] = [];
 
     // Generate 100 random notes from the pool
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < USER_CONFIG.NUMBER_OF_NOTES; i++) {
       const randomNote = notePool[Math.floor(Math.random() * notePool.length)];
       notes.push(
         new Vex.Flow.StaveNote({
