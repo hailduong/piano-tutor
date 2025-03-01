@@ -40,10 +40,8 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({notes, onCorrectNote})
   const [lastKeyPressIncorrect, setLastKeyPressIncorrect] = useState(false)
 
   // Clear previous rendering
-  const clearMusicSheet = () => {
-    if (musicRef.current) {
-      musicRef.current.innerHTML = ''
-    }
+  const clearMusicSheet = (context: Vex.RenderContext) => {
+    context.clear()
   }
 
   /* Handlers */
@@ -69,6 +67,15 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({notes, onCorrectNote})
         // All other notes use default color.
         note.setStyle({fillStyle: 'black'})
       }
+
+      // Add accidentals if present
+      const keys = note.getKeys()
+      keys.forEach((key, keyIndex) => {
+        const accidental = key.match(/[#b]/)
+        if (accidental) {
+          note.addModifier(new Vex.Flow.Accidental(accidental[0]), keyIndex)
+        }
+      })
     })
   }
 
@@ -80,12 +87,13 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({notes, onCorrectNote})
       return
     } // nothing to render
 
-    clearMusicSheet()
+
     const VF = Vex.Flow
     const staffWidth = Math.max(200, notes.length * USER_CONFIG.NOTE_WIDTH)
     const renderer = new VF.Renderer(musicRef.current!, VF.Renderer.Backends.SVG)
     renderer.resize(staffWidth, 200)
     const context = renderer.getContext()
+    clearMusicSheet(context)
 
     const stave = new VF.Stave(10, 40, staffWidth)
     stave.addClef('treble')
