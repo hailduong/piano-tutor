@@ -1,9 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
-import musicNotesReducer from './slices/musicNotesSlice';
+import musicNotesReducer from 'slices/musicNotesSlice';
+import performanceReducer from 'slices/performanceSlice';
 
-const store = configureStore({
+export const store = configureStore({
   reducer: {
     musicNotes: musicNotesReducer,
+    performance: performanceReducer,
+    // other reducers...
   },
 });
 

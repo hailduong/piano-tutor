@@ -7,6 +7,7 @@ import LearnMusicNotes from 'pages/LearnMusicNotes';
 import VirtualPiano from 'components/VirtualPiano';
 import { Provider } from 'react-redux';
 import store from 'store';
+import Results from 'pages/Results'
 
 // Placeholder components for the new menu items
 const PracticeSongs = () => <div><h2>Practice with Songs</h2></div>;
@@ -33,6 +34,7 @@ function App() {
             <Menu.Item key="1" icon={<FileTextOutlined />}><Link to="/learn-music-notes">Learn Music Notes</Link></Menu.Item>
             <Menu.Item key="2" icon={<TrophyOutlined />}><Link to="/practice-songs">Practice with Songs</Link></Menu.Item>
             <Menu.Item key="3" icon={<TrophyOutlined />}><Link to="/challenge-yourself">Challenge Yourself</Link></Menu.Item>
+            <Menu.Item key="4" icon={<TrophyOutlined />}><Link to="/results">Results</Link></Menu.Item>
           </Menu>
         </Sider>
 
@@ -49,6 +51,7 @@ function App() {
               <Route path="/learn-music-notes" element={<LearnMusicNotes />} />
               <Route path="/practice-songs" element={<PracticeSongs />} />
               <Route path="/challenge-yourself" element={<ChallengeYourself />} />
+              <Route path="/results" element={<Results />} />
             </Routes>
           </Content>
         </Layout>

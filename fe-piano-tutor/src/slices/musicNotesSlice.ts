@@ -11,7 +11,8 @@ interface MusicNotesState {
   currentNote: Note | null;
   history: Note[];
   suggestedNote: Note | null; // The note that should be played (suggested by the system)
-  score: number;
+  score: number;  // Total accumulated score
+  lastSessionScore: number; // Score from the most recent session
 }
 
 const initialState: MusicNotesState = {
@@ -19,6 +20,7 @@ const initialState: MusicNotesState = {
   history: [],
   suggestedNote: null,
   score: 0,
+  lastSessionScore: 0,
 };
 
 const musicNotesSlice = createSlice({
@@ -38,11 +40,21 @@ const musicNotesSlice = createSlice({
     resetScore: (state) => {
       state.score = 0;
     },
+    setLastSessionScore: (state, action: PayloadAction<number>) => {
+      state.lastSessionScore = action.payload;
+    },
     clearHistory: (state) => {
       state.history = [];
     },
   },
 });
 
-export const { setCurrentNote, setSuggestedNote, incrementScore, resetScore, clearHistory } = musicNotesSlice.actions;
+export const {
+  setCurrentNote,
+  setSuggestedNote,
+  incrementScore,
+  resetScore,
+  setLastSessionScore,
+  clearHistory
+} = musicNotesSlice.actions;
 export default musicNotesSlice.reducer;
