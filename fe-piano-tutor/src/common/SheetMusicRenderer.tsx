@@ -16,11 +16,9 @@ const MusicContainer = styled.div`
     position: relative;
 `
 
-const ScrollingContainer = styled.div<{ offset: number }>`
+const ScrollingContainer = styled.div`
     display: inline-block;
     width: 3600px;
-    transform: translateX(${({offset}) => -offset}px);
-    transition: transform 0.5s ease-out;
 `
 
 // Interfaces
@@ -32,16 +30,21 @@ interface SheetMusicRendererProps {
 const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({notes, onCorrectNote}) => {
   /* Store and props */
   const musicRef = useRef<HTMLDivElement>(null)
+  const rendererRef = useRef<Vex.Renderer | null>(null)
   const dispatch = useDispatch()
   const {currentNote, suggestedNote} = useSelector((state: RootState) => state.musicNotes)
 
   /* States */
-  const [scrollOffset, setScrollOffset] = useState(0)
   const [lastKeyPressIncorrect, setLastKeyPressIncorrect] = useState(false)
 
-  // Clear previous rendering
-  const clearMusicSheet = (context: Vex.RenderContext) => {
-    context.clear()
+  // Clear previous rendering by removing SVG content
+  const clearMusicSheet = () => {
+    if (musicRef.current) {
+      // Remove all SVG elements inside the container
+      while (musicRef.current.firstChild) {
+        musicRef.current.removeChild(musicRef.current.firstChild)
+      }
+    }
   }
 
   /* Handlers */
@@ -87,13 +90,21 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({notes, onCorrectNote})
       return
     } // nothing to render
 
+    // Clean up previous SVG content to prevent stacking
+    // clearMusicSheet()
 
     const VF = Vex.Flow
     const staffWidth = Math.max(200, notes.length * USER_CONFIG.NOTE_WIDTH)
-    const renderer = new VF.Renderer(musicRef.current!, VF.Renderer.Backends.SVG)
-    renderer.resize(staffWidth, 200)
-    const context = renderer.getContext()
-    clearMusicSheet(context)
+
+    // Only create a new renderer if we don't have one
+    if (!rendererRef.current && musicRef.current) {
+      rendererRef.current = new VF.Renderer(musicRef.current, VF.Renderer.Backends.SVG)
+    }
+
+    if (rendererRef.current) {
+      rendererRef.current.resize(staffWidth, 200)
+      const context = rendererRef.current.getContext()
+      context.clear()
 
     const stave = new VF.Stave(10, 40, staffWidth)
     stave.addClef('treble')
@@ -105,7 +116,16 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({notes, onCorrectNote})
     voice.draw(context, stave)
 
     renderSheetMusic(notes, context, stave)
+    }
   }, [notes, currentNote, suggestedNote])
+
+  // Cleanup renderer on component unmount
+  useEffect(() => {
+    return () => {
+      clearMusicSheet()
+      rendererRef.current = null
+    }
+  }, [])
 
   // Check if the current note is correct.
   useEffect(() => {
@@ -125,8 +145,7 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({notes, onCorrectNote})
       }
       // Remove the note from the sheet (by calling the provided callback)
       onCorrectNote()
-      // Update scroll offset
-      setScrollOffset((prev) => prev + USER_CONFIG.NOTE_WIDTH)
+
     } else if (lastKeyPressIncorrect) {
       // Set the suggestion if the last key press was incorrect
       const key = notes[0].getKeys()[0].split('/')[0].toUpperCase()
@@ -143,7 +162,7 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({notes, onCorrectNote})
       ) : (
         <>
           <strong>{notes.length}</strong> Notes Remaining
-          <ScrollingContainer offset={0} ref={musicRef}/>
+          <ScrollingContainer ref={musicRef}/>
         </>
 
       )}
