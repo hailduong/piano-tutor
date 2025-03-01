@@ -21,13 +21,30 @@ const ScrollingContainer = styled.div`
     width: 3600px;
 `
 
+const TempoDisplay = styled.div`
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-weight: bold;
+`
+
+
 // Interfaces
 interface SheetMusicRendererProps {
   notes: Vex.StaveNote[];
-  onCorrectNote: () => void; // callback to remove the first note
+  onCorrectNote: (noteAttempted: string, timingDeviation: number) => void;
+  tempo?: number; // Beats per minute, default is 60 (1 beat per second)
 }
 
-const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({notes, onCorrectNote}) => {
+const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({
+  notes,
+  onCorrectNote,
+  tempo = 60 // Default tempo: 60 BPM (quarter note = 1 second)
+}) => {
   /* Store and props */
   const musicRef = useRef<HTMLDivElement>(null)
   const rendererRef = useRef<Vex.Renderer | null>(null)
@@ -36,6 +53,14 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({notes, onCorrectNote})
 
   /* States */
   const [lastKeyPressIncorrect, setLastKeyPressIncorrect] = useState(false)
+  const [expectedNoteTime, setExpectedNoteTime] = useState<number | null>(null)
+
+  // When component mounts, set the initial expected note time
+  useEffect(() => {
+    if (notes.length > 0 && expectedNoteTime === null) {
+      setExpectedNoteTime(Date.now())
+    }
+  }, [notes.length])
 
   // Clear previous rendering by removing SVG content
   const clearMusicSheet = () => {
@@ -90,9 +115,6 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({notes, onCorrectNote})
       return
     } // nothing to render
 
-    // Clean up previous SVG content to prevent stacking
-    // clearMusicSheet()
-
     const VF = Vex.Flow
     const staffWidth = Math.max(200, notes.length * USER_CONFIG.NOTE_WIDTH)
 
@@ -108,6 +130,10 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({notes, onCorrectNote})
 
     const stave = new VF.Stave(10, 40, staffWidth)
     stave.addClef('treble')
+
+      // Add tempo marking
+      stave.setTempo({ bpm: tempo, duration: "q" }, 0)
+
     stave.setContext(context).draw()
 
     const voice = new Voice({num_beats: notes.length, beat_value: 4})
@@ -117,7 +143,7 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({notes, onCorrectNote})
 
     renderSheetMusic(notes, context, stave)
     }
-  }, [notes, currentNote, suggestedNote])
+  }, [notes, currentNote, suggestedNote, tempo])
 
   // Cleanup renderer on component unmount
   useEffect(() => {
@@ -129,10 +155,17 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({notes, onCorrectNote})
 
   // Check if the current note is correct.
   useEffect(() => {
-    if (notes.length === 0 || !currentNote) return
+    if (notes.length === 0 || !currentNote || !expectedNoteTime) return
 
     const expectedNoteKey = notes[0].getKeys()[0].toLowerCase()
     const playedNoteKey = currentNote.note.toLowerCase() + '/' + currentNote.octave
+
+    // Calculate timing deviation
+    const currentTime = Date.now()
+    const beatDuration = 60000 / tempo // Duration of one beat in ms (quarter note)
+    const expectedTime = expectedNoteTime // When the note should have been played
+    const timingDeviation = currentTime - expectedTime
+
     if (expectedNoteKey === playedNoteKey) {
       // Correct key pressed.
       // If no suggestion was active, award a point.
@@ -143,8 +176,13 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({notes, onCorrectNote})
       if (suggestedNote !== null) {
         dispatch(setSuggestedNote(null))
       }
-      // Remove the note from the sheet (by calling the provided callback)
-      onCorrectNote()
+
+      // Call onCorrectNote with the played note and timing deviation
+      onCorrectNote(playedNoteKey, timingDeviation)
+
+      // Calculate the next expected note time
+      // Each note is expected to be played after one beat (quarter note)
+      setExpectedNoteTime(expectedNoteTime + beatDuration)
 
     } else if (lastKeyPressIncorrect) {
       // Set the suggestion if the last key press was incorrect
@@ -162,6 +200,7 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({notes, onCorrectNote})
       ) : (
         <>
           <strong>{notes.length}</strong> Notes Remaining
+          <TempoDisplay>♩ = {tempo}</TempoDisplay>
           <ScrollingContainer ref={musicRef}/>
         </>
 
