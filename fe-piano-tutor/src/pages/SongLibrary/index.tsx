@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Typography, Button, Space, Divider, Row, Col } from 'antd';
 import styled from 'styled-components';
 import { SortAscendingOutlined, SortDescendingOutlined } from '@ant-design/icons';
-import { fetchSongs, selectSortConfig, setSort } from '../../slices/songLibrarySlice';
+import { fetchSongs, selectSortConfig, setSort } from '../../store/slices/songLibrarySlice';
 import { SortOption, SortDirection } from '../../models/Song';
 import SongSearch from './SongSearch';
 import SongFilters from './SongFilters';
@@ -33,7 +33,7 @@ const SortText = styled(Paragraph)`
     margin-bottom: 0;
 `;
 
-const SongLibraryPage: React.FC = () => {
+const SongLibrary: React.FC = () => {
   const dispatch = useDispatch();
   const sortConfig = useSelector(selectSortConfig);
 
@@ -112,4 +112,4 @@ const SongLibraryPage: React.FC = () => {
   );
 };
 
-export default SongLibraryPage;
+export default SongLibrary;

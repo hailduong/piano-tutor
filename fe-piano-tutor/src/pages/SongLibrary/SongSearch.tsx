@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Input } from 'antd';
 import styled from 'styled-components';
 import { SearchOutlined } from '@ant-design/icons';
-import { setSearchQuery, selectSearchQuery } from '../../slices/songLibrarySlice';
+import { setSearchQuery, selectSearchQuery } from '../../store/slices/songLibrarySlice';
 
 const { Search } = Input;
 

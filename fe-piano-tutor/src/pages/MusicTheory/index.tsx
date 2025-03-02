@@ -1,6 +1,6 @@
 import React, {FC, useState} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
-import {RootState} from 'store'
+import {RootState} from 'store/store'
 import {Card, Typography, Row, Col, Progress, Button, Space, Tabs, List, Radio, message, Modal, Result} from 'antd'
 import {
   BookOutlined,
@@ -10,8 +10,8 @@ import {
   ArrowLeftOutlined,
   SoundOutlined
 } from '@ant-design/icons'
-import type {QuizQuestion} from 'slices/musicTheorySlice'
-import {setActiveConcept, answerQuizQuestion, markConceptAsCompleted, resetQuiz} from 'slices/musicTheorySlice'
+import type {QuizQuestion} from 'store/slices/musicTheorySlice'
+import {setActiveConcept, answerQuizQuestion, markConceptAsCompleted, resetQuiz} from 'store/slices/musicTheorySlice'
 import styled from 'styled-components'
 import TheoryInPractice from 'pages/MusicTheory/TheoryInPractice'
 import musicTheoryConcept from 'pages/MusicTheory/data/musicTheoryConcept'

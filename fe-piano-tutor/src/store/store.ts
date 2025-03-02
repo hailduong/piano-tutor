@@ -11,10 +11,10 @@ import {
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; // defaults to localStorage
 
-import musicNotesReducer from 'slices/musicNotesSlice';
-import performanceReducer from 'slices/performanceSlice';
-import musicTheoryReducer from 'slices/musicTheorySlice';
-import songLibraryReducer from 'slices/songLibrarySlice';
+import musicNotesReducer from 'store/slices/musicNotesSlice';
+import performanceReducer from 'store/slices/performanceSlice';
+import musicTheoryReducer from 'store/slices/musicTheorySlice';
+import songLibraryReducer from 'store/slices/songLibrarySlice';
 
 // Persist configuration
 const persistConfig = {

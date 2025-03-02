@@ -2,7 +2,7 @@
 
 import Vex from 'vexflow'
 import {USER_CONFIG} from 'config'
-import {Note} from 'slices/musicNotesSlice'
+import {Note} from 'store/slices/musicNotesSlice'
 
 // Types for music theory concepts
 export type ScaleType = 'major' | 'minor' | 'pentatonicMajor' | 'pentatonicMinor' | 'chromatic' | 'blues';
@@ -20,7 +20,7 @@ export interface NoteGeneratorOptions {
   noteCount?: number;
 }
 
-export class MusicNoteGeneratorService {
+export class MusicNoteGenerator {
   private levels: { [key: number]: string[] }
   private noteValues: { [key: string]: number }
   private notesByValue: string[]
@@ -335,5 +335,5 @@ export class MusicNoteGeneratorService {
   }
 }
 
-export const musicNoteGenerator = new MusicNoteGeneratorService()
+export const musicNoteGenerator = new MusicNoteGenerator()
 export default musicNoteGenerator

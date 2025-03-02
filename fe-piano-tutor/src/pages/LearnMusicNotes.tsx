@@ -1,21 +1,21 @@
 import {useState, FC, useEffect, memo} from 'react'
 import {Button, Typography, Space, Modal} from 'antd'
-import {MusicNoteGeneratorService} from 'services/musicNoteGeneratorService'
+import {MusicNoteGenerator} from 'utils/musicNoteGenerator'
 import SheetMusicRenderer from 'common/SheetMusicRenderer'
 import {StaveNote} from 'vexflow'
 import {useSelector, useDispatch} from 'react-redux'
-import {RootState} from 'store'
+import {RootState} from 'store/store'
 import React from 'react'
 import {useNavigate} from 'react-router-dom'
-import {setLastSessionScore} from 'slices/musicNotesSlice'
-import {recordNotePerformance, startSession, endSession} from 'slices/performanceSlice'
+import {setLastSessionScore} from 'store/slices/musicNotesSlice'
+import {recordNotePerformance, startSession, endSession} from 'store/slices/performanceSlice'
 
 const LearnMusicNotes: FC = memo(() => {
   /* Props & Store */
   const {score} = useSelector((state: RootState) => state.musicNotes)
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const musicNoteGeneratorService = new MusicNoteGeneratorService()
+  const musicNoteGeneratorService = new MusicNoteGenerator()
   const { accuracyRate, totalNotesPlayed } = useSelector((state: RootState) => state.performance);
 
   /* States */

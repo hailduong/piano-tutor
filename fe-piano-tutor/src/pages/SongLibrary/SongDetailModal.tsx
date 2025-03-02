@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store';
-import { fetchSongDetails, selectSongDetails } from '../../slices/songLibrarySlice';
+import { RootState } from 'store/store';
+import { fetchSongDetails, selectSongDetails } from '../../store/slices/songLibrarySlice';
 import { Modal, Button, Typography, Spin } from 'antd';
 import styled from 'styled-components';
 

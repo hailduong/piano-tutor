@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Pagination } from 'antd';
 import styled from 'styled-components';
-import { setPaginationPage, selectPagination } from '../../slices/songLibrarySlice';
+import { setPaginationPage, selectPagination } from '../../store/slices/songLibrarySlice';
 
 const PaginationContainer = styled.div`
   display: flex;

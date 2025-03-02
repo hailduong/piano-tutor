@@ -1,8 +1,8 @@
 import React, {useRef, useEffect, useState} from 'react'
 import styled from 'styled-components'
 import {useDispatch, useSelector} from 'react-redux'
-import {RootState} from 'store'
-import {setCurrentNote} from 'slices/musicNotesSlice'
+import {RootState} from 'store/store'
+import {setCurrentNote} from 'store/slices/musicNotesSlice'
 import {useMusicTheory} from 'contexts/MusicTheoryContext'
 import {UpOutlined, DownOutlined} from '@ant-design/icons'
 import {Button} from 'antd'
@@ -13,7 +13,7 @@ import {
   WhiteKeysContainer,
   OctaveContainer,
   PianoContainer
-} from 'components/VirtualPiano/VirtualPiano.style'
+} from 'common/VirtualPiano/VirtualPiano.style'
 
 // Added a toggle button styled component
 const ToggleButton = styled(Button)<{ isVisible: boolean }>`

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Select, Space, Typography } from 'antd';
 import styled from 'styled-components';
-import { setFilter, selectFilters, selectSongs } from '../../slices/songLibrarySlice';
+import { setFilter, selectFilters, selectSongs } from '../../store/slices/songLibrarySlice';
 import { SongFilter } from '../../models/Song';
 
 const { Text } = Typography;

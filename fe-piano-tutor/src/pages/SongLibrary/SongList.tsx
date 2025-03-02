@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { Empty, Spin, Alert } from 'antd';
 import styled from 'styled-components';
-import { selectCurrentPageSongs, selectIsLoading, selectError } from '../../slices/songLibrarySlice';
+import { selectCurrentPageSongs, selectIsLoading, selectError } from '../../store/slices/songLibrarySlice';
 import SongListItem from './SongListItem';
 import SongPagination from './SongPagination';
 

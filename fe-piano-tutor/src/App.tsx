@@ -2,15 +2,15 @@ import React, {useEffect} from 'react'
 import {BrowserRouter as Router, Route, Link, Routes} from 'react-router-dom'
 import {Layout, Menu} from 'antd'
 import {ReadOutlined, BookOutlined, PlayCircleOutlined, ThunderboltOutlined, BarChartOutlined} from '@ant-design/icons'
-import {initMidi} from 'services/midiService'
+import {initMidi} from 'utils/midiUtil'
 import LearnMusicNotes from 'pages/LearnMusicNotes'
-import VirtualPiano from 'components/VirtualPiano'
+import VirtualPiano from 'common/VirtualPiano'
 import {Provider} from 'react-redux'
-import store from 'store'
+import store from 'store/store'
 import Results from 'pages/Results'
 import MusicTheory from 'pages/MusicTheory'
 import {MusicTheoryProvider} from 'contexts/MusicTheoryContext'
-import SongLibraryPage from 'pages/learnSongs/SongLibraryPage'
+import SongLibrary from 'pages/SongLibrary'
 
 
 // Placeholder components for the new menu items
@@ -59,7 +59,7 @@ function App() {
                 <Routes>
                   <Route path="/music-theory" element={<MusicTheory/>}/>
                   <Route path="/learn-music-notes" element={<LearnMusicNotes/>}/>
-                  <Route path="/learn-songs" element={<SongLibraryPage/>}/>
+                  <Route path="/learn-songs" element={<SongLibrary/>}/>
                   <Route path="/challenge-yourself" element={<ChallengeYourself/>}/>
                   <Route path="/results" element={<Results/>}/>
                   {/* Default route */}

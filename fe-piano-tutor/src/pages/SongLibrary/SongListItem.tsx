@@ -4,8 +4,8 @@ import {Card, Typography, Tag, Button, Space} from 'antd'
 import styled from 'styled-components'
 import {RightOutlined, InfoCircleOutlined} from '@ant-design/icons'
 import {Song} from '../../models/Song'
-import SongDetailModal from 'pages/learnSongs/SongDetailModal'
-import {selectSong} from 'slices/songLibrarySlice'
+import SongDetailModal from 'pages/SongLibrary/SongDetailModal'
+import {selectSong} from 'store/slices/songLibrarySlice'
 import { useDispatch } from 'react-redux'
 
 const {Title, Text} = Typography
