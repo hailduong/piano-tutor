@@ -14,7 +14,7 @@ import type {QuizQuestion} from 'slices/musicTheorySlice'
 import {setActiveConcept, answerQuizQuestion, markConceptAsCompleted, resetQuiz} from 'slices/musicTheorySlice'
 import styled from 'styled-components'
 import TheoryInPractice from 'pages/MusicTheory/TheoryInPractice'
-import musicConceptData from 'pages/MusicTheory/musicConceptData'
+import musicTheoryConcept from 'pages/MusicTheory/data/musicTheoryConcept'
 
 const {Title, Text, Paragraph} = Typography
 const {TabPane} = Tabs
@@ -228,7 +228,7 @@ const MusicTheory: FC = () => {
             }
             key="learn"
           >
-            {musicConceptData[activeConcept.id] || (
+            {musicTheoryConcept[activeConcept.id] || (
               <Paragraph>Content for this concept is coming soon!</Paragraph>
             )}
           </TabPane>

@@ -11,7 +11,7 @@ const TheoryContent = styled.div`
     margin-bottom: 24px;
 `
 
-const musicConceptData: Record<string, React.ReactNode> = {
+const musicTheoryConcept: Record<string, React.ReactNode> = {
   'basic-notation': (
     <TheoryContent>
       <Title level={3}>Basic Music Notation</Title>
@@ -179,4 +179,4 @@ const musicConceptData: Record<string, React.ReactNode> = {
     </TheoryContent>
   )
 }
-export default musicConceptData
+export default musicTheoryConcept
