@@ -1,9 +1,12 @@
-import React from 'react'
+import React, {useState} from 'react'
 import {Link} from 'react-router-dom'
 import {Card, Typography, Tag, Button, Space} from 'antd'
 import styled from 'styled-components'
 import {RightOutlined, InfoCircleOutlined} from '@ant-design/icons'
 import {Song} from '../../models/Song'
+import SongDetailModal from 'pages/learnSongs/SongDetailModal'
+import {selectSong} from 'slices/songLibrarySlice'
+import { useDispatch } from 'react-redux'
 
 const {Title, Text} = Typography
 
@@ -79,6 +82,8 @@ const StyledLink = styled(Link)`
 `
 
 const SongListItem: React.FC<SongListItemProps> = ({song}) => {
+  const dispatch = useDispatch()
+
   // Function to get difficulty tag color
   const getDifficultyColor = (difficulty: string | number): string => {
     const difficultyStr = difficulty.toString().toLowerCase()
@@ -101,6 +106,17 @@ const SongListItem: React.FC<SongListItemProps> = ({song}) => {
 
     return 'default'
   }
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const handleClick = () => {
+    dispatch(selectSong(song.id));
+    setIsModalVisible(true);
+  };
+
+  const handleClose = () => {
+    setIsModalVisible(false);
+  };
 
   return (
     <StyledCard>
@@ -133,7 +149,7 @@ const SongListItem: React.FC<SongListItemProps> = ({song}) => {
         </DetailsContainer>
 
         <ActionsContainer>
-          <Link to={`/learn/songs/${song.id}`}>
+          <Link to={`/learn-songs/${song.id}`}>
             <Button
               type="primary"
               icon={<RightOutlined/>}
@@ -141,15 +157,15 @@ const SongListItem: React.FC<SongListItemProps> = ({song}) => {
               Learn Song
             </Button>
           </Link>
-          <Link to={`/learn/songs/${song.id}/details`}>
-            <Button
-              icon={<InfoCircleOutlined/>}
-            >
-              Details
-            </Button>
-          </Link>
+          <Button
+            onClick={handleClick}
+            icon={<InfoCircleOutlined/>}
+          >
+            Details
+          </Button>
         </ActionsContainer>
       </SongContainer>
+      <SongDetailModal songId={song.id} visible={isModalVisible} onClose={handleClose} />
     </StyledCard>
   )
 }

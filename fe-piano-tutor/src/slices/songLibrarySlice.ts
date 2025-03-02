@@ -1,6 +1,7 @@
 import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit'
 import {Song, SongFilter, SortConfig} from '../models/Song'
 import songsData from '../data/songs.json'
+import {RootState} from 'store'
 
 // Define types for the slice state
 interface SongLibraryState {
@@ -11,6 +12,8 @@ interface SongLibraryState {
   filters: SongFilter;
   sortConfig: SortConfig;
   searchQuery: string;
+  selectedSong: Song | null;
+  loading: boolean;
   pagination: {
     currentPage: number;
     itemsPerPage: number;
@@ -27,12 +30,23 @@ const initialState: SongLibraryState = {
   filters: {},
   sortConfig: {option: 'title', direction: 'asc'},
   searchQuery: '',
+  selectedSong: null,
+  loading: false,
   pagination: {
     currentPage: 1,
     itemsPerPage: 10,
     totalItems: 0
   }
 }
+
+export const fetchSongDetails = createAsyncThunk(
+  'songLibrary/fetchSongDetails',
+  async (songId: string) => {
+    const response = await fetch(`/api/songs/${songId}`);
+    const data = await response.json();
+    return data as Song;
+  }
+);
 
 // Create async thunks for fetching songs
 export const fetchSongs = createAsyncThunk('songLibrary/fetchSongs', async () => {
@@ -128,9 +142,13 @@ const songLibrarySlice = createSlice({
     },
     setPaginationPage: (state, action: PayloadAction<number>) => {
       state.pagination.currentPage = action.payload
-    }
+    },
+    selectSong: (state, action) => {
+      state.selectedSong = state.songs.find(song => song.id === action.payload);
+    },
   },
   extraReducers: (builder) => {
+    // Fetch Songs
     builder
       .addCase(fetchSongs.pending, (state) => {
         state.isLoading = true
@@ -151,11 +169,24 @@ const songLibrarySlice = createSlice({
         state.isLoading = false
         state.error = action.error.message || 'Failed to fetch songs'
       })
+
+    // Fetch song details
+    builder.addCase(fetchSongDetails.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(fetchSongDetails.fulfilled, (state, action) => {
+      state.loading = false;
+      state.selectedSong = action.payload;
+    });
+    builder.addCase(fetchSongDetails.rejected, (state) => {
+      state.loading = false;
+    });
   }
 })
 
 // Export actions
 export const {setFilter, setSort, setSearchQuery, setPaginationPage} = songLibrarySlice.actions
+export const { selectSong } = songLibrarySlice.actions;
 
 // Export selectors
 export const selectSongs = (state: { songLibrary: SongLibraryState }) => state.songLibrary.songs
@@ -172,6 +203,10 @@ export const selectSortConfig = (state: { songLibrary: SongLibraryState }) => st
 export const selectSearchQuery = (state: { songLibrary: SongLibraryState }) => state.songLibrary.searchQuery
 export const selectIsLoading = (state: { songLibrary: SongLibraryState }) => state.songLibrary.isLoading
 export const selectError = (state: { songLibrary: SongLibraryState }) => state.songLibrary.error
+
+export const selectSongDetails = (state: RootState, songId: string) =>
+  state.songLibrary.songs.find((song) => song.id === songId);
+
 
 // Export reducer
 const songLibraryReducer = songLibrarySlice.reducer

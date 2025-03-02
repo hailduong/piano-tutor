@@ -39,7 +39,7 @@ function App() {
                 <Menu.Item key="1" icon={<ReadOutlined/>}><Link to="/learn-music-notes">Learn Music
                   Notes</Link>
                 </Menu.Item>
-                <Menu.Item key="3" icon={<PlayCircleOutlined/>}><Link to="/learn/songs">Practice with
+                <Menu.Item key="3" icon={<PlayCircleOutlined/>}><Link to="/learn-songs">Practice with
                   Songs</Link></Menu.Item>
                 <Menu.Item key="4" icon={<ThunderboltOutlined/>}><Link to="/challenge-yourself">Challenge
                   Yourself</Link></Menu.Item>
@@ -59,7 +59,7 @@ function App() {
                 <Routes>
                   <Route path="/music-theory" element={<MusicTheory/>}/>
                   <Route path="/learn-music-notes" element={<LearnMusicNotes/>}/>
-                  <Route path="/learn/songs" element={<SongLibraryPage/>}/>
+                  <Route path="/learn-songs" element={<SongLibraryPage/>}/>
                   <Route path="/challenge-yourself" element={<ChallengeYourself/>}/>
                   <Route path="/results" element={<Results/>}/>
                   {/* Default route */}
