@@ -14,6 +14,7 @@ import storage from 'redux-persist/lib/storage'; // defaults to localStorage
 import musicNotesReducer from 'slices/musicNotesSlice';
 import performanceReducer from 'slices/performanceSlice';
 import musicTheoryReducer from 'slices/musicTheorySlice';
+import songLibraryReducer from 'slices/songLibrarySlice';
 
 // Persist configuration
 const persistConfig = {
@@ -37,11 +38,17 @@ const persistedMusicTheoryReducer = persistReducer(
   musicTheoryReducer
 );
 
+const persistedSongLibraryReducer = persistReducer(
+  { ...persistConfig, key: 'songLibrary' },
+  songLibraryReducer
+);
+
 export const store = configureStore({
   reducer: {
     musicNotes: persistedMusicNotesReducer,
     performance: persistedPerformanceReducer,
     musicTheory: persistedMusicTheoryReducer,
+    songLibrary: persistedSongLibraryReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

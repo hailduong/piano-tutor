@@ -1,0 +1,112 @@
+{
+  "songs": [
+    {
+      "id": "song-001",
+      "title": "Twinkle Twinkle Little Star",
+      "artist": "Traditional",
+      "genre": "Children",
+      "difficulty": "Beginner",
+      "thumbnailUrl": "/assets/images/song-thumbnails/twinkle.jpg",
+      "sheetMusicUrl": "/assets/sheet-music/twinkle.xml"
+    },
+    {
+      "id": "song-002",
+      "title": "Fur Elise",
+      "artist": "Ludwig van Beethoven",
+      "genre": "Classical",
+      "difficulty": "Intermediate",
+      "thumbnailUrl": "/assets/images/song-thumbnails/fur-elise.jpg",
+      "sheetMusicUrl": "/assets/sheet-music/fur-elise.xml"
+    },
+    {
+      "id": "song-003",
+      "title": "Canon in D",
+      "artist": "Johann Pachelbel",
+      "genre": "Classical",
+      "difficulty": "Intermediate",
+      "thumbnailUrl": "/assets/images/song-thumbnails/canon-d.jpg",
+      "sheetMusicUrl": "/assets/sheet-music/canon-d.xml"
+    },
+    {
+      "id": "song-004",
+      "title": "Moonlight Sonata",
+      "artist": "Ludwig van Beethoven",
+      "genre": "Classical",
+      "difficulty": "Advanced",
+      "thumbnailUrl": "/assets/images/song-thumbnails/moonlight-sonata.jpg",
+      "sheetMusicUrl": "/assets/sheet-music/moonlight-sonata.xml"
+    },
+    {
+      "id": "song-005",
+      "title": "Happy Birthday",
+      "artist": "Traditional",
+      "genre": "Children",
+      "difficulty": "Beginner",
+      "thumbnailUrl": "/assets/images/song-thumbnails/happy-birthday.jpg",
+      "sheetMusicUrl": "/assets/sheet-music/happy-birthday.xml"
+    },
+    {
+      "id": "song-006",
+      "title": "Clair de Lune",
+      "artist": "Claude Debussy",
+      "genre": "Impressionist",
+      "difficulty": "Advanced",
+      "thumbnailUrl": "/assets/images/song-thumbnails/clair-de-lune.jpg",
+      "sheetMusicUrl": "/assets/sheet-music/clair-de-lune.xml"
+    },
+    {
+      "id": "song-007",
+      "title": "Jingle Bells",
+      "artist": "James Lord Pierpont",
+      "genre": "Holiday",
+      "difficulty": "Beginner",
+      "thumbnailUrl": "/assets/images/song-thumbnails/jingle-bells.jpg",
+      "sheetMusicUrl": "/assets/sheet-music/jingle-bells.xml"
+    },
+    {
+      "id": "song-008",
+      "title": "River Flows in You",
+      "artist": "Yiruma",
+      "genre": "Contemporary",
+      "difficulty": "Intermediate",
+      "thumbnailUrl": "/assets/images/song-thumbnails/river-flows.jpg",
+      "sheetMusicUrl": "/assets/sheet-music/river-flows.xml"
+    },
+    {
+      "id": "song-009",
+      "title": "Prelude in C Major",
+      "artist": "J.S. Bach",
+      "genre": "Classical",
+      "difficulty": "Intermediate",
+      "thumbnailUrl": "/assets/images/song-thumbnails/prelude-c.jpg",
+      "sheetMusicUrl": "/assets/sheet-music/prelude-c.xml"
+    },
+    {
+      "id": "song-010",
+      "title": "The Entertainer",
+      "artist": "Scott Joplin",
+      "genre": "Ragtime",
+      "difficulty": "Advanced",
+      "thumbnailUrl": "/assets/images/song-thumbnails/entertainer.jpg",
+      "sheetMusicUrl": "/assets/sheet-music/entertainer.xml"
+    },
+    {
+      "id": "song-011",
+      "title": "Mary Had a Little Lamb",
+      "artist": "Traditional",
+      "genre": "Children",
+      "difficulty": "Beginner",
+      "thumbnailUrl": "/assets/images/song-thumbnails/mary-lamb.jpg",
+      "sheetMusicUrl": "/assets/sheet-music/mary-lamb.xml"
+    },
+    {
+      "id": "song-012",
+      "title": "Nuvole Bianche",
+      "artist": "Ludovico Einaudi",
+      "genre": "Contemporary",
+      "difficulty": "Intermediate",
+      "thumbnailUrl": "/assets/images/song-thumbnails/nuvole-bianche.jpg",
+      "sheetMusicUrl": "/assets/sheet-music/nuvole-bianche.xml"
+    }
+  ]
+}
