@@ -1,69 +1,31 @@
-import React, {useEffect, useRef, useState, FC} from 'react'
+import React, {useEffect, useRef, useState, FC, useMemo} from 'react'
 import Vex, {Voice, Formatter} from 'vexflow'
-import styled from 'styled-components'
 import {useDispatch, useSelector} from 'react-redux'
 import {RootState} from 'store'
 import {incrementScore, setSuggestedNote, Note} from 'slices/musicNotesSlice'
 import {USER_CONFIG} from 'config'
 import {useMusicTheory} from 'contexts/MusicTheoryContext'
+import {
+  TheoryAnnotation,
+  TempoDisplay,
+  ScrollingContainer,
+  SheetMusicRendererStyled
+} from 'common/SheetMusicRenderer/SheetMusicRenderer.styled'
 
-
-// Styled Components
-const MusicContainer = styled.div`
-    background-color: white;
-    padding: 10px;
-    border: 1px solid #ccc;
-    overflow: hidden;
-    width: 100%;
-    position: relative;
-`
-
-const ScrollingContainer = styled.div`
-    display: inline-block;
-    width: 3600px;
-`
-
-const TempoDisplay = styled.div`
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 0.9em;
-    font-weight: bold;
-`
-
-const TheoryAnnotation = styled.div`
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(225, 245, 254, 0.9);
-    padding: 5px 10px;
-    border-radius: 4px;
-    border: 1px solid #90caf9;
-    font-size: 0.9em;
-    color: #0277bd;
-    max-width: 90%;
-    text-align: center;
-`
 
 // Interfaces
 interface SheetMusicRendererProps {
-  notes: Vex.StaveNote[];
-  onCorrectNote?: (noteAttempted: string, timingDeviation: number) => void;
-  tempo?: number; // Beats per minute, default is 60 (1 beat per second)
-  rawNotes?: Note[]; // Optional: raw notes for music theory annotations
-  showTheoryHints?: boolean; // Optional: whether to show music theory hints
-  selectedConcept?: string; // Optional: which concept to highlight
+  notes: Vex.StaveNote[] | Note[]; // Accept both VexFlow StaveNotes and our own Note type
+  onCorrectNote?: (noteAttempted: string, timingDeviation: number) => void; // Make this optional
+  tempo?: number;
+  showTheoryHints?: boolean;
+  selectedConcept?: string;
 }
 
 const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({
                                                            notes,
                                                            onCorrectNote,
-                                                           tempo = 60, // Default tempo: 60 BPM (quarter note = 1 second)
-                                                           rawNotes = [],
+                                                           tempo = 60,
                                                            showTheoryHints = false,
                                                            selectedConcept = ''
                                                          }) => {
@@ -72,6 +34,32 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({
   const rendererRef = useRef<Vex.Renderer | null>(null)
   const dispatch = useDispatch()
   const {currentNote, suggestedNote} = useSelector((state: RootState) => state.musicNotes)
+
+  // Convert notes to Vex.StaveNote if they are not already
+  const vexNotes = useMemo(() => {
+    // Check if notes are already Vex.StaveNote objects
+    if (notes.length > 0 && 'getKeys' in notes[0]) {
+      return notes as Vex.StaveNote[]
+    }
+
+    // Convert Note objects to Vex.StaveNote objects
+    return (notes as Note[]).map(note => {
+      const staveNote = new Vex.Flow.StaveNote({
+        keys: [`${note.note.toLowerCase()}/${note.octave}`],
+        duration: note.length || 'q'
+      })
+
+      // Add accidentals if present
+      if (note.note.includes('#')) {
+        staveNote.addModifier(new Vex.Flow.Accidental('#'), 0)
+      } else if (note.note.includes('b')) {
+        staveNote.addModifier(new Vex.Flow.Accidental('b'), 0)
+      }
+
+      return staveNote
+    })
+  }, [notes])
+
 
   // Use music theory context if available
   const musicTheory = useMusicTheory()
@@ -143,8 +131,22 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({
     })
 
     // Add music theory annotations if enabled
-    if ((showTheoryHints || musicTheoryContext.showTheoryAnnotations) && rawNotes.length > 0) {
-      generateTheoryHint(rawNotes, musicTheoryContext.currentTheoryConcept || selectedConcept)
+    if ((showTheoryHints || musicTheoryContext.showTheoryAnnotations) && notes.length > 0) {
+      // Convert VexFlow notes to our Note type for theory hint generation
+      const appNotes = notes.map(vexNote => {
+        const keyParts = vexNote.getKeys()[0].split('/')
+        const noteName = keyParts[0].toUpperCase()
+        const octave = parseInt(keyParts[1])
+        const length = vexNote.getDuration()
+        return {
+          note: noteName,
+          octave,
+          length,
+          timestamp: Date.now()
+        } as Note
+      })
+
+      generateTheoryHint(appNotes, musicTheoryContext.currentTheoryConcept || selectedConcept)
     }
   }
 
@@ -275,13 +277,13 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({
   /* Effects */
   // Everytime the notes change, re-render the sheet music
   useEffect(() => {
-    if (notes.length === 0) {
+    if (vexNotes.length === 0) {
       clearMusicSheet()
       return
     } // nothing to render
 
     const VF = Vex.Flow
-    const staffWidth = Math.max(200, notes.length * USER_CONFIG.NOTE_WIDTH)
+    const staffWidth = Math.max(200, vexNotes.length * USER_CONFIG.NOTE_WIDTH)
 
     // Only create a new renderer if we don't have one
     if (!rendererRef.current && musicRef.current) {
@@ -301,31 +303,23 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({
 
       stave.setContext(context).draw()
 
-      const voice = new Voice({num_beats: notes.length, beat_value: 4})
-
       // Check that each note is a proper VexFlow Tickable object
-      const validNotes = notes.filter(note =>
-        note && typeof note.shouldIgnoreTicks === 'function'
-      )
-
-      // Only create a voice if we have notes
-      if (validNotes.length > 0) {
-        // Create voice with the actual number of valid notes
+      if (vexNotes.length > 0) {
         const voice = new Voice({
-          num_beats: validNotes.length,
+          num_beats: vexNotes.length,
           beat_value: 4
         })
 
-        voice.addTickables(validNotes)
+        voice.addTickables(vexNotes)
         new Formatter().joinVoices([voice]).format([voice], staffWidth - 100)
         voice.draw(context, stave)
       } else {
         console.warn('No valid notes to render')
       }
 
-      renderSheetMusic(notes, context, stave)
+      renderSheetMusic(vexNotes, context, stave)
     }
-  }, [notes, currentNote, suggestedNote, tempo, rawNotes, showTheoryHints, selectedConcept])
+  }, [vexNotes, currentNote, suggestedNote])
 
   // Cleanup renderer on component unmount
   useEffect(() => {
@@ -335,11 +329,11 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({
     }
   }, [])
 
-  // Check if the current note is correct.
+  // Check if the current note matches the expected note
   useEffect(() => {
-    if (notes.length === 0 || !currentNote || !expectedNoteTime || !onCorrectNote) return
+    if (notes.length === 0 || !currentNote || !expectedNoteTime) return
 
-    const expectedNoteKey = notes[0].getKeys()[0].toLowerCase()
+    const expectedNoteKey = vexNotes[0].getKeys()[0].toLowerCase()
     const playedNoteKey = currentNote.note.toLowerCase() + '/' + currentNote.octave
 
     // Calculate timing deviation
@@ -359,8 +353,10 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({
         dispatch(setSuggestedNote(null))
       }
 
-      // Call onCorrectNote with the played note and timing deviation
-      onCorrectNote(playedNoteKey, timingDeviation)
+      // Call onCorrectNote with the played note and timing deviation if provided
+      if (onCorrectNote) {
+        onCorrectNote(playedNoteKey, timingDeviation)
+      }
 
       // Calculate the next expected note time
       // Each note is expected to be played after one beat (quarter note)
@@ -368,30 +364,31 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({
 
     } else if (lastKeyPressIncorrect) {
       // Set the suggestion if the last key press was incorrect
-      const key = notes[0].getKeys()[0].split('/')[0].toUpperCase()
-      const octave = parseInt(notes[0].getKeys()[0].split('/')[1])
+      const key = vexNotes[0].getKeys()[0].split('/')[0].toUpperCase()
+      const octave = parseInt(vexNotes[0].getKeys()[0].split('/')[1])
       dispatch(setSuggestedNote({note: key, length: 'q', timestamp: Date.now(), octave}))
     }
-  }, [currentNote, dispatch, onCorrectNote, expectedNoteTime, notes, suggestedNote, lastKeyPressIncorrect, tempo])
+  }, [currentNote, dispatch])
+
 
   /* Render */
   return (
-    <MusicContainer>
-      {notes.length === 0 ? (
+    <SheetMusicRendererStyled>
+      {vexNotes.length === 0 ? (
         <span>Training Complete! Well done!</span>
       ) : (
         <>
-          <strong>{notes.length}</strong> Notes Remaining
+          <strong>{vexNotes.length}</strong> Notes Remaining
           <TempoDisplay>♩ = {tempo}</TempoDisplay>
           <ScrollingContainer ref={musicRef}/>
 
           {/* Show theory hint if applicable */}
-          {(showTheoryHints || musicTheoryContext.showTheoryAnnotations) && theoryHint && (
+          {showTheoryHints && theoryHint && (
             <TheoryAnnotation>{theoryHint}</TheoryAnnotation>
           )}
         </>
       )}
-    </MusicContainer>
+    </SheetMusicRendererStyled>
   )
 }
 
