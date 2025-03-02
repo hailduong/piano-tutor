@@ -63,6 +63,7 @@ const SongFilters: React.FC = () => {
         <Text>Genre:</Text>
         <Select
           value={currentFilters.genre || 'all'}
+          allowClear
           onChange={(value) => handleFilterChange('genre', value)}
           style={{ width: 150 }}
         >
@@ -78,6 +79,7 @@ const SongFilters: React.FC = () => {
       <FilterGroup>
         <Text>Difficulty:</Text>
         <Select
+          allowClear
           value={currentFilters.difficulty || 'all'}
           onChange={(value) => handleFilterChange('difficulty', value)}
           style={{ width: 150 }}

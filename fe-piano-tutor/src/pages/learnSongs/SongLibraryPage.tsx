@@ -1,10 +1,37 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Typography, Button, Space, Divider, Row, Col } from 'antd';
+import styled from 'styled-components';
+import { SortAscendingOutlined, SortDescendingOutlined } from '@ant-design/icons';
 import { fetchSongs, selectSortConfig, setSort } from '../../slices/songLibrarySlice';
 import { SortOption, SortDirection } from '../../models/Song';
 import SongSearch from './SongSearch';
 import SongFilters from './SongFilters';
 import SongList from './SongList';
+
+const { Title, Paragraph } = Typography;
+
+const PageContainer = styled.div`
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+`;
+
+const HeaderContainer = styled.div`
+    text-align: center;
+    margin-bottom: 32px;
+`;
+
+const SortContainer = styled.div`
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+`;
+
+const SortText = styled(Paragraph)`
+    margin-right: 16px;
+    margin-bottom: 0;
+`;
 
 const SongLibraryPage: React.FC = () => {
   const dispatch = useDispatch();
@@ -32,45 +59,56 @@ const SongLibraryPage: React.FC = () => {
     if (sortConfig.option !== option) {
       return null;
     }
-    return sortConfig.direction === 'asc' ? '↑' : '↓';
+    return sortConfig.direction === 'asc' ? <SortAscendingOutlined /> : <SortDescendingOutlined />;
   };
 
   return (
-    <div className="song-library-page">
-      <div className="song-library-header">
-        <h1>Browse Songs</h1>
-        <p>Discover and select songs to learn on the piano</p>
-      </div>
+    <PageContainer>
+      <HeaderContainer>
+        <Title level={2}>Browse Songs</Title>
+        <Paragraph>Discover and select songs to learn on the piano</Paragraph>
+      </HeaderContainer>
 
-      <div className="song-library-tools">
-        <SongSearch />
-        <SongFilters />
-      </div>
+      <Row gutter={[16, 16]}>
+        <Col xs={24}>
+          <SongSearch />
+        </Col>
 
-      <div className="song-library-sort">
-        <span>Sort by:</span>
-        <button
-          onClick={() => handleSortChange('title')}
-          className={sortConfig.option === 'title' ? 'active' : ''}
-        >
-          Title {renderSortIcon('title')}
-        </button>
-        <button
-          onClick={() => handleSortChange('artist')}
-          className={sortConfig.option === 'artist' ? 'active' : ''}
-        >
-          Artist {renderSortIcon('artist')}
-        </button>
-        <button
-          onClick={() => handleSortChange('difficulty')}
-          className={sortConfig.option === 'difficulty' ? 'active' : ''}
-        >
-          Difficulty {renderSortIcon('difficulty')}
-        </button>
-      </div>
+        <Col xs={24}>
+          <SongFilters />
+        </Col>
+      </Row>
+
+      <Divider />
+
+      <SortContainer>
+        <SortText>Sort by:</SortText>
+        <Space>
+          <Button
+            type={sortConfig.option === 'title' ? 'primary' : 'default'}
+            onClick={() => handleSortChange('title')}
+          >
+            Title {renderSortIcon('title')}
+          </Button>
+
+          <Button
+            type={sortConfig.option === 'artist' ? 'primary' : 'default'}
+            onClick={() => handleSortChange('artist')}
+          >
+            Artist {renderSortIcon('artist')}
+          </Button>
+
+          <Button
+            type={sortConfig.option === 'difficulty' ? 'primary' : 'default'}
+            onClick={() => handleSortChange('difficulty')}
+          >
+            Difficulty {renderSortIcon('difficulty')}
+          </Button>
+        </Space>
+      </SortContainer>
 
       <SongList />
-    </div>
+    </PageContainer>
   );
 };
 

@@ -1,102 +1,112 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Card, Typography, Tag, Button, Space } from 'antd';
-import styled from 'styled-components';
-import { RightOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { Song } from '../../models/Song';
+import React from 'react'
+import {Link} from 'react-router-dom'
+import {Card, Typography, Tag, Button, Space} from 'antd'
+import styled from 'styled-components'
+import {RightOutlined, InfoCircleOutlined} from '@ant-design/icons'
+import {Song} from '../../models/Song'
 
-const { Title, Text } = Typography;
+const {Title, Text} = Typography
 
 interface SongListItemProps {
   song: Song;
 }
 
 const StyledCard = styled(Card)`
-  margin-bottom: 16px;
-  transition: all 0.3s;
+    margin-bottom: 16px;
+    transition: all 0.3s;
 
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-`;
+    &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+`
 
 const SongContainer = styled.div`
-  display: flex;
-  align-items: center;
-`;
+    display: flex;
+    align-items: center;
+`
 
 const ThumbnailContainer = styled.div`
-  width: 100px;
-  height: 100px;
-  overflow: hidden;
-  border-radius: 4px;
-  margin-right: 16px;
-`;
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    border-radius: 4px;
+    margin-right: 16px;
+    background-color: lightgray;
+    background-size: cover;
+    background-position: center;
+`
 
 const Thumbnail = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-`;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background-color: lightgray;
+`
 
 const PlaceholderThumbnail = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f5f5f5;
-  font-size: 24px;
-  font-weight: bold;
-`;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f5f5;
+    font-size: 24px;
+    font-weight: bold;
+`
 
 const DetailsContainer = styled.div`
-  flex: 1;
-`;
+    flex: 1;
+`
 
 const MetaContainer = styled.div`
-  display: flex;
-  align-items: center;
-  margin-top: 8px;
-  gap: 8px;
-`;
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+    gap: 8px;
+`
 
 const ActionsContainer = styled.div`
-  display: flex;
-  gap: 8px;
-`;
+    display: flex;
+    gap: 8px;
+`
 
-const SongListItem: React.FC<SongListItemProps> = ({ song }) => {
+// Styled Link that looks like Ant Button
+const StyledLink = styled(Link)`
+    &.ant-btn {
+        display: inline-flex;
+        align-items: center;
+    }
+`
+
+const SongListItem: React.FC<SongListItemProps> = ({song}) => {
   // Function to get difficulty tag color
   const getDifficultyColor = (difficulty: string | number): string => {
-    const difficultyStr = difficulty.toString().toLowerCase();
+    const difficultyStr = difficulty.toString().toLowerCase()
 
     if (difficultyStr.includes('beginner')) {
-      return 'success';
+      return 'success'
     } else if (difficultyStr.includes('intermediate')) {
-      return 'warning';
+      return 'warning'
     } else if (difficultyStr.includes('advanced')) {
-      return 'error';
+      return 'error'
     }
 
     // Numerical difficulty
-    const numDifficulty = parseInt(difficultyStr);
+    const numDifficulty = parseInt(difficultyStr)
     if (!isNaN(numDifficulty)) {
-      if (numDifficulty <= 3) return 'success';
-      if (numDifficulty <= 7) return 'warning';
-      return 'error';
+      if (numDifficulty <= 3) return 'success'
+      if (numDifficulty <= 7) return 'warning'
+      return 'error'
     }
 
-    return 'default';
-  };
+    return 'default'
+  }
 
   return (
     <StyledCard>
       <SongContainer>
-        <ThumbnailContainer>
-          {song.thumbnailUrl ? (
-            <Thumbnail src={song.thumbnailUrl} alt={`${song.title} thumbnail`} />
-          ) : (
+        <ThumbnailContainer style={{backgroundImage: song.thumbnailUrl ? `url(${song.thumbnailUrl})` : 'none'}}>
+          {!song.thumbnailUrl && (
             <PlaceholderThumbnail>
               {song.title.substring(0, 2)}
             </PlaceholderThumbnail>
@@ -104,7 +114,7 @@ const SongListItem: React.FC<SongListItemProps> = ({ song }) => {
         </ThumbnailContainer>
 
         <DetailsContainer>
-          <Title level={4} style={{ margin: 0 }}>
+          <Title level={4} style={{margin: 0}}>
             {song.title}
           </Title>
 
@@ -123,25 +133,25 @@ const SongListItem: React.FC<SongListItemProps> = ({ song }) => {
         </DetailsContainer>
 
         <ActionsContainer>
-          <Button
-            type="primary"
-            icon={<RightOutlined />}
-            as={Link}
-            to={`/learn/songs/${song.id}`}
-          >
-            Learn Song
-          </Button>
-          <Button
-            icon={<InfoCircleOutlined />}
-            as={Link}
-            to={`/learn/songs/${song.id}/details`}
-          >
-            Details
-          </Button>
+          <Link to={`/learn/songs/${song.id}`}>
+            <Button
+              type="primary"
+              icon={<RightOutlined/>}
+            >
+              Learn Song
+            </Button>
+          </Link>
+          <Link to={`/learn/songs/${song.id}/details`}>
+            <Button
+              icon={<InfoCircleOutlined/>}
+            >
+              Details
+            </Button>
+          </Link>
         </ActionsContainer>
       </SongContainer>
     </StyledCard>
-  );
-};
+  )
+}
 
-export default SongListItem;
+export default SongListItem
