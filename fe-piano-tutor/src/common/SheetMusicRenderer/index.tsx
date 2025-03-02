@@ -11,6 +11,7 @@ import {
   ScrollingContainer,
   SheetMusicRendererStyled
 } from 'common/SheetMusicRenderer/SheetMusicRenderer.styled'
+import musicTheoryUtil from 'utils/musicTheory'
 
 
 // Interfaces
@@ -146,132 +147,9 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({
         } as Note
       })
 
-      generateTheoryHint(appNotes, musicTheoryContext.currentTheoryConcept || selectedConcept)
+      const hint = musicTheoryUtil.generateTheoryHint(appNotes, musicTheoryContext.currentTheoryConcept || selectedConcept)
+      setTheoryHint(hint)
     }
-  }
-
-  // Generate music theory hints based on the displayed notes
-  const generateTheoryHint = (notes: Note[], conceptType: string): void => {
-    if (!notes || notes.length === 0) {
-      setTheoryHint('')
-      return
-    }
-
-    let hint = ''
-
-    // Generate different hints based on the selected concept
-    switch (conceptType) {
-      case 'intervals':
-        if (notes.length >= 2) {
-          hint = getIntervalHint(notes[0], notes[1])
-        }
-        break
-      case 'scales-keys':
-        if (notes.length >= 3) {
-          hint = getScaleHint(notes)
-        }
-        break
-      case 'chords':
-        if (notes.length >= 3) {
-          hint = getChordHint(notes)
-        }
-        break
-      case 'basic-notation':
-        hint = `Note: ${notes[0].note}${notes[0].octave} - ${getNotePosition(notes[0])}`
-        break
-      case 'rhythm-basics':
-        hint = `${notes[0].length === 'q' ? 'Quarter Note' :
-          notes[0].length === 'h' ? 'Half Note' :
-            notes[0].length === 'w' ? 'Whole Note' :
-              notes[0].length === '8' ? 'Eighth Note' :
-                'Note'} (${notes[0].note}${notes[0].octave})`
-        break
-      default:
-        // Default hint about note names
-        if (notes.length > 0) {
-          hint = `Note: ${notes[0].note}${notes[0].octave}`
-        }
-    }
-
-    setTheoryHint(hint)
-  }
-
-  // Helper functions for theory explanations
-  const getIntervalHint = (note1: Note, note2: Note): string => {
-    // Simplified interval calculation (would need to be enhanced for a real app)
-    const noteValues: Record<string, number> = {
-      'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3,
-      'E': 4, 'F': 5, 'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8,
-      'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11
-    }
-
-    const value1 = noteValues[note1.note] + (note1.octave * 12)
-    const value2 = noteValues[note2.note] + (note2.octave * 12)
-    const semitones = Math.abs(value2 - value1)
-
-    // Map semitones to interval names
-    const intervalNames: Record<number, string> = {
-      0: 'Unison', 1: 'Minor 2nd', 2: 'Major 2nd', 3: 'Minor 3rd',
-      4: 'Major 3rd', 5: 'Perfect 4th', 7: 'Perfect 5th',
-      8: 'Minor 6th', 9: 'Major 6th', 10: 'Minor 7th',
-      11: 'Major 7th', 12: 'Octave'
-    }
-
-    return `Interval: ${intervalNames[semitones] || `${semitones} semitones`}`
-  }
-
-  const getScaleHint = (notes: Note[]): string => {
-    // Very simplified - just check for common patterns
-    const firstNote = notes[0].note.replace('#', '').replace('b', '')
-
-    // Check for C major scale pattern
-    if (notes.length >= 7) {
-      const noteNames = notes.map(n => n.note.replace('#', '').replace('b', ''))
-      if (['C', 'D', 'E', 'F', 'G', 'A', 'B'].every(note => noteNames.includes(note))) {
-        return `${firstNote} Major Scale`
-      }
-    }
-
-    return `Scale starting with ${firstNote}`
-  }
-
-  const getChordHint = (notes: Note[]): string => {
-    // Very simplified - just check for common chord types based on first note
-    const rootNote = notes[0].note
-
-    if (notes.length === 3) {
-      // Simplified major/minor detection
-      const noteNames = notes.map(n => n.note)
-      if (noteNames.includes('E') && noteNames.includes('G') && rootNote === 'C') {
-        return 'C Major Chord (C-E-G)'
-      } else if (noteNames.includes('Eb') && noteNames.includes('G') && rootNote === 'C') {
-        return 'C Minor Chord (C-Eb-G)'
-      }
-    }
-
-    return `Chord based on ${rootNote}`
-  }
-
-  const getNotePosition = (note: Note): string => {
-    // Return the position of the note on the staff
-    const positions: Record<string, string> = {
-      'C': 'First ledger line below the staff',
-      'D': 'Space below the staff',
-      'E': 'First line',
-      'F': 'First space',
-      'G': 'Second line',
-      'A': 'Second space',
-      'B': 'Third line',
-      'C5': 'Third space',
-      'D5': 'Fourth line',
-      'E5': 'Fourth space',
-      'F5': 'Fifth line',
-      'G5': 'Space above the staff',
-      'A5': 'Ledger line above the staff'
-    }
-
-    const key = note.note + (note.octave >= 5 ? note.octave : '')
-    return positions[key] || 'On the staff'
   }
 
   /* Effects */
@@ -378,11 +256,12 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = ({
         <span>Training Complete! Well done!</span>
       ) : (
         <>
+          {/* Sheet Music */}
           <strong>{vexNotes.length}</strong> Notes Remaining
           <TempoDisplay>♩ = {tempo}</TempoDisplay>
           <ScrollingContainer ref={musicRef}/>
 
-          {/* Show theory hint if applicable */}
+          {/* Theory Hints */}
           {showTheoryHints && theoryHint && (
             <TheoryAnnotation>{theoryHint}</TheoryAnnotation>
           )}
