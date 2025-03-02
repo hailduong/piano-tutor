@@ -1,11 +1,13 @@
 import React, {FC} from 'react'
-import {Button, Typography, Card, Space, Row, Col, Statistic} from 'antd'
+import {Button, Typography, Card, Space, Row, Col, Statistic, Tabs} from 'antd'
 import {useSelector} from 'react-redux'
 import {useNavigate, useLocation} from 'react-router-dom'
 import {RootState} from 'store'
-import {TrophyOutlined, ArrowLeftOutlined, ReloadOutlined} from '@ant-design/icons'
+import {TrophyOutlined, ArrowLeftOutlined, ReloadOutlined, BookOutlined} from '@ant-design/icons'
+import MusicTheoryStats from 'components/MusicTheoryStats'
 
 const {Title, Text} = Typography
+const {TabPane} = Tabs
 
 type TLocationState = {
   source?: string;
@@ -28,10 +30,15 @@ const Results: FC = () => {
   /* Render */
   return (
     <div style={{padding: '20px', textAlign: 'center'}}>
-      <Card style={{maxWidth: 500, margin: '0 auto', padding: 20}}>
+      <Card style={{maxWidth: 600, margin: '0 auto', padding: 20}}>
         <TrophyOutlined style={{fontSize: 48, color: '#faad14', marginBottom: 16}}/>
         <Title level={2}>{message}</Title>
 
+        <Tabs defaultActiveKey="performance" centered>
+          <TabPane
+            tab={<span><TrophyOutlined /> Performance</span>}
+            key="performance"
+          >
         <Row gutter={16} style={{marginBottom: 20}}>
           <Col span={12}>
             <Card>
@@ -82,7 +89,17 @@ const Results: FC = () => {
             </Card>
           </Col>
         </Row>
-        <Space>
+          </TabPane>
+
+          <TabPane
+            tab={<span><BookOutlined /> Music Theory</span>}
+            key="musicTheory"
+          >
+            <MusicTheoryStats />
+          </TabPane>
+        </Tabs>
+
+        <Space style={{marginTop: 20}}>
           {sourceActivity === 'learn-music-notes' && (
             <Button
               type="primary"
@@ -91,6 +108,16 @@ const Results: FC = () => {
               onClick={() => navigate('/learn-music-notes')}
             >
               Practice Again
+            </Button>
+          )}
+          {sourceActivity === 'music-theory' && (
+            <Button
+              type="primary"
+              icon={<BookOutlined/>}
+              block
+              onClick={() => navigate('/music-theory')}
+            >
+              Return to Music Theory
             </Button>
           )}
           <Button
