@@ -1,7 +1,14 @@
 import React, {useEffect} from 'react'
 import {BrowserRouter as Router, Route, Link, Routes} from 'react-router-dom'
 import {Layout, Menu} from 'antd'
-import {ReadOutlined, BookOutlined, PlayCircleOutlined, ThunderboltOutlined, BarChartOutlined, SoundOutlined} from '@ant-design/icons'
+import {
+  ReadOutlined,
+  BookOutlined,
+  PlayCircleOutlined,
+  ThunderboltOutlined,
+  BarChartOutlined,
+  SoundOutlined
+} from '@ant-design/icons'
 import {initMidi} from 'utils/midiUtil'
 import LearnMusicNotes from 'pages/LearnMusicNotes/LearnMusicNotes'
 import VirtualPiano from 'common/VirtualPiano'
@@ -13,7 +20,6 @@ import {MusicTheoryProvider} from 'contexts/MusicTheoryContext'
 import SongLibrary from 'pages/SongLibrary'
 import LearnSongPage from 'pages/LearnSong/LearnSongPage'
 import SoundTest from 'pages/SoundTest'
-
 
 // Placeholder components for the new menu items
 const ChallengeYourself = () => <div><h2>Challenge Yourself</h2></div>
@@ -31,11 +37,21 @@ function App() {
         <Router>
           <Layout style={{minHeight: '100vh'}}>
             {/* Vertical Menu */}
-            <Sider width={200} style={{background: '#fff'}}>
+            <Sider width={280} style={{background: '#fff'}}>
+              <div style={{
+                padding: '16px',
+                textAlign: 'center',
+                fontSize: '18px',
+                fontWeight: 700,
+                color: '#512da8',
+                borderBottom: '1px solid #f0f0f0'
+              }}>
+                AI Piano Tutor
+              </div>
               <Menu
                 mode="inline"
                 defaultSelectedKeys={['1']}
-                style={{height: '100%', borderRight: 0}}
+                style={{height: 'calc(100% - 53px)', borderRight: 0}}
               >
                 <Menu.Item key="2" icon={<BookOutlined/>}><Link to="/music-theory">Music Theory</Link></Menu.Item>
                 <Menu.Item key="1" icon={<ReadOutlined/>}><Link to="/learn-music-notes">Learn Music
@@ -56,7 +72,9 @@ function App() {
                 style={{
                   padding: 24,
                   margin: 0,
-                  minHeight: 280
+                  minHeight: 280,
+                  overflow: 'auto', // Make content scrollable
+                  marginBottom: '170px' // Add bottom margin to avoid overlap with VirtualPiano
                 }}
               >
                 <Routes>

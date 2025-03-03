@@ -31,10 +31,11 @@ const musicTheoryConcept: Record<string, React.ReactNode> = {
         A clef is a musical symbol used to indicate which notes are represented by the lines and spaces on the staff.
       </Paragraph>
       <ul>
-        <li><strong>Treble Clef (G clef)</strong>: Used for higher-pitched instruments and typically the right hand in
+        <li><span className="large notation">𝄞</span><strong>Treble Clef (G clef)</strong>: Used for higher-pitched
+          instruments and typically the right hand in
           piano music.
         </li>
-        <li><strong>Bass Clef (F clef)</strong>: Used for lower-pitched instruments and typically the left hand in piano
+        <li><span className="large notation">𝄢</span><strong>Bass Clef (F clef)</strong>: Used for lower-pitched instruments and typically the left hand in piano
           music.
         </li>
       </ul>
@@ -45,10 +46,10 @@ const musicTheoryConcept: Record<string, React.ReactNode> = {
         pitch, while its shape indicates its duration.
       </Paragraph>
       <ul>
-        <li><strong>Whole note</strong>: An empty oval (○) that lasts for 4 beats in 4/4 time.</li>
-        <li><strong>Half note</strong>: An empty oval with a stem (𝅗𝅥) that lasts for 2 beats in 4/4 time.</li>
-        <li><strong>Quarter note</strong>: A filled oval with a stem (♩) that lasts for 1 beat in 4/4 time.</li>
-        <li><strong>Eighth note</strong>: A filled oval with a stem and a flag (♪) that lasts for 1/2 beat in 4/4 time.
+        <li><strong>Whole note</strong>: An empty oval (<span className="large notation">𝅗</span>) that lasts for 4 beats in 4/4 time.</li>
+        <li><strong>Half note</strong>: An empty oval with a stem (<span className="large notation">𝅗𝅥</span>) that lasts for 2 beats in 4/4 time.</li>
+        <li><strong>Quarter note</strong>: A filled oval with a stem (<span className="large notation">𝅘𝅥</span>) that lasts for 1 beat in 4/4 time.</li>
+        <li><strong>Eighth note</strong>: A filled oval with a stem and a flag (<span className="large notation">𝅘𝅥𝅮</span>) that lasts for 1/2 beat in 4/4 time.
         </li>
       </ul>
     </TheoryContent>

@@ -32,7 +32,7 @@ const Results: FC = () => {
     <div style={{padding: '20px', textAlign: 'center'}}>
       <Card style={{maxWidth: 600, margin: '0 auto', padding: 20}}>
         <TrophyOutlined style={{fontSize: 48, color: '#faad14', marginBottom: 16}}/>
-        <Title level={2}>{message}</Title>
+        <h2>{message}</h2>
 
         <Tabs defaultActiveKey="performance" centered>
           <TabPane

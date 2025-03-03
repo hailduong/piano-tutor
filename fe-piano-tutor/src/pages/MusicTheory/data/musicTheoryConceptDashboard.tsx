@@ -11,7 +11,7 @@ export const concepts: MusicTheoryConcept[] = [
     id: 'basic-notation',
     title: 'Basic Music Notation',
     description: 'Learn about the staff, clefs, and basic note values in music notation.',
-    image: '/images/basic-notation.png',
+    image: '/images/basic-notation.jpg',
     completed: false,
   },
   {

@@ -13,13 +13,14 @@ import {
   WhiteKeysContainer,
   OctaveContainer,
   PianoContainer
-} from 'common/VirtualPiano/VirtualPiano.style'
+} from 'common/VirtualPiano/styles/VirtualPiano.style'
+import { useMIDIHandler } from 'pages/LearnSong/hooks/useMIDIHandler'
 
 // Added a toggle button styled component
 const ToggleButton = styled(Button)<{ isVisible: boolean }>`
     position: fixed;
-    bottom: ${props => props.isVisible ? '160px' : '20px'};
-    right: 20px;
+    bottom: ${props => props.isVisible ? '138px' : '20px'};
+    right: 0;
     z-index: 1001;
     display: flex;
     align-items: center;
@@ -43,10 +44,14 @@ const baseFrequencies: { [note: string]: number } = {
   'A#': 466.16
 }
 
-const getFrequency = (note: string, octave: number): number => {
-  const base = baseFrequencies[note]
-  if (!base) return 0
-  return base * Math.pow(2, octave - 4)
+// MIDI note conversion helper
+const getNoteToMIDI = (note: string, octave: number): number => {
+  const noteValues: { [key: string]: number } = {
+    'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5,
+    'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11
+  }
+
+  return (octave + 1) * 12 + noteValues[note]
 }
 
 // White keys for one octave (C, D, E, F, G, A, B)
@@ -87,7 +92,7 @@ const createBlackKeysForOctave = (octave: number): BlackKeyData[] => {
 
 const VirtualPiano: React.FC = () => {
   const [isVisible, setIsVisible] = useState(true)
-  const audioContextRef = useRef<AudioContext | null>(null)
+  const { playNote, instrumentLoading } = useMIDIHandler()
   const dispatch = useDispatch()
   const {currentNote, suggestedNote} = useSelector((state: RootState) => state.musicNotes)
   const {showTheoryAnnotations, currentTheoryConcept} = useMusicTheory()
@@ -95,12 +100,6 @@ const VirtualPiano: React.FC = () => {
   const toggleVisibility = () => {
     setIsVisible(!isVisible)
   }
-
-  useEffect(() => {
-    if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
-    }
-  }, [])
 
   // Add a function for getting theory hints for each key
   const getTheoryHint = (note: string, octave: number): string | null => {
@@ -127,7 +126,7 @@ const VirtualPiano: React.FC = () => {
   return null
   }
 
-  const playNote = (note: string, octave: number) => {
+  const handlePlayNote = (note: string, octave: number) => {
     const noteData = {
       note,
       length: 'q', // default quarter note
@@ -138,21 +137,9 @@ const VirtualPiano: React.FC = () => {
     // Dispatch the note info to Redux
     dispatch(setCurrentNote(noteData))
 
-    const frequency = getFrequency(note, octave)
-    if (!frequency || !audioContextRef.current) return
-
-    const oscillator = audioContextRef.current.createOscillator()
-    const gainNode = audioContextRef.current.createGain()
-
-    oscillator.frequency.value = frequency
-    oscillator.type = 'sine'
-    oscillator.connect(gainNode)
-    gainNode.connect(audioContextRef.current.destination)
-
-    oscillator.start()
-    gainNode.gain.setValueAtTime(1, audioContextRef.current.currentTime)
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContextRef.current.currentTime + 0.5)
-    oscillator.stop(audioContextRef.current.currentTime + 0.5)
+    // Convert to MIDI note number and play using the MIDI handler
+    const midiNote = getNoteToMIDI(note, octave)
+    playNote(midiNote, 500, 100) // 500ms duration, medium velocity
   }
 
   // Render three octaves: lower (3), middle (4), upper (5)
@@ -166,12 +153,12 @@ const VirtualPiano: React.FC = () => {
         onClick={toggleVisibility}
         isVisible={isVisible}
       />
-      <PianoContainer isVisible={isVisible}>
+      <PianoContainer className='shadow-lg' isVisible={isVisible}>
+        {instrumentLoading && <div style={{color: 'white', padding: '10px'}}>Loading piano sounds...</div>}
         {octaves.map((octave) => (
           <OctaveContainer key={octave}>
             <WhiteKeysContainer>
               {createWhiteKeysForOctave(octave).map((keyData) => {
-                // Determine if this key should be highlighted as active or suggested
                 const isActive =
                   currentNote &&
                   currentNote.note === keyData.note &&
@@ -183,7 +170,7 @@ const VirtualPiano: React.FC = () => {
                 return (
                   <WhiteKey
                     key={`${keyData.note}${octave}`}
-                    onClick={() => playNote(keyData.note, octave)}
+                    onClick={() => handlePlayNote(keyData.note, octave)}
                     active={isActive}
                     suggested={isSuggested}
                   >
@@ -191,8 +178,6 @@ const VirtualPiano: React.FC = () => {
                       {keyData.note}
                       {octave}
                     </KeyLabel>
-
-                    {/* Add theory hint if available */}
                     {showTheoryAnnotations && (
                       <div style={{
                         fontSize: '8px',
@@ -223,7 +208,7 @@ const VirtualPiano: React.FC = () => {
                   leftOffset={bk.left}
                   onClick={(e) => {
                     e.stopPropagation()
-                    playNote(bk.note, octave)
+                    handlePlayNote(bk.note, octave)
                   }}
                   active={isActive}
                   suggested={isSuggested}
@@ -232,7 +217,6 @@ const VirtualPiano: React.FC = () => {
                     {bk.note}
                     {octave}
                   </KeyLabel>
-                  {/* Add theory hint if available */}
                   {showTheoryAnnotations && (
                     <div style={{
                       fontSize: '8px',

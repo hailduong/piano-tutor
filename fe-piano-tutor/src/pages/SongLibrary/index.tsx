@@ -65,7 +65,7 @@ const SongLibrary: React.FC = () => {
   return (
     <PageContainer>
       <HeaderContainer>
-        <Title level={2}>Browse Songs</Title>
+        <Title level={1}>Browse Songs</Title>
         <Paragraph>Discover and select songs to learn on the piano</Paragraph>
       </HeaderContainer>
 

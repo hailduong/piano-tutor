@@ -33,7 +33,7 @@ const ConceptCard = styled(Card)<{ completed: boolean }>`
 
 const ConceptImage = styled.div<{ imgSrc?: string }>`
     width: 100%;
-    height: 150px;
+    height: 50px;
     border-radius: 4px;
     margin-bottom: 16px;
     background: ${props => props.imgSrc ? `url(${props.imgSrc}) center/cover no-repeat` : '#f0f2f5'};
@@ -42,17 +42,23 @@ const ConceptImage = styled.div<{ imgSrc?: string }>`
     justify-content: center;
     color: #999;
     font-size: 18px;
-`;
+`
 
 const QuizContainer = styled.div`
-    padding: 20px;
     background-color: #f5f5f5;
     border-radius: 8px;
     margin-top: 20px;
 `
 
-// Placeholder content for concepts
+const ConceptList = styled.div`
+  
+`
 
+const ConceptDetail = styled.div`
+    .ant-tabs-nav-list .ant-icon {
+        margin-right: 8px;
+    }
+`
 
 const MusicTheory: FC = () => {
   const dispatch = useDispatch()
@@ -149,8 +155,8 @@ const MusicTheory: FC = () => {
 
   // Render concept list view
   const renderConceptList = () => (
-    <div style={{padding: '20px'}}>
-      <Title level={2}>Music Theory</Title>
+    <ConceptList style={{padding: '20px'}}>
+      <Title level={1}>Music Theory</Title>
       <Paragraph>
         Explore these fundamental music theory concepts to enhance your piano playing skills.
         Each topic includes learning materials and a quiz to test your knowledge.
@@ -184,7 +190,7 @@ const MusicTheory: FC = () => {
                 title={concept.title}
                 description={
                   <div>
-                    <Text>{concept.description}</Text>
+                    <div style={{'minHeight': '50px'}}>{concept.description}</div>
                     <Progress
                       percent={conceptProgress[concept.id] || 0}
                       size="small"
@@ -198,7 +204,7 @@ const MusicTheory: FC = () => {
           </Col>
         ))}
       </Row>
-    </div>
+    </ConceptList>
   )
 
   // Render concept detail view
@@ -206,7 +212,7 @@ const MusicTheory: FC = () => {
     if (!activeConcept) return null
 
     return (
-      <div style={{padding: '20px'}}>
+      <ConceptDetail style={{padding: '20px'}}>
         <Button
           type="text"
           icon={<ArrowLeftOutlined/>}
@@ -223,7 +229,7 @@ const MusicTheory: FC = () => {
             tab={
               <span>
                 <BookOutlined/>
-                Learn
+                <span>Learn</span>
               </span>
             }
             key="learn"
@@ -237,7 +243,7 @@ const MusicTheory: FC = () => {
             tab={
               <span>
                 <QuestionCircleOutlined/>
-                Quiz
+                <span>Quiz</span>
               </span>
             }
             key="quiz"
@@ -314,7 +320,7 @@ const MusicTheory: FC = () => {
             </QuizContainer>
           </TabPane>
           <TabPane
-            tab={<span><SoundOutlined/>Practice</span>}
+            tab={<span><SoundOutlined/><span>Practice</span></span>}
             key="practice"
           >
             <TheoryInPractice conceptId={activeConcept.id}/>
@@ -360,7 +366,7 @@ const MusicTheory: FC = () => {
             ]}
           />
         </Modal>
-      </div>
+      </ConceptDetail>
     )
   }
 
