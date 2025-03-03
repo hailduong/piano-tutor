@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Select, Space, Typography } from 'antd';
 import styled from 'styled-components';
-import { setFilter, selectFilters, selectSongs } from '../../store/slices/songLibrarySlice';
-import { SongFilter } from '../../models/Song';
+import { setFilter, selectFilters, selectSongs } from 'store/slices/songLibrarySlice';
+import { SongFilter } from 'models/Song';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -21,14 +21,29 @@ const FilterGroup = styled.div`
 `;
 
 const SongFilters: React.FC = () => {
+  /* Store */
   const dispatch = useDispatch();
   const currentFilters = useSelector(selectFilters);
   const songs = useSelector(selectSongs);
 
+  /* States */
   // Extract unique genres and difficulty levels from songs
   const [genres, setGenres] = useState<string[]>([]);
   const [difficulties, setDifficulties] = useState<string[]>([]);
 
+  /* Handlers */
+  const handleFilterChange = (filterType: keyof SongFilter, value: string) => {
+    // If "All" is selected, remove that filter
+    if (value === 'all') {
+      const newFilters = { ...currentFilters };
+      delete newFilters[filterType];
+      dispatch(setFilter(newFilters));
+    } else {
+      dispatch(setFilter({ ...currentFilters, [filterType]: value }));
+    }
+  };
+
+  /* Effects */
   useEffect(() => {
     if (songs.length) {
       // Extract unique genres
@@ -46,17 +61,7 @@ const SongFilters: React.FC = () => {
     }
   }, [songs]);
 
-  const handleFilterChange = (filterType: keyof SongFilter, value: string) => {
-    // If "All" is selected, remove that filter
-    if (value === 'all') {
-      const newFilters = { ...currentFilters };
-      delete newFilters[filterType];
-      dispatch(setFilter(newFilters));
-    } else {
-      dispatch(setFilter({ ...currentFilters, [filterType]: value }));
-    }
-  };
-
+  /* Render */
   return (
     <FilterContainer>
       <FilterGroup>

@@ -11,6 +11,7 @@ import Results from 'pages/Results'
 import MusicTheory from 'pages/MusicTheory'
 import {MusicTheoryProvider} from 'contexts/MusicTheoryContext'
 import SongLibrary from 'pages/SongLibrary'
+import LearnSongPage from 'pages/LearnSong/LearnSongPage'
 
 
 // Placeholder components for the new menu items
@@ -60,6 +61,7 @@ function App() {
                   <Route path="/music-theory" element={<MusicTheory/>}/>
                   <Route path="/learn-music-notes" element={<LearnMusicNotes/>}/>
                   <Route path="/learn-songs" element={<SongLibrary/>}/>
+                  <Route path="/learn-songs/:songId" element={<LearnSongPage/>}/>
                   <Route path="/challenge-yourself" element={<ChallengeYourself/>}/>
                   <Route path="/results" element={<Results/>}/>
                   {/* Default route */}

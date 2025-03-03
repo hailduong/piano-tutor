@@ -32,6 +32,7 @@ const SongSearch: React.FC = () => {
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         style={{ width: '100%' }}
+        size={'large'}
         allowClear
         prefix={<SearchOutlined />}
       />

@@ -15,6 +15,7 @@ import musicNotesReducer from 'store/slices/musicNotesSlice';
 import performanceReducer from 'store/slices/performanceSlice';
 import musicTheoryReducer from 'store/slices/musicTheorySlice';
 import songLibraryReducer from 'store/slices/songLibrarySlice';
+import learnSongReducer from 'store/slices/learnSongSlice'
 
 // Persist configuration
 const persistConfig = {
@@ -43,12 +44,18 @@ const persistedSongLibraryReducer = persistReducer(
   songLibraryReducer
 );
 
+const persistedLearnSongReducer = persistReducer(
+  { ...persistConfig, key: 'learnSong' },
+  learnSongReducer
+);
+
 export const store = configureStore({
   reducer: {
     musicNotes: persistedMusicNotesReducer,
     performance: persistedPerformanceReducer,
     musicTheory: persistedMusicTheoryReducer,
     songLibrary: persistedSongLibraryReducer,
+    learnSong: persistedLearnSongReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

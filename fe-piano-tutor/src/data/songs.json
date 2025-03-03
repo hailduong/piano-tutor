@@ -7,7 +7,7 @@
       "genre": "Children",
       "difficulty": "Beginner",
       "thumbnailUrl": "/assets/images/song-thumbnails/twinkle.jpg",
-      "sheetMusicUrl": "/assets/sheet-music/twinkle.xml"
+      "sheetMusicUrl": "/assets/sheet-music/twinkle.musicxml"
     },
     {
       "id": "song-002",
@@ -16,7 +16,7 @@
       "genre": "Classical",
       "difficulty": "Intermediate",
       "thumbnailUrl": "/assets/images/song-thumbnails/fur-elise.jpg",
-      "sheetMusicUrl": "/assets/sheet-music/fur-elise.xml"
+      "sheetMusicUrl": "/assets/sheet-music/fur-elise.musicxml"
     },
     {
       "id": "song-003",
@@ -25,7 +25,7 @@
       "genre": "Classical",
       "difficulty": "Intermediate",
       "thumbnailUrl": "/assets/images/song-thumbnails/canon-d.jpg",
-      "sheetMusicUrl": "/assets/sheet-music/canon-d.xml"
+      "sheetMusicUrl": "/assets/sheet-music/canon-d.musicxml"
     },
     {
       "id": "song-004",
@@ -34,7 +34,7 @@
       "genre": "Classical",
       "difficulty": "Advanced",
       "thumbnailUrl": "/assets/images/song-thumbnails/moonlight-sonata.jpg",
-      "sheetMusicUrl": "/assets/sheet-music/moonlight-sonata.xml"
+      "sheetMusicUrl": "/assets/sheet-music/moonlight-sonata.musicxml"
     },
     {
       "id": "song-005",
@@ -43,7 +43,7 @@
       "genre": "Children",
       "difficulty": "Beginner",
       "thumbnailUrl": "/assets/images/song-thumbnails/happy-birthday.jpg",
-      "sheetMusicUrl": "/assets/sheet-music/happy-birthday.xml"
+      "sheetMusicUrl": "/assets/sheet-music/happy-birthday.musicxml"
     },
     {
       "id": "song-006",
@@ -52,7 +52,7 @@
       "genre": "Impressionist",
       "difficulty": "Advanced",
       "thumbnailUrl": "/assets/images/song-thumbnails/clair-de-lune.jpg",
-      "sheetMusicUrl": "/assets/sheet-music/clair-de-lune.xml"
+      "sheetMusicUrl": "/assets/sheet-music/clair-de-lune.musicxml"
     },
     {
       "id": "song-007",
@@ -61,7 +61,7 @@
       "genre": "Holiday",
       "difficulty": "Beginner",
       "thumbnailUrl": "/assets/images/song-thumbnails/jingle-bells.jpg",
-      "sheetMusicUrl": "/assets/sheet-music/jingle-bells.xml"
+      "sheetMusicUrl": "/assets/sheet-music/jingle-bells.musicxml"
     },
     {
       "id": "song-008",
@@ -70,7 +70,7 @@
       "genre": "Contemporary",
       "difficulty": "Intermediate",
       "thumbnailUrl": "/assets/images/song-thumbnails/river-flows.jpg",
-      "sheetMusicUrl": "/assets/sheet-music/river-flows.xml"
+      "sheetMusicUrl": "/assets/sheet-music/river-flows.musicxml"
     },
     {
       "id": "song-009",
@@ -79,7 +79,7 @@
       "genre": "Classical",
       "difficulty": "Intermediate",
       "thumbnailUrl": "/assets/images/song-thumbnails/prelude-c.jpg",
-      "sheetMusicUrl": "/assets/sheet-music/prelude-c.xml"
+      "sheetMusicUrl": "/assets/sheet-music/prelude-c.musicxml"
     },
     {
       "id": "song-010",
@@ -88,7 +88,7 @@
       "genre": "Ragtime",
       "difficulty": "Advanced",
       "thumbnailUrl": "/assets/images/song-thumbnails/entertainer.jpg",
-      "sheetMusicUrl": "/assets/sheet-music/entertainer.xml"
+      "sheetMusicUrl": "/assets/sheet-music/entertainer.musicxml"
     },
     {
       "id": "song-011",
@@ -97,7 +97,7 @@
       "genre": "Children",
       "difficulty": "Beginner",
       "thumbnailUrl": "/assets/images/song-thumbnails/mary-lamb.jpg",
-      "sheetMusicUrl": "/assets/sheet-music/mary-lamb.xml"
+      "sheetMusicUrl": "/assets/sheet-music/mary-lamb.musicxml"
     },
     {
       "id": "song-012",
@@ -106,7 +106,7 @@
       "genre": "Contemporary",
       "difficulty": "Intermediate",
       "thumbnailUrl": "/assets/images/song-thumbnails/nuvole-bianche.jpg",
-      "sheetMusicUrl": "/assets/sheet-music/nuvole-bianche.xml"
+      "sheetMusicUrl": "/assets/sheet-music/nuvole-bianche.musicxml"
     }
   ]
 }
