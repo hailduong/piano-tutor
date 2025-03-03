@@ -117,7 +117,7 @@ const LearnSongPage: React.FC = () => {
 
     // Check if session is complete
     if (notesPlayed >= totalNotes) {
-      handleSessionComplete()
+      // handleSessionComplete()
     }
   }
 
@@ -193,6 +193,7 @@ const LearnSongPage: React.FC = () => {
           currentPosition={sessionProgress.currentPosition}
           onNotePlay={handleNotePlay}
           highlightEnabled={learnSongState.highlightEnabled}
+          onSongComplete={handleSessionComplete}
         />
 
         {/* Progress Information */}

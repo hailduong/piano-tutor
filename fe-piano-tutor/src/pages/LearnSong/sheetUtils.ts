@@ -1,7 +1,7 @@
 // Helper function converting duration strings to beat values in 4/4
 import Vex from 'vexflow'
 
-const durationToBeats = (duration: string): number => {
+export const durationToBeats = (duration: string): number => {
   switch (duration) {
     case 'w':
       return 4
