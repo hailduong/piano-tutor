@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react'
 import {BrowserRouter as Router, Route, Link, Routes} from 'react-router-dom'
 import {Layout, Menu} from 'antd'
-import {ReadOutlined, BookOutlined, PlayCircleOutlined, ThunderboltOutlined, BarChartOutlined} from '@ant-design/icons'
+import {ReadOutlined, BookOutlined, PlayCircleOutlined, ThunderboltOutlined, BarChartOutlined, SoundOutlined} from '@ant-design/icons'
 import {initMidi} from 'utils/midiUtil'
 import LearnMusicNotes from 'pages/LearnMusicNotes/LearnMusicNotes'
 import VirtualPiano from 'common/VirtualPiano'
@@ -12,6 +12,7 @@ import MusicTheory from 'pages/MusicTheory'
 import {MusicTheoryProvider} from 'contexts/MusicTheoryContext'
 import SongLibrary from 'pages/SongLibrary'
 import LearnSongPage from 'pages/LearnSong/LearnSongPage'
+import SoundTest from 'pages/SoundTest'
 
 
 // Placeholder components for the new menu items
@@ -45,6 +46,7 @@ function App() {
                 <Menu.Item key="4" icon={<ThunderboltOutlined/>}><Link to="/challenge-yourself">Challenge
                   Yourself</Link></Menu.Item>
                 <Menu.Item key="5" icon={<BarChartOutlined/>}><Link to="/results">Results</Link></Menu.Item>
+                <Menu.Item key="6" icon={<SoundOutlined/>}><Link to="/sound-test">Sound Test</Link></Menu.Item>
               </Menu>
             </Sider>
 
@@ -64,7 +66,7 @@ function App() {
                   <Route path="/learn-songs/:songId" element={<LearnSongPage/>}/>
                   <Route path="/challenge-yourself" element={<ChallengeYourself/>}/>
                   <Route path="/results" element={<Results/>}/>
-                  {/* Default route */}
+                  <Route path="/sound-test" element={<SoundTest/>}/>
                   <Route path="/" element={<LearnMusicNotes/>}/>
                 </Routes>
               </Content>

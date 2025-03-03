@@ -227,48 +227,6 @@ const AdvancedMusicSheet: React.FC<AdvancedMusicSheetProps> = (props) => {
       <div>
         {hasSupport ? 'MIDI support detected' : 'MIDI not supported in your browser'}
       </div>
-
-      <div style={{margin: '20px 0', padding: '10px', border: '1px solid #ccc'}}>
-        <h3>Note Playback Test</h3>
-        <div style={{display: 'flex', gap: '10px', flexWrap: 'wrap', maxWidth: '600px'}}>
-          {vexNotes.slice(0, 8).map((note, index) => (
-            <button
-              key={index}
-              onClick={() => handleTestPlay(index)}
-              style={{
-                padding: '8px 12px',
-                background: '#1890ff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Play {note.getKeys()[0]}
-            </button>
-          ))}
-        </div>
-        <button
-          onClick={() => {
-            if (isPlaying) return
-            // Test playing a chord with multiple notes
-            const demoNotes = [60, 64, 67] // C major chord
-            demoNotes.forEach(note => playNote(note, 800))
-          }}
-          style={{
-            margin: '10px 0',
-            padding: '8px 12px',
-            background: '#52c41a',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
-        >
-          Play C Major Chord
-        </button>
-      </div>
-
       <div
         ref={scrollContainerRef}
         style={{
