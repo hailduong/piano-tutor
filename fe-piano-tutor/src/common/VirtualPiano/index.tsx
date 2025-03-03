@@ -1,7 +1,7 @@
 import React, {useRef, useEffect, useState} from 'react'
 import styled from 'styled-components'
 import {useDispatch, useSelector} from 'react-redux'
-import {RootState} from 'store/store'
+import {RootState} from 'store'
 import {setCurrentNote} from 'store/slices/musicNotesSlice'
 import {useMusicTheory} from 'contexts/MusicTheoryContext'
 import {UpOutlined, DownOutlined} from '@ant-design/icons'

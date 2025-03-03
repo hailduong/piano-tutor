@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from 'store/store';
+import { RootState } from 'store';
 import { Card, Typography, Row, Col, Progress, Statistic } from 'antd';
 import { BookOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';

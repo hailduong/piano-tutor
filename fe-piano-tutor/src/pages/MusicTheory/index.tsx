@@ -1,6 +1,6 @@
 import React, {FC, useState} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
-import {RootState} from 'store/store'
+import {RootState} from 'store'
 import {Card, Typography, Row, Col, Progress, Button, Space, Tabs, List, Radio, message, Modal, Result} from 'antd'
 import {
   BookOutlined,

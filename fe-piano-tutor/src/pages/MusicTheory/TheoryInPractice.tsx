@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import {Card, Typography, Button, Space, Divider, Row, Col, Tooltip} from 'antd'
 import {useDispatch, useSelector} from 'react-redux'
-import {RootState} from 'store/store'
+import {RootState} from 'store'
 import {setSuggestedNote, Note} from 'store/slices/musicNotesSlice'
 import {useMusicTheory} from 'contexts/MusicTheoryContext'
 import SheetMusicRenderer from 'common/SheetMusicRenderer'

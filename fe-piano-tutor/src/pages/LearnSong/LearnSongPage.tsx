@@ -1,140 +1,129 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import styled from 'styled-components';
-import { Typography, Spin, Button, Space, Row, Col, Alert, Card, Modal } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import React, {useEffect, useState, useRef} from 'react'
+import {useParams, useNavigate} from 'react-router-dom'
+import {useSelector, useDispatch} from 'react-redux'
+import {Typography, Spin, Button, Row, Col, Alert, Card, Modal} from 'antd'
+import {ArrowLeftOutlined} from '@ant-design/icons'
 
 import {
   initializeSession,
-  loadSheetMusic,
+  loadSheetMusicThunk,
   selectLearnSongState,
   selectSessionProgress,
   selectIsPlaying,
-  startPlaying,
   pauseSession,
-  resumeSession,
   setCurrentNote,
   setNextNote,
   updateProgress
-} from '../../store/slices/learnSongSlice';
+} from 'store/slices/learnSongSlice'
 
-import { selectSongDetails } from '../../store/slices/songLibrarySlice';
-import { RootState } from '../../store/store';
-import SongSheetMusicRenderer from '../../common/SheetMusicRenderer/SongSheetMusicRenderer';
-import LearnSongControls from './LearnSongControls';
-import LearnSongKeyboardAdapter from '../../common/VirtualPiano/LearnSongKeyboardAdapter';
-import { IPerformanceSummary } from '../../models/LearnSong';
+import {selectSongDetails} from 'store/slices/songLibrarySlice'
+import {RootState} from 'store'
+import AdvancedMusicSheet from 'pages/LearnSong/AdvancedMusicSheet'
+import LearnSongControls from './LearnSongControls'
+import LearnSongKeyboardAdapter from '../../common/VirtualPiano/LearnSongKeyboardAdapter'
+import {IPerformanceSummary} from 'models/LearnSong'
+import {ProgressContainer, LearnSongContainer} from 'pages/LearnSong/styles/LearnSongPage.styled'
 
-const { Title, Text } = Typography;
-
-// Styled Components
-const LearnSongContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    padding: 16px;
-`;
-
-const ProgressContainer = styled.div`
-    margin-top: 24px;
-    margin-bottom: 16px;
-`;
+const {Title, Text} = Typography
 
 const LearnSongPage: React.FC = () => {
   /* Refs */
-  const sessionStartTimeRef = useRef<number | null>(null);
+  const sessionStartTimeRef = useRef<number | null>(null)
 
   /* Props & Store */
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { songId } = useParams<{ songId: string }>();
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const {songId} = useParams<{ songId: string }>()
 
-  const learnSongState = useSelector(selectLearnSongState);
-  const sessionProgress = useSelector(selectSessionProgress);
-  const isPlaying = useSelector(selectIsPlaying);
+  const learnSongState = useSelector(selectLearnSongState)
+  const sessionProgress = useSelector(selectSessionProgress)
+  const isPlaying = useSelector(selectIsPlaying)
   const songDetails = useSelector((state: RootState) =>
     songId ? selectSongDetails(state, songId) : null
-  );
+  )
 
   /* States */
-  const [loading, setLoading] = useState(true);
-  const [showSummary, setShowSummary] = useState(false);
-  const [performanceSummary, setPerformanceSummary] = useState<IPerformanceSummary | null>(null);
+  const [loading, setLoading] = useState(true)
+  const [showSummary, setShowSummary] = useState(false)
+  const [performanceSummary, setPerformanceSummary] = useState<IPerformanceSummary | null>(null)
 
   /* Effects */
   // Initialize the learning session when the component mounts
   useEffect(() => {
-    if (songId) {
-      dispatch(initializeSession({ songId }));
-      dispatch(loadSheetMusic(songId))
-        .unwrap()
-        .then(() => setLoading(false))
-        .catch((err) => {
-          console.error("Failed to load sheet music:", err);
+    const initializeAndLoadSheetMusic = async () => {
+      if (songId) {
+        try {
+          dispatch(initializeSession({ songId }));
+          await dispatch(loadSheetMusicThunk(songId)).unwrap();
           setLoading(false);
-        });
-    } else {
-      // Redirect back to song library if no song ID is provided
-      navigate('/learn-songs');
-    }
+        } catch (err) {
+          console.error('Failed to load sheet music:', err);
+          setLoading(false);
+        }
+      } else {
+        // Redirect back to song library if no song ID is provided
+        navigate('/learn-songs');
+      }
+    };
+
+    initializeAndLoadSheetMusic();
   }, [dispatch, songId, navigate]);
 
   // Track session time
   useEffect(() => {
     if (isPlaying && !sessionStartTimeRef.current) {
-      sessionStartTimeRef.current = Date.now();
+      sessionStartTimeRef.current = Date.now()
     } else if (!isPlaying && sessionStartTimeRef.current) {
       // Update session time when paused
-      const elapsedTime = Date.now() - sessionStartTimeRef.current;
-      sessionStartTimeRef.current = null;
+      const elapsedTime = Date.now() - sessionStartTimeRef.current
+      sessionStartTimeRef.current = null
       // We could dispatch an action here to update total session time
     }
-  }, [isPlaying]);
+  }, [isPlaying])
 
   /* Handlers */
   const handleTempoChange = (tempo: number) => {
     // Additional handling if needed beyond what's in the controls
-  };
+  }
 
   const handleSeek = (position: number) => {
     // Set the current note based on position
-    const noteId = `note-${position}`;
-    dispatch(setCurrentNote(noteId));
+    const noteId = `note-${position}`
+    dispatch(setCurrentNote(noteId))
 
     // Set the next note
-    const nextNoteId = `note-${position + 1}`;
-    dispatch(setNextNote(nextNoteId));
-  };
+    const nextNoteId = `note-${position + 1}`
+    dispatch(setNextNote(nextNoteId))
+  }
 
   const handleNotePlay = (noteId: string, timingDeviation: number) => {
     // Update progress
-    const totalNotes = learnSongState.sessionProgress.totalNotes;
-    const notesPlayed = learnSongState.sessionProgress.notesPlayed + 1;
+    const totalNotes = learnSongState.sessionProgress.totalNotes
+    const notesPlayed = learnSongState.sessionProgress.notesPlayed + 1
     const accuracy = timingDeviation < 300 ?
       (learnSongState.sessionProgress.accuracy * (notesPlayed - 1) + 1) / notesPlayed :
-      (learnSongState.sessionProgress.accuracy * (notesPlayed - 1)) / notesPlayed;
+      (learnSongState.sessionProgress.accuracy * (notesPlayed - 1)) / notesPlayed
 
     dispatch(updateProgress({
       notesPlayed,
       currentPosition: notesPlayed,
       accuracy
-    }));
+    }))
 
     // Set the next note
-    const currentIndex = noteId.split('-')[1] ? parseInt(noteId.split('-')[1]) : 0;
-    const nextNoteId = `note-${currentIndex + 1}`;
-    dispatch(setNextNote(nextNoteId));
+    const currentIndex = noteId.split('-')[1] ? parseInt(noteId.split('-')[1]) : 0
+    const nextNoteId = `note-${currentIndex + 1}`
+    dispatch(setNextNote(nextNoteId))
 
     // Check if session is complete
     if (notesPlayed >= totalNotes) {
-      handleSessionComplete();
+      handleSessionComplete()
     }
-  };
+  }
 
   const handleSessionComplete = () => {
     // Stop playing
-    dispatch(pauseSession());
+    dispatch(pauseSession())
 
     // Generate performance summary
     const summary: IPerformanceSummary = {
@@ -146,37 +135,37 @@ const LearnSongPage: React.FC = () => {
       elapsedTime: Date.now() - (learnSongState.startTime || Date.now()),
       songId: songId || '',
       date: new Date().toISOString()
-    };
+    }
 
-    setPerformanceSummary(summary);
-    setShowSummary(true);
-  };
+    setPerformanceSummary(summary)
+    setShowSummary(true)
+  }
 
   /* Render */
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-        <Spin tip="Loading song details and sheet music..." size="large" />
+      <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%'}}>
+        <Spin tip="Loading song details and sheet music..." size="large"/>
       </div>
-    );
+    )
   }
 
   return (
     <LearnSongKeyboardAdapter>
       <LearnSongContainer>
         {/* Header */}
-        <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
+        <Row justify="space-between" align="middle" style={{marginBottom: 16}}>
           <Col>
             <Button
               type="text"
-              icon={<ArrowLeftOutlined />}
+              icon={<ArrowLeftOutlined/>}
               onClick={() => navigate('/learn-songs')}
-              style={{ marginRight: 8 }}
+              style={{marginRight: 8}}
             />
-            <Title level={2} style={{ display: 'inline', marginRight: 16 }}>
+            <Title level={2} style={{display: 'inline', marginRight: 16}}>
               {songDetails?.title}
             </Title>
-            <Text type="secondary" style={{ fontSize: 16 }}>
+            <Text type="secondary" style={{fontSize: 16}}>
               {songDetails?.artist}
             </Text>
           </Col>
@@ -196,9 +185,9 @@ const LearnSongPage: React.FC = () => {
         />
 
         {/* Sheet Music */}
-        <SongSheetMusicRenderer
+        <AdvancedMusicSheet
           songId={songId || null}
-          sheetMusic={learnSongState.sheetMusic}
+          sheetMusicXMLString={learnSongState.sheetMusic}
           tempo={learnSongState.tempo}
           isPlaying={isPlaying}
           currentPosition={sessionProgress.currentPosition}
@@ -256,13 +245,15 @@ const LearnSongPage: React.FC = () => {
               <p><strong>Notes:</strong> {performanceSummary.totalNotes}</p>
               <p><strong>Correct:</strong> {performanceSummary.correctNotes}</p>
               <p><strong>Incorrect:</strong> {performanceSummary.incorrectNotes}</p>
-              <p><strong>Time:</strong> {Math.floor(performanceSummary.elapsedTime / 60000)}m {Math.floor((performanceSummary.elapsedTime % 60000) / 1000)}s</p>
+              <p>
+                <strong>Time:</strong> {Math.floor(performanceSummary.elapsedTime / 60000)}m {Math.floor((performanceSummary.elapsedTime % 60000) / 1000)}s
+              </p>
             </Card>
           )}
         </Modal>
       </LearnSongContainer>
     </LearnSongKeyboardAdapter>
-  );
-};
+  )
+}
 
-export default LearnSongPage;
+export default LearnSongPage

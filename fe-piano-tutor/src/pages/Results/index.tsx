@@ -2,7 +2,7 @@ import React, {FC} from 'react'
 import {Button, Typography, Card, Space, Row, Col, Statistic, Tabs} from 'antd'
 import {useSelector} from 'react-redux'
 import {useNavigate, useLocation} from 'react-router-dom'
-import {RootState} from 'store/store'
+import {RootState} from 'store'
 import {TrophyOutlined, ArrowLeftOutlined, ReloadOutlined, BookOutlined} from '@ant-design/icons'
 import MusicTheoryStats from 'pages/Results/MusicTheoryStats'
 

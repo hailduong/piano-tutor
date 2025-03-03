@@ -1,7 +1,7 @@
 import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit'
 import {Song, SongFilter, SortConfig} from 'models/Song'
 import songsData from 'data/songs.json'
-import {RootState} from 'store/store'
+import {RootState} from 'store/index'
 
 // Define types for the slice state
 interface SongLibraryState {

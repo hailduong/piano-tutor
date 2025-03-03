@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState, FC, useMemo} from 'react'
 import Vex, {Voice, Formatter} from 'vexflow'
 import {useDispatch, useSelector} from 'react-redux'
-import {RootState} from 'store/store'
+import {RootState} from 'store'
 import {incrementScore, setSuggestedNote, Note} from 'store/slices/musicNotesSlice'
 import {USER_CONFIG} from 'config'
 import {useMusicTheory} from 'contexts/MusicTheoryContext'
@@ -10,7 +10,7 @@ import {
   TempoDisplay,
   ScrollingContainer,
   SheetMusicRendererStyled
-} from 'common/SheetMusicRenderer/SheetMusicRenderer.styled'
+} from 'common/SheetMusicRenderer/styles/SheetMusicRenderer.styled'
 import musicTheoryUtil from 'utils/musicTheoryUtil'
 
 
