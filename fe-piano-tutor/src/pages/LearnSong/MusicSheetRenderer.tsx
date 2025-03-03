@@ -1,60 +1,13 @@
-import React, { useEffect, useRef } from 'react'
+import React, {useEffect, useRef} from 'react'
 import Vex from 'vexflow'
-
-// Helper function converting duration strings to beat values in 4/4
-const durationToBeats = (duration: string): number => {
-  switch (duration) {
-    case 'w':
-      return 4
-    case 'h':
-      return 2
-    case 'q':
-      return 1
-    case '8':
-      return 0.5
-    case '16':
-      return 0.25
-    default:
-      throw new Error(`Unknown duration: ${duration}`)
-  }
-}
-
-// Group notes into measures dynamically based on their duration
-const groupNotesByMeasure = (vexNotes: Vex.Flow.StaveNote[]): Vex.Flow.StaveNote[][] => {
-  const measures: Vex.Flow.StaveNote[][] = []
-  let currentMeasure: Vex.Flow.StaveNote[] = []
-  let currentBeats = 0
-  const beatsPerMeasure = 4
-
-  for (const note of vexNotes) {
-    const noteDuration = (note as any).duration as string
-    const noteBeats = durationToBeats(noteDuration)
-
-    if (currentBeats + noteBeats === beatsPerMeasure) {
-      currentMeasure.push(note)
-      measures.push(currentMeasure)
-      currentMeasure = []
-      currentBeats = 0
-    } else if (currentBeats + noteBeats > beatsPerMeasure) {
-      if (currentMeasure.length > 0) measures.push(currentMeasure)
-      currentMeasure = [note]
-      currentBeats = noteBeats
-    } else {
-      currentMeasure.push(note)
-      currentBeats += noteBeats
-    }
-  }
-
-  if (currentMeasure.length > 0) measures.push(currentMeasure)
-  return measures
-}
+import {groupNotesByMeasure} from 'pages/LearnSong/sheetUtils'
 
 interface MusicSheetRendererProps {
-  vexNotes: Vex.Flow.StaveNote[]
+  vexNotes: Vex.StaveNote[]
   onNoteElementsUpdate: (elements: Map<string, HTMLElement>) => void
 }
 
-const MusicSheetRenderer: React.FC<MusicSheetRendererProps> = ({ vexNotes, onNoteElementsUpdate }) => {
+const MusicSheetRenderer: React.FC<MusicSheetRendererProps> = ({vexNotes, onNoteElementsUpdate}) => {
   const rendererRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -83,6 +36,8 @@ const MusicSheetRenderer: React.FC<MusicSheetRendererProps> = ({ vexNotes, onNot
       const stave = new VF.Stave(offsetX, 10, currentWidth)
 
       if (i === 0) {
+        // TODO: Add key signature and time signature for multiple staves
+        // TODO: Dynamically get key/time signature from notes
         stave.addClef('treble').addTimeSignature('4/4')
         stave.setBegBarType(VF.Barline.type.SINGLE)
       }
@@ -93,7 +48,7 @@ const MusicSheetRenderer: React.FC<MusicSheetRendererProps> = ({ vexNotes, onNot
       }
       stave.setContext(context).draw()
 
-      const voice = new VF.Voice({ num_beats: 4, beat_value: 4 })
+      const voice = new VF.Voice({num_beats: 4, beat_value: 4})
       voice.addTickables(measureNotes)
       try {
         new VF.Formatter().joinVoices([voice]).format([voice], currentWidth - 40)
@@ -118,7 +73,7 @@ const MusicSheetRenderer: React.FC<MusicSheetRendererProps> = ({ vexNotes, onNot
     */
   }, [vexNotes, onNoteElementsUpdate])
 
-  return <div ref={rendererRef} />
+  return <div ref={rendererRef}/>
 }
 
 export default MusicSheetRenderer
