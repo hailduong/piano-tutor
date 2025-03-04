@@ -8,6 +8,7 @@ import performanceReducer, {IPerformanceState} from 'store/slices/performanceSli
 import musicTheoryReducer, {IMusicTheoryState} from 'store/slices/musicTheorySlice'
 import songLibraryReducer, {ISongLibraryState} from 'store/slices/songLibrarySlice'
 import learnSongReducer from 'store/slices/learnSongSlice'
+import virtualPianoReducer, {IVirtualPianoState} from 'store/slices/virtualPianoSlice'
 import settingsReducer, {ISettingsState} from 'store/slices/settingsSlice'
 import {TypedUseSelectorHook, useSelector, useDispatch} from 'react-redux'
 import {ILearnSongState} from 'models/LearnSong' // Import the new settings slice
@@ -27,7 +28,8 @@ const persistedPerformanceReducer = createPersistedReducer('performance', perfor
 const persistedMusicTheoryReducer = createPersistedReducer('musicTheory', musicTheoryReducer)
 const persistedSongLibraryReducer = createPersistedReducer('songLibrary', songLibraryReducer)
 const persistedLearnSongReducer = createPersistedReducer('learnSong', learnSongReducer)
-const persistedSettingsReducer = createPersistedReducer('settings', settingsReducer) // Persist the settings reducer
+const persistedSettingsReducer = createPersistedReducer('settings', settingsReducer)
+const persistedVirtualPianoReducer = createPersistedReducer('virtualPiano', virtualPianoReducer)
 
 export const store = configureStore({
   reducer: {
@@ -36,7 +38,8 @@ export const store = configureStore({
     performance: persistedPerformanceReducer,
     songLibrary: persistedSongLibraryReducer,
     learnSong: persistedLearnSongReducer,
-    settings: persistedSettingsReducer // Add the settings reducer
+    settings: persistedSettingsReducer,
+    virtualPiano: persistedVirtualPianoReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -50,12 +53,13 @@ export const store = configureStore({
 export const persistor = persistStore(store)
 
 export type RootState = {
+  learnSong: ILearnSongState & PersistPartial;
   musicNotes: IMusicNotesState & PersistPartial;
   musicTheory: IMusicTheoryState & PersistPartial;
   performance: IPerformanceState & PersistPartial;
-  songLibrary: ISongLibraryState & PersistPartial;
-  learnSong: ILearnSongState & PersistPartial;
   settings: ISettingsState & PersistPartial;
+  songLibrary: ISongLibraryState & PersistPartial;
+  virtualPiano: IVirtualPianoState & PersistPartial;
 };
 
 export type AppDispatch = typeof store.dispatch;

@@ -35,7 +35,7 @@ interface ILearnSongControlsProps {
   onSeek: (position: number) => void;
   currentPosition: number;
   totalNotes: number;
-  onStartPractice?: (practiceMode: boolean) => void;
+  onStartPractice?: () => void;
 }
 
 const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
@@ -158,6 +158,7 @@ const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
 
     // Start count-in with metronome
     intervalRef.current = setInterval(() => {
+      // TODO: should retrieve the number of count beats based on the time signature
       if (countRef.current < 4) {
         // Play metronome sound for each beat
         playMetronomeSound(0.8)
@@ -175,7 +176,7 @@ const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
 
         // Notify parent component to set up practice mode
         if (onStartPractice) {
-          onStartPractice(true)
+          onStartPractice()
         }
       }
     }, beatDuration)

@@ -13,7 +13,8 @@ import {
   pauseSession,
   setCurrentNote,
   setNextNote,
-  updateProgress
+  updateProgress,
+  updateSettings, seekToPosition
 } from 'store/slices/learnSongSlice'
 
 import {selectSongDetails} from 'store/slices/songLibrarySlice'
@@ -141,23 +142,18 @@ const LearnSongPage: React.FC = () => {
     setShowSummary(true)
   }
 
-  const handleStartPractice = (practiceMode: boolean) => {
-    if (practiceMode) {
-      // Set up for user practice mode (without auto-playing)
-      dispatch(updateSettings({ mode: 'practice' }));
+  const handleStartPractice = () => {
+    // Set up for user practice mode (without auto-playing)
+    dispatch(updateSettings({ mode: 'practice' }));
 
-      // Reset to initial position if needed
-      if (sessionProgress.currentPosition > 0) {
-        dispatch(seekToPosition(0));
-      }
-
-      // Important: Don't start playing automatically in practice mode
-      // Focus on the virtual piano for keyboard input
-      containerRef.current?.focus();
-    } else {
-      // Regular playback mode
-      dispatch(startPlaying());
+    // Reset to initial position if needed
+    if (sessionProgress.currentPosition > 0) {
+      dispatch(seekToPosition(0));
     }
+
+    // Important: Don't start playing automatically in practice mode
+    // Focus on the virtual piano for keyboard input
+    containerRef.current?.focus();
   };
   /* Render */
   if (loading) {

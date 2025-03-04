@@ -1,8 +1,14 @@
-import React, {useState} from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import {useDispatch, useSelector} from 'react-redux'
 import {RootState} from 'store'
-import {setCurrentNote} from 'store/slices/musicNotesSlice'
+import {
+  setCurrentNote as setVirtualPianoCurrentNote,
+  selectCurrentNote,
+  selectSuggestedNote,
+  selectPianoVisibility,
+  togglePianoVisibility
+} from 'store/slices/virtualPianoSlice'
 import {UpOutlined, DownOutlined} from '@ant-design/icons'
 import {Button} from 'antd'
 import {
@@ -33,19 +39,15 @@ const VirtualPiano: React.FC = () => {
   /* Props & Store */
   const dispatch = useDispatch()
 
-  /// Get current and suggested notes from Redux
-  const musicNotesState = useSelector((state: RootState) => state.musicNotes)
-  const currentNote = musicNotesState?.currentNote
-  const suggestedNote = musicNotesState?.suggestedNote
+  // Get piano state from Redux
+  const currentNote = useSelector(selectCurrentNote)
+  const suggestedNote = useSelector(selectSuggestedNote)
+  const isVisible = useSelector(selectPianoVisibility)
 
   // Get music theory state from Redux
   const musicTheoryState = useSelector((state: RootState) => state.musicTheory)
   const showTheoryAnnotations = musicTheoryState?.showTheoryAnnotations
   const currentTheoryConcept = musicTheoryState?.currentTheoryConcept
-
-  /* State */
-  // Control piano visibility on screen
-  const [isVisible, setIsVisible] = useState(true)
 
   /* Hooks */
   // MIDI sound handler
@@ -54,21 +56,18 @@ const VirtualPiano: React.FC = () => {
   /* Handlers */
   // Toggle piano visibility
   const toggleVisibility = () => {
-    setIsVisible(!isVisible)
+    dispatch(togglePianoVisibility())
   }
 
   // Handle note playing and state update
   const handlePlayNote = (note: string, octave: number) => {
-    const noteData = {
+    // Dispatch the note info to Redux with timestamp
+    dispatch(setVirtualPianoCurrentNote({
       note,
-      length: 'q', // default quarter note
-      timestamp: Date.now(),
-      octave
-    }
-
-    // Dispatch the note info to Redux
-    dispatch(setCurrentNote(noteData))
-
+      octave,
+      timestamp: Date.now()
+    }))
+    
     // Convert to MIDI note number and play using the MIDI handler
     const midiNote = pianoUtils.getNoteToMIDI(note, octave)
     playNote(midiNote, 500, 100) // 500ms duration, medium velocity
