@@ -13,6 +13,7 @@ export interface IMusicNotesState {
   history: INote[];
   score: number;  // Total accumulated score
   lastSessionScore: number; // Score from the most recent session
+  selectedLevel: number; // The most recently selected level
 }
 
 const initialState: IMusicNotesState = {
@@ -20,7 +21,8 @@ const initialState: IMusicNotesState = {
   history: [],
   suggestedNote: null,
   score: 0,
-  lastSessionScore: 0
+  lastSessionScore: 0,
+  selectedLevel: 1 // Default to level 1
 }
 
 const musicNotesSlice = createSlice({
@@ -47,6 +49,9 @@ const musicNotesSlice = createSlice({
     },
     clearHistory: (state) => {
       state.history = []
+    },
+    setSelectedLevel: (state, action: PayloadAction<number>) => {
+      state.selectedLevel = action.payload
     }
   }
 })
@@ -57,6 +62,7 @@ export const {
   incrementScore,
   resetScore,
   setLastSessionScore,
-  clearHistory
+  clearHistory,
+  setSelectedLevel
 } = musicNotesSlice.actions
 export default musicNotesSlice.reducer

@@ -22,7 +22,7 @@ export interface NoteGeneratorOptions {
 }
 
 export class MusicNoteGenerator {
-  private levels: { [key: number]: { notes: string[], keySignature: string } }
+  private levels: { [key: number]: { notes: string[], keySignature: TKeySignature } }
   private noteValues: { [key: string]: number }
   private notesByValue: string[]
 
@@ -76,7 +76,7 @@ export class MusicNoteGenerator {
    */
   generateNotes(level: number, numberOfNotes: number): {
     notes: Vex.StaveNote[],
-    keySignature: string
+    keySignature: TKeySignature
   } {
     if (level < 1 || level > 7) {
       throw new Error('Level must be between 1 and 7.')

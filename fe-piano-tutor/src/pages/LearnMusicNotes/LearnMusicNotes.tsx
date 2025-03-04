@@ -1,23 +1,24 @@
 import React, {useState, FC, useEffect, memo} from 'react'
 import {Button, Typography, Space, Modal} from 'antd'
-import {MusicNoteGenerator} from 'pages/LearnMusicNotes/utils/musicNoteGenerator'
+import {MusicNoteGenerator, TKeySignature} from 'pages/LearnMusicNotes/utils/musicNoteGenerator'
 import SheetMusicRenderer from 'common/SheetMusicRenderer'
 import {StaveNote} from 'vexflow'
 import {useSelector, useDispatch} from 'react-redux'
 import {RootState} from 'store'
 import {useNavigate} from 'react-router-dom'
-import {setLastSessionScore, setCurrentNote, setSuggestedNote} from 'store/slices/musicNotesSlice'
+import {setLastSessionScore, setCurrentNote, setSuggestedNote, setSelectedLevel} from 'store/slices/musicNotesSlice'
 import {recordNotePerformance, startSession, endSession} from 'store/slices/performanceSlice'
 
 const LearnMusicNotes: FC = memo(() => {
   /* Props & Store */
-  const {score} = useSelector((state: RootState) => state.musicNotes)
+  const {score, selectedLevel: storedLevel} = useSelector((state: RootState) => state.musicNotes)
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const musicNoteGeneratorService = new MusicNoteGenerator()
   const {accuracyRate, totalNotesPlayed} = useSelector((state: RootState) => state.performance)
   const NUMBER_OF_NOTES = useSelector((state: RootState) => state.settings.learnMusicNotes.NUMBER_OF_NOTES)
   const TEMPO = useSelector((state: RootState) => state.settings.learnMusicNotes.TEMPO)
+
 
   /* States */
   const [notes, setNotes] = useState<StaveNote[]>([])
@@ -26,7 +27,7 @@ const LearnMusicNotes: FC = memo(() => {
   const [pendingLevel, setPendingLevel] = useState<number | null>(null)
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false)
   const [expectedNoteStartTime, setExpectedNoteStartTime] = useState<number | null>(null)
-  const [keySignature, setKeySignature] = useState<string | null>(null)
+  const [keySignature, setKeySignature] = useState<TKeySignature | undefined>(undefined)
 
   /* Handlers */
   const handleCorrectNote = (noteAttempted: string, timingDeviation: number) => {
@@ -107,6 +108,9 @@ const LearnMusicNotes: FC = memo(() => {
   }
 
   const handleLevelSelect = (selectedLevel: number) => {
+    // Store the selected level in Redux
+    dispatch(setSelectedLevel(selectedLevel))
+
     // If there's already an active practice with notes remaining
     if (level !== null && notes.length > 0 && sessionScore > 0) {
       setPendingLevel(selectedLevel)
@@ -121,6 +125,7 @@ const LearnMusicNotes: FC = memo(() => {
     if (pendingLevel !== null) {
       // Save the current session score to Redux before switching levels
       dispatch(setLastSessionScore(sessionScore))
+      dispatch(setSelectedLevel(pendingLevel))
       startNewLevel(pendingLevel)
       setPendingLevel(null)
     }
@@ -146,6 +151,16 @@ const LearnMusicNotes: FC = memo(() => {
       })
     }
   }, [notes, level, navigate, sessionScore, dispatch])
+
+  // Initialize with the stored level
+  useEffect(() => {
+    if (level === null && storedLevel) {
+      setLevel(storedLevel)
+
+      // Start the level immediately
+      startNewLevel(storedLevel)
+    }
+  }, [level, storedLevel])
 
   /* Renders */
   return (

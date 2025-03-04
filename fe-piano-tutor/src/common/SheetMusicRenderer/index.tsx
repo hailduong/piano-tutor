@@ -10,26 +10,23 @@ import {
 } from 'common/SheetMusicRenderer/styles/SheetMusicRenderer.styled'
 import {useVexFlowRenderer} from './hooks/useVexFlowRenderer'
 import {generateMusicTheoryHint} from 'pages/MusicTheory/utils/musicTheoryHintUtil'
+import {TKeySignature} from 'pages/LearnMusicNotes/utils/musicNoteGenerator'
 
 // Interfaces
 interface SheetMusicRendererProps {
   notes: Vex.StaveNote[] | INote[];
-  keySignature?: string;
+  keySignature?: TKeySignature;
   onCorrectNote?: (noteAttempted: string, timingDeviation: number) => void;
   tempo?: number;
   showTheoryHints?: boolean;
   selectedConcept?: string;
 }
 
-// Component to display remaining notes
-const RemainingNotes: FC<{ count: number }> = ({count}) => (
-  <><strong>{count}</strong> Notes Remaining</>
-)
 
 // Main component
 const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
   /* Store & Props */
-  const {notes, onCorrectNote, tempo = 120, showTheoryHints = false, selectedConcept} = props
+  const {notes, onCorrectNote, tempo = 120, showTheoryHints = false, selectedConcept, keySignature} = props
   const dispatch = useDispatch()
 
   // Access current and suggested notes from Redux store
@@ -76,7 +73,8 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
   const {musicRef, renderSheet} = useVexFlowRenderer(
     currentNote,
     tempo,
-    setLastKeyPressIncorrect
+    setLastKeyPressIncorrect,
+    keySignature
   )
 
   const theoryHint = showTheoryAnnotations ? generateMusicTheoryHint(vexNotes, currentTheoryConcept) : ''
@@ -148,7 +146,8 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
         <span>Training Complete! Well done!</span>
       ) : (
         <>
-          <RemainingNotes count={vexNotes.length}/>
+          <span className='me-3'>Notes Remaining: <strong>{vexNotes.length}</strong></span>
+          <span>Key: <strong>{keySignature}</strong></span>
           <ScrollingSheetMusicDisplay ref={musicRef}/>
 
           {showTheoryAnnotations && theoryHint && (
