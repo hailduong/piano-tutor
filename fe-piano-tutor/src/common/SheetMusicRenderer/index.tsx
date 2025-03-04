@@ -4,14 +4,14 @@ import {useDispatch, useSelector} from 'react-redux'
 import {RootState} from 'store'
 import {incrementScore, setSuggestedNote, Note} from 'store/slices/musicNotesSlice'
 import {USER_CONFIG} from 'config'
-import {useMusicTheory} from 'contexts/MusicTheoryContext'
+import {useMusicTheory} from 'pages/MusicTheory/MusicTheoryContext'
 import {
   TheoryAnnotation,
   ScrollingContainer,
   SheetMusicRendererStyled
 } from 'common/SheetMusicRenderer/styles/SheetMusicRenderer.styled'
 import {useVexFlowRenderer} from './hooks/useVexFlowRenderer'
-import {generateMusicTheoryHint} from 'common/SheetMusicRenderer/utils/musicTheoryHintUtil'
+import {generateMusicTheoryHint} from 'pages/MusicTheory/utils/musicTheoryHintUtil'
 
 // Interfaces
 interface SheetMusicRendererProps {

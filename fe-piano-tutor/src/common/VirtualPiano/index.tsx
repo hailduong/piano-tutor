@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import {useDispatch, useSelector} from 'react-redux'
 import {RootState} from 'store'
 import {setCurrentNote} from 'store/slices/musicNotesSlice'
-import {useMusicTheory} from 'contexts/MusicTheoryContext'
+import {useMusicTheory} from 'pages/MusicTheory/MusicTheoryContext'
 import {UpOutlined, DownOutlined} from '@ant-design/icons'
 import {Button} from 'antd'
 import {
