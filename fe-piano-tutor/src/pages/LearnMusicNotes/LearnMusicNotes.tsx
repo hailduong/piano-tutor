@@ -28,6 +28,7 @@ const LearnMusicNotes: FC = memo(() => {
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false)
   const [expectedNoteStartTime, setExpectedNoteStartTime] = useState<number | null>(null)
   const [keySignature, setKeySignature] = useState<TKeySignature | undefined>(undefined)
+  const [hasIncorrectAttempt, setHasIncorrectAttempt] = useState<boolean>(false)
 
   /* Handlers */
   const handleCorrectNote = (noteAttempted: string, timingDeviation: number) => {
@@ -44,10 +45,17 @@ const LearnMusicNotes: FC = memo(() => {
         timestamp: Date.now()
       }))
 
+      // Only increase score if there was no incorrect attempt for this note
+      if (!hasIncorrectAttempt) {
+        setSessionScore(prev => prev + 1)
+      }
+
       // Remove the played note
       const newNotes = notes.slice(1)
       setNotes(newNotes)
-      setSessionScore(prev => prev + 1)
+
+      // Reset incorrect attempt tracking for the next note
+      setHasIncorrectAttempt(false)
 
       // Set timing for next note
       setExpectedNoteStartTime(Date.now())
@@ -67,6 +75,9 @@ const LearnMusicNotes: FC = memo(() => {
         difficultyLevel: level || 1,
         timestamp: Date.now()
       }))
+
+      // Mark that this note has been attempted incorrectly
+      setHasIncorrectAttempt(true)
     }
   }
 
@@ -76,6 +87,7 @@ const LearnMusicNotes: FC = memo(() => {
     dispatch(setCurrentNote(null))
     dispatch(setSuggestedNote(null))
     setSessionScore(0)
+    setHasIncorrectAttempt(false)
 
     // Set up new session
     setLevel(newLevel)
@@ -199,6 +211,7 @@ const LearnMusicNotes: FC = memo(() => {
             <SheetMusicRenderer
               notes={notes}
               onCorrectNote={handleCorrectNote}
+              onIncorrectNote={handleIncorrectNote}
               tempo={TEMPO}
               keySignature={keySignature || undefined}
             />

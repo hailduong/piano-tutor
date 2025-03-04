@@ -17,6 +17,7 @@ interface SheetMusicRendererProps {
   notes: Vex.StaveNote[] | INote[];
   keySignature?: TKeySignature;
   onCorrectNote?: (noteAttempted: string, timingDeviation: number) => void;
+  onIncorrectNote?: (noteAttempted: string, timingDeviation: number) => void;
   tempo?: number;
   showTheoryHints?: boolean;
   selectedConcept?: string;
@@ -26,7 +27,7 @@ interface SheetMusicRendererProps {
 // Main component
 const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
   /* Store & Props */
-  const {notes, onCorrectNote, tempo = 120, showTheoryHints = false, selectedConcept, keySignature} = props
+  const {notes, onCorrectNote, onIncorrectNote, tempo = 120, showTheoryHints = false, selectedConcept, keySignature} = props
   const dispatch = useDispatch()
 
   // Access current and suggested notes from Redux store
@@ -126,7 +127,15 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
 
       // Update timing expectation for next note
       setExpectedNoteTime(expectedNoteTime + beatDuration)
-    } else if (lastKeyPressIncorrect) {
+  } else {
+    // Incorrect key pressed
+    setLastKeyPressIncorrect(true)
+
+    // Notify parent component of incorrect note
+    if (onIncorrectNote) {
+      onIncorrectNote(playedNoteKey, timingDeviation)
+    }
+
       // Set visual suggestion for incorrect attempt
       const key = vexNotes[0].getKeys()[0].split('/')[0].toUpperCase()
       const octave = parseInt(vexNotes[0].getKeys()[0].split('/')[1])
