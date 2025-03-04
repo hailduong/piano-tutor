@@ -41,7 +41,7 @@ export class MusicNoteGenerator {
       'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3,
       'E': 4, 'F': 5, 'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8,
       'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11
-  }
+    }
 
     // Reverse mapping from values to note names (preferring sharps)
     this.notesByValue = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
@@ -50,7 +50,7 @@ export class MusicNoteGenerator {
   /**
    * Generate random notes based on the difficulty level
    */
-  generateNotes(level: number): Vex.StaveNote[] {
+  generateNotes(level: number, numberOfNotes: number): Vex.StaveNote[] {
     if (level < 1 || level > 7) {
       throw new Error('Level must be between 1 and 7.')
     }
@@ -59,7 +59,7 @@ export class MusicNoteGenerator {
     const notes: Vex.StaveNote[] = []
 
     // Generate random notes from the pool
-    for (let i = 0; i < USER_CONFIG.NUMBER_OF_NOTES; i++) {
+    for (let i = 0; i < numberOfNotes; i++) {
       const randomNote = notePool[Math.floor(Math.random() * notePool.length)]
       notes.push(
         new Vex.Flow.StaveNote({
@@ -130,7 +130,7 @@ export class MusicNoteGenerator {
       case 'major':
       default:
         intervals = [0, 2, 4, 5, 7, 9, 11, 12] // Major scale
-}
+    }
 
     // Limit note count if specified
     const finalIntervals = noteCount ? intervals.slice(0, noteCount) : intervals

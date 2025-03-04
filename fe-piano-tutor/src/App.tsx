@@ -7,7 +7,7 @@ import {
   PlayCircleOutlined,
   ThunderboltOutlined,
   BarChartOutlined,
-  SoundOutlined
+  SoundOutlined, SettingOutlined
 } from '@ant-design/icons'
 import {initMidi} from 'utils/midiUtil'
 import LearnMusicNotes from 'pages/LearnMusicNotes/LearnMusicNotes'
@@ -20,6 +20,7 @@ import {MusicTheoryProvider} from 'contexts/MusicTheoryContext'
 import SongLibrary from 'pages/SongLibrary'
 import LearnSongPage from 'pages/LearnSong/LearnSongPage'
 import SoundTest from 'pages/SoundTest'
+import Settings from 'pages/Settings'
 
 // Placeholder components for the new menu items
 const ChallengeYourself = () => <div><h2>Challenge Yourself</h2></div>
@@ -63,6 +64,9 @@ function App() {
                   Yourself</Link></Menu.Item>
                 <Menu.Item key="5" icon={<BarChartOutlined/>}><Link to="/results">Results</Link></Menu.Item>
                 <Menu.Item key="6" icon={<SoundOutlined/>}><Link to="/sound-test">Sound Test</Link></Menu.Item>
+                <Menu.Item key="7" icon={<SettingOutlined />}>
+                  <Link to="/settings">Settings</Link>
+                </Menu.Item>
               </Menu>
             </Sider>
 
@@ -85,6 +89,7 @@ function App() {
                   <Route path="/challenge-yourself" element={<ChallengeYourself/>}/>
                   <Route path="/results" element={<Results/>}/>
                   <Route path="/sound-test" element={<SoundTest/>}/>
+                  <Route path="/settings" element={<Settings />} />
                   <Route path="/" element={<LearnMusicNotes/>}/>
                 </Routes>
               </Content>

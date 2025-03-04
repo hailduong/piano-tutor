@@ -17,6 +17,7 @@ const LearnMusicNotes: FC = memo(() => {
   const dispatch = useDispatch()
   const musicNoteGeneratorService = new MusicNoteGenerator()
   const { accuracyRate, totalNotesPlayed } = useSelector((state: RootState) => state.performance);
+  const NUMBER_OF_NOTES = useSelector((state: RootState) => state.settings.learnMusicNotes.NUMBER_OF_NOTES);
 
   /* States */
   const [notes, setNotes] = useState<StaveNote[]>([])
@@ -70,7 +71,7 @@ const LearnMusicNotes: FC = memo(() => {
   // Start a new practice session
   const startNewLevel = (newLevel: number) => {
     setLevel(newLevel);
-    const generatedNotes = musicNoteGeneratorService.generateNotes(newLevel);
+    const generatedNotes = musicNoteGeneratorService.generateNotes(newLevel, NUMBER_OF_NOTES);
     setNotes(generatedNotes);
     setSessionScore(0);
     dispatch(startSession());
