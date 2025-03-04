@@ -4,7 +4,7 @@ import songsData from 'data/songs.json'
 import {RootState} from 'store/index'
 
 // Define types for the slice state
-interface SongLibraryState {
+export interface ISongLibraryState {
   songs: Song[];
   filteredSongs: Song[];
   isLoading: boolean;
@@ -22,7 +22,7 @@ interface SongLibraryState {
 }
 
 // Define the initial state
-const initialState: SongLibraryState = {
+const initialState: ISongLibraryState = {
   songs: [],
   filteredSongs: [],
   isLoading: false,
@@ -189,20 +189,20 @@ export const {setFilter, setSort, setSearchQuery, setPaginationPage} = songLibra
 export const { selectSong } = songLibrarySlice.actions;
 
 // Export selectors
-export const selectSongs = (state: { songLibrary: SongLibraryState }) => state.songLibrary.songs
-export const selectFilteredSongs = (state: { songLibrary: SongLibraryState }) => state.songLibrary.filteredSongs
-export const selectCurrentPageSongs = (state: { songLibrary: SongLibraryState }) => {
+export const selectSongs = (state: { songLibrary: ISongLibraryState }) => state.songLibrary.songs
+export const selectFilteredSongs = (state: { songLibrary: ISongLibraryState }) => state.songLibrary.filteredSongs
+export const selectCurrentPageSongs = (state: { songLibrary: ISongLibraryState }) => {
   const {currentPage, itemsPerPage} = state.songLibrary.pagination
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
   return state.songLibrary.filteredSongs.slice(startIndex, endIndex)
 }
-export const selectPagination = (state: { songLibrary: SongLibraryState }) => state.songLibrary.pagination
-export const selectFilters = (state: { songLibrary: SongLibraryState }) => state.songLibrary.filters
-export const selectSortConfig = (state: { songLibrary: SongLibraryState }) => state.songLibrary.sortConfig
-export const selectSearchQuery = (state: { songLibrary: SongLibraryState }) => state.songLibrary.searchQuery
-export const selectIsLoading = (state: { songLibrary: SongLibraryState }) => state.songLibrary.isLoading
-export const selectError = (state: { songLibrary: SongLibraryState }) => state.songLibrary.error
+export const selectPagination = (state: { songLibrary: ISongLibraryState }) => state.songLibrary.pagination
+export const selectFilters = (state: { songLibrary: ISongLibraryState }) => state.songLibrary.filters
+export const selectSortConfig = (state: { songLibrary: ISongLibraryState }) => state.songLibrary.sortConfig
+export const selectSearchQuery = (state: { songLibrary: ISongLibraryState }) => state.songLibrary.searchQuery
+export const selectIsLoading = (state: { songLibrary: ISongLibraryState }) => state.songLibrary.isLoading
+export const selectError = (state: { songLibrary: ISongLibraryState }) => state.songLibrary.error
 
 export const selectSongDetails = (state: RootState, songId: string) =>
   state.songLibrary.songs.find((song) => song.id === songId);

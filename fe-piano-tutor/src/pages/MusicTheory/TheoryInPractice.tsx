@@ -1,12 +1,11 @@
 import React, {useState, useEffect} from 'react'
 import {Card, Typography, Button, Space, Divider, Row, Col, Tooltip} from 'antd'
-import {useDispatch, useSelector} from 'react-redux'
-import {RootState} from 'store'
+import {RootState, useAppDispatch, useAppSelector} from 'store'
 import {setSuggestedNote, Note} from 'store/slices/musicNotesSlice'
-import {useMusicTheory} from 'pages/MusicTheory/MusicTheoryContext'
 import SheetMusicRenderer from 'common/SheetMusicRenderer'
 import {QuestionCircleOutlined, SoundOutlined} from '@ant-design/icons'
 import musicNoteGenerator from 'utils/musicNoteGenerator'
+import {setCurrentTheoryConcept} from 'store/slices/musicTheorySlice'
 
 const {Title, Paragraph, Text} = Typography
 
@@ -31,12 +30,14 @@ interface PracticeExample {
 }
 
 const TheoryInPractice: React.FC<TheoryInPracticeProps> = ({conceptId}) => {
-  const dispatch = useDispatch()
-  const {history} = useSelector((state: RootState) => state.musicNotes)
-  const {setCurrentTheoryConcept} = useMusicTheory()
+  const dispatch = useAppDispatch()
+  const {history} = useAppSelector((state: RootState) => state.musicNotes)
   const [practiceMode, setPracticeMode] = useState<string>('')
   const [currentExample, setCurrentExample] = useState<number>(0)
   const [practiceExamples, setPracticeExamples] = useState<Record<string, PracticeExample[]>>({})
+  const currentTheoryConcept = useAppSelector((state) => state.musicTheory.currentTheoryConcept)
+  const showTheoryAnnotations = useAppSelector((state) => state.musicTheory.showTheoryAnnotations)
+
 
   // Initialize practice examples using the note generator service
   useEffect(() => {
@@ -46,7 +47,7 @@ const TheoryInPractice: React.FC<TheoryInPracticeProps> = ({conceptId}) => {
           {
             title: 'Reading Notes in Treble Clef',
             description: 'Play each note as it appears on the staff',
-            notes: musicNoteGenerator.generateBasicNotationNotes('treble', { noteCount: 5 }),
+            notes: musicNoteGenerator.generateBasicNotationNotes('treble', {noteCount: 5}),
             generationOptions: {
               type: 'basic-notation',
               clef: 'treble'
@@ -55,7 +56,7 @@ const TheoryInPractice: React.FC<TheoryInPracticeProps> = ({conceptId}) => {
           {
             title: 'Reading Notes in Bass Clef',
             description: 'Play each note as it appears on the staff',
-            notes: musicNoteGenerator.generateBasicNotationNotes('bass', { noteCount: 5 }),
+            notes: musicNoteGenerator.generateBasicNotationNotes('bass', {noteCount: 5}),
             generationOptions: {
               type: 'basic-notation',
               clef: 'bass'
@@ -186,7 +187,7 @@ const TheoryInPractice: React.FC<TheoryInPracticeProps> = ({conceptId}) => {
               {note: 'C', length: 'q', timestamp: Date.now(), octave: 4},
               {note: 'D', length: 'q', timestamp: Date.now() + 100, octave: 4},
               {note: 'E', length: 'q', timestamp: Date.now() + 200, octave: 4},
-              {note: 'F', length: 'q', timestamp: Date.now() + 300, octave: 4},
+              {note: 'F', length: 'q', timestamp: Date.now() + 300, octave: 4}
             ],
             generationOptions: {
               type: 'basic-notation',
@@ -198,7 +199,7 @@ const TheoryInPractice: React.FC<TheoryInPracticeProps> = ({conceptId}) => {
             description: 'Play these half notes in 4/4 time',
             notes: [
               {note: 'G', length: 'h', timestamp: Date.now(), octave: 4},
-              {note: 'A', length: 'h', timestamp: Date.now() + 100, octave: 4},
+              {note: 'A', length: 'h', timestamp: Date.now() + 100, octave: 4}
             ],
             generationOptions: {
               type: 'basic-notation',
@@ -206,13 +207,13 @@ const TheoryInPractice: React.FC<TheoryInPracticeProps> = ({conceptId}) => {
             }
           }
         ]
-      };
+      }
 
-      setPracticeExamples(examples);
-    };
+      setPracticeExamples(examples)
+    }
 
-    generateExamples();
-  }, []);
+    generateExamples()
+  }, [])
 
   // Get current examples based on concept ID
   const currentPracticeExamples = practiceExamples[conceptId] || []
@@ -220,10 +221,10 @@ const TheoryInPractice: React.FC<TheoryInPracticeProps> = ({conceptId}) => {
 
   useEffect(() => {
     // Set the current theory concept when this component mounts
-    setCurrentTheoryConcept(conceptId)
+    dispatch(setCurrentTheoryConcept(conceptId))
 
     // Clean up when component unmounts
-    return () => setCurrentTheoryConcept('')
+    return () => dispatch(setCurrentTheoryConcept(''))
   }, [conceptId, setCurrentTheoryConcept])
 
   // Reset practice mode when example changes
@@ -242,10 +243,10 @@ const TheoryInPractice: React.FC<TheoryInPracticeProps> = ({conceptId}) => {
 
   // Generate new examples of the same type
   const handleRegenerateExample = () => {
-    if (!example || !example.generationOptions) return;
+    if (!example || !example.generationOptions) return
 
-    const options = example.generationOptions;
-    let newNotes: Note[] = [];
+    const options = example.generationOptions
+    let newNotes: Note[] = []
 
     // Generate new notes based on the example type
     switch (options.type) {
@@ -254,39 +255,39 @@ const TheoryInPractice: React.FC<TheoryInPracticeProps> = ({conceptId}) => {
           options.rootNote || 'C',
           options.octave || 4,
           options.scaleType as any || 'major'
-        );
-        break;
+        )
+        break
       case 'chord':
         newNotes = musicNoteGenerator.generateChord(
           options.rootNote || 'C',
           options.octave || 4,
           options.chordType as any || 'major'
-        );
-        break;
+        )
+        break
       case 'interval':
         newNotes = musicNoteGenerator.generateInterval(
           options.rootNote || 'C',
           options.octave || 4,
           options.intervalType as any || 'perfect5'
-        );
-        break;
+        )
+        break
       case 'basic-notation':
         newNotes = musicNoteGenerator.generateBasicNotationNotes(
           options.clef || 'treble',
-          { noteCount: 5 }
-        );
-        break;
+          {noteCount: 5}
+        )
+        break
     }
 
     // Update the current example with new notes
-    const updatedExamples = { ...practiceExamples };
+    const updatedExamples = {...practiceExamples}
     if (updatedExamples[conceptId] && updatedExamples[conceptId][currentExample]) {
-      updatedExamples[conceptId][currentExample].notes = newNotes;
-      setPracticeExamples(updatedExamples);
+      updatedExamples[conceptId][currentExample].notes = newNotes
+      setPracticeExamples(updatedExamples)
     }
 
     // Reset practice mode
-    setPracticeMode('');
+    setPracticeMode('')
   }
 
   // Navigation between examples

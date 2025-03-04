@@ -2,12 +2,12 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit'
 import {USER_CONFIG} from 'config'
 
-interface SettingsState {
+export interface ISettingsState {
   learnMusicNotes: typeof USER_CONFIG;
   // Add other pages' settings here if needed
 }
 
-const initialState: SettingsState = {
+const initialState: ISettingsState = {
   learnMusicNotes: USER_CONFIG
   // Initialize other pages' settings here if needed
 }

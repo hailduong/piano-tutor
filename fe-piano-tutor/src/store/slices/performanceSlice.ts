@@ -10,7 +10,7 @@ export interface INotePerformance {
   timestamp: number;      // When the note was attempted
 }
 
-interface IPerformanceState {
+export interface IPerformanceState {
   currentSessionPerformance: INotePerformance[];  // Current practice session data
   accuracyRate: number;    // Percentage of correct notes in session
   averageTiming: number;   // Average timing deviation in ms

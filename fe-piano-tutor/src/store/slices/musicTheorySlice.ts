@@ -4,7 +4,7 @@ import {MusicTheoryConcept, concepts} from 'pages/MusicTheory/data/musicTheoryCo
 
 
 // Define the state for the music theory slice
-interface MusicTheoryState {
+export interface IMusicTheoryState {
   concepts: MusicTheoryConcept[];
   quizzes: Record<string, QuizQuestion[]>; // conceptId -> questions
   activeConceptId: string | null;
@@ -16,7 +16,7 @@ interface MusicTheoryState {
 }
 
 // Initial state with sample music theory concepts
-const initialState: MusicTheoryState = {
+const initialState: IMusicTheoryState = {
   concepts,
   quizzes,
   activeConceptId: null,

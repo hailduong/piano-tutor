@@ -4,10 +4,9 @@ import {useDispatch, useSelector} from 'react-redux'
 import {RootState} from 'store'
 import {incrementScore, setSuggestedNote, Note} from 'store/slices/musicNotesSlice'
 import {USER_CONFIG} from 'config'
-import {useMusicTheory} from 'pages/MusicTheory/MusicTheoryContext'
 import {
   TheoryAnnotation,
-  ScrollingContainer,
+  ScrollingSheetMusicDisplay,
   SheetMusicRendererStyled
 } from 'common/SheetMusicRenderer/styles/SheetMusicRenderer.styled'
 import {useVexFlowRenderer} from './hooks/useVexFlowRenderer'
@@ -27,11 +26,6 @@ const RemainingNotes: FC<{ count: number }> = ({count}) => (
   <><strong>{count}</strong> Notes Remaining</>
 )
 
-// Component for sheet music rendering
-const SheetMusicDisplay: FC<{ musicRef: React.RefObject<HTMLDivElement> }> = ({musicRef}) => (
-  <ScrollingContainer ref={musicRef}/>
-)
-
 // Main component
 const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
   /* Store & Props */
@@ -43,24 +37,17 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
   const currentNote = musicNotesState.currentNote
   const suggestedNote = musicNotesState.suggestedNote
 
+  // Get music theory state from Redux instead of context
+  const showTheoryAnnotations = useSelector((state: RootState) => state.musicTheory.showTheoryAnnotations)
+  const currentTheoryConcept = useSelector((state: RootState) => state.musicTheory.currentTheoryConcept)
+  const theoryHint = showTheoryAnnotations ? generateMusicTheoryHint(vexNotes, currentTheoryConcept) : '';
+
   /* State */
   // Track correctness and timing for note evaluation
   const [lastKeyPressIncorrect, setLastKeyPressIncorrect] = useState(false)
   const [expectedNoteTime, setExpectedNoteTime] = useState<number | null>(null)
 
-  /* Hooks & Memoized Values */
-  // Access music theory context with fallback
-  const musicTheory = useMusicTheory()
-  const musicTheoryContext = useMemo(() => {
-    try {
-      return musicTheory
-    } catch (e) {
-      return {
-        showTheoryAnnotations: showTheoryHints,
-        currentTheoryConcept: selectedConcept || ''
-      }
-    }
-  }, [musicTheory, showTheoryHints, selectedConcept])
+  /* Hooks */
 
   // Convert input notes to VexFlow format if needed
   const vexNotes = useMemo(() => {
@@ -94,9 +81,6 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
     suggestedNote,
     tempo
   )
-
-  const theoryConcept = musicTheoryContext.currentTheoryConcept || selectedConcept || '';
-  const theoryHint = showTheoryHints ? generateMusicTheoryHint(vexNotes, theoryConcept) : '';
 
   /* Effects */
   // Initialize expected note time when notes are loaded
@@ -195,9 +179,9 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
       ) : (
         <>
           <RemainingNotes count={vexNotes.length}/>
-          <SheetMusicDisplay musicRef={musicRef}/>
+          <ScrollingSheetMusicDisplay ref={musicRef}/>
 
-          {showTheoryHints && theoryHint && (
+          {showTheoryAnnotations && theoryHint && (
             <TheoryAnnotation>{theoryHint}</TheoryAnnotation>
           )}
         </>

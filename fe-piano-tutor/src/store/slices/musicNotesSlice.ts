@@ -7,7 +7,7 @@ export interface Note {
   octave: number;    // The octave of the note (e.g., 4 for A4)
 }
 
-interface MusicNotesState {
+export interface IMusicNotesState {
   currentNote: Note | null;
   history: Note[];
   suggestedNote: Note | null; // The note that should be played (suggested by the system)
@@ -15,7 +15,7 @@ interface MusicNotesState {
   lastSessionScore: number; // Score from the most recent session
 }
 
-const initialState: MusicNotesState = {
+const initialState: IMusicNotesState = {
   currentNote: null,
   history: [],
   suggestedNote: null,

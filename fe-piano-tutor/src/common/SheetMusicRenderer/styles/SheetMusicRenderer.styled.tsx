@@ -9,7 +9,7 @@ export const SheetMusicRendererStyled = styled.div`
     width: 100%;
     position: relative;
 `
-export const ScrollingContainer = styled.div`
+export const ScrollingSheetMusicDisplay = styled.div`
     display: inline-block;
     width: 3600px;
 `
