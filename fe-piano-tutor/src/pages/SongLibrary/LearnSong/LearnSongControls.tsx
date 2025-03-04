@@ -1,6 +1,6 @@
-import React, {FC, useState} from 'react'
+import React, {FC, useRef, useState, useEffect} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
-import {Slider, Button, Space, Radio, Tooltip, Divider, Switch, Row, Col} from 'antd'
+import {Button, Space, Radio, Tooltip, Divider, Switch, Row, Col} from 'antd'
 import {
   PlayCircleOutlined,
   PauseCircleOutlined,
@@ -8,7 +8,9 @@ import {
   StepBackwardOutlined,
   RedoOutlined,
   SettingOutlined,
-  InfoCircleOutlined
+  InfoCircleOutlined,
+  SoundOutlined,
+  LoadingOutlined
 } from '@ant-design/icons'
 import {
   pauseSession,
@@ -25,26 +27,60 @@ import {
   SectionTitle,
   ControlsContainer
 } from 'pages/SongLibrary/LearnSong/styles/LearnSongControls.styled'
+import {useMIDIHandler} from './hooks/useMIDIHandler'
 
+/* Interfaces */
 interface ILearnSongControlsProps {
   onTempoChange: (tempo: number) => void;
   onSeek: (position: number) => void;
   currentPosition: number;
   totalNotes: number;
+  onStartPractice?: (practiceMode: boolean) => void;
 }
 
 const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
   /* Props & Store */
-  const {onTempoChange, onSeek, currentPosition, totalNotes} = props
+  const {onTempoChange, onSeek, currentPosition, totalNotes, onStartPractice} = props
   const dispatch = useDispatch()
   const isPlaying = useSelector(selectIsPlaying)
   const learnSongState = useSelector(selectLearnSongState)
 
+  /* Refs */
+  // Reference to track count-in beats
+  const countRef = useRef<number>(0)
+  // Reference to interval timer for cleanup
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+
   /* States */
+  // UI states
   const [showAdvanced, setShowAdvanced] = useState(false)
+  const [countingIn, setCountingIn] = useState(false)
+
+  // Mode states
+  const [isPracticing, setIsPracticing] = useState(false)
+
+  /* Hooks */
+  // MIDI sounds handling
+  const {playMetronomeSound} = useMIDIHandler()
+
+  /* Effects */
+  // Clean up interval on unmount
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+    }
+  }, [])
 
   /* Handlers */
+  // Play/Pause button handler
   const handlePlayPause = () => {
+    // Reset practice mode when using play mode
+    if (isPracticing) {
+      setIsPracticing(false)
+    }
+
     if (isPlaying) {
       dispatch(pauseSession())
     } else {
@@ -56,181 +92,211 @@ const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
     }
   }
 
+  // Restart button handler
   const handleRestart = () => {
-    // Reset to beginning and pause
-    dispatch(pauseSession())
+    // Stop playback first
+    if (isPlaying) {
+      dispatch(pauseSession())
+    }
+
+    // Reset position to beginning
     dispatch(seekToPosition(0))
     onSeek(0)
+
+    // Reset practice mode if active
+    if (isPracticing) {
+      setIsPracticing(false)
+    }
   }
 
+  // Next note button handler
   const handleNext = () => {
-    const nextPosition = Math.min(currentPosition + 1, totalNotes - 1)
-    dispatch(seekToPosition(nextPosition))
-    onSeek(nextPosition)
+    if (currentPosition < totalNotes - 1) {
+      const newPosition = currentPosition + 1
+      dispatch(seekToPosition(newPosition))
+      onSeek(newPosition)
+    }
   }
 
+  // Previous note button handler
   const handlePrevious = () => {
-    const prevPosition = Math.max(currentPosition - 1, 0)
-    dispatch(seekToPosition(prevPosition))
-    onSeek(prevPosition)
+    if (currentPosition > 0) {
+      const newPosition = currentPosition - 1
+      dispatch(seekToPosition(newPosition))
+      onSeek(newPosition)
+    }
   }
 
+  // Tempo slider handler
   const handleTempoChange = (value: number) => {
     dispatch(updateSettings({tempo: value}))
     onTempoChange(value)
   }
 
+  // Metronome toggle handler
   const handleMetronomeToggle = (checked: boolean) => {
     dispatch(updateSettings({metronomeEnabled: checked}))
   }
 
-  const handleHighlightToggle = (checked: boolean) => {
-    dispatch(updateSettings({highlightEnabled: checked}))
+  // Mode change handler (practice vs play)
+  const handleModeChange = (e: any) => {
+    const mode = e.target.value
+    dispatch(updateSettings({mode}))
   }
 
-  const handleModeChange = (e: any) => {
-    dispatch(updateSettings({mode: e.target.value}))
+  // Start practice button handler with metronome count-in
+  const handleStartPractice = () => {
+    // Prevent starting if already counting in or playing
+    if (countingIn || isPlaying) return
+
+    // Set counting in state and reset counter
+    setCountingIn(true)
+    countRef.current = 0
+
+    // Calculate beat duration based on current tempo
+    const beatDuration = (60 / learnSongState.tempo) * 1000
+
+    // Start count-in with metronome
+    intervalRef.current = setInterval(() => {
+      if (countRef.current < 4) {
+        // Play metronome sound for each beat
+        playMetronomeSound(0.8)
+        countRef.current++
+      } else {
+        // After 4 beats, clear interval and enter practice mode
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current)
+          intervalRef.current = null
+        }
+        setCountingIn(false)
+
+        // Enter practice mode instead of auto-playing
+        setIsPracticing(true)
+
+        // Notify parent component to set up practice mode
+        if (onStartPractice) {
+          onStartPractice(true)
+        }
+      }
+    }, beatDuration)
   }
 
   /* Render */
   return (
     <ControlsContainer>
       {/* Main Controls */}
-      <Row gutter={16} align="middle">
-        <Col>
-          <Space size="middle">
-            <Button
-              type="primary"
-              shape="circle"
-              icon={<StepBackwardOutlined/>}
-              onClick={handlePrevious}
-              disabled={currentPosition <= 0}
-            />
-            <Button
-              type="primary"
-              shape="circle"
-              size="large"
-              icon={isPlaying ? <PauseCircleOutlined/> : <PlayCircleOutlined/>}
-              onClick={handlePlayPause}
-            />
-            <Button
-              type="primary"
-              shape="circle"
-              icon={<StepForwardOutlined/>}
-              onClick={handleNext}
-              disabled={currentPosition >= totalNotes - 1}
-            />
-            <Button
-              icon={<RedoOutlined/>}
-              onClick={handleRestart}
-            >
-              Restart
-            </Button>
-          </Space>
-        </Col>
-
-        <Col flex="auto">
-          <Space>
-            <span>Tempo:</span>
-            <TempoSlider
-              min={40}
-              max={200}
-              value={learnSongState.tempo}
-              onChange={handleTempoChange}
-              tooltip={{formatter: (value) => `${value} BPM`}}
-            />
-            <span>{learnSongState.tempo} BPM</span>
-          </Space>
-        </Col>
-
-        <Col>
+      <ControlSection>
+        <SectionTitle>Playback Controls</SectionTitle>
+        <Space size="middle">
+          {/* Previous button */}
           <Button
-            type="text"
-            icon={<SettingOutlined/>}
-            onClick={() => setShowAdvanced(!showAdvanced)}
+            icon={<StepBackwardOutlined/>}
+            onClick={handlePrevious}
+            disabled={currentPosition <= 0 || countingIn}
+          />
+
+          {/* Play/Pause button */}
+          <Button
+            type="primary"
+            shape="circle"
+            icon={isPlaying ? <PauseCircleOutlined/> : <PlayCircleOutlined/>}
+            onClick={handlePlayPause}
+            size="large"
+            disabled={countingIn}
+          />
+
+          {/* Next button */}
+          <Button
+            className='me-4'
+            icon={<StepForwardOutlined/>}
+            onClick={handleNext}
+            disabled={currentPosition >= totalNotes - 1 || countingIn}
+          />
+
+          {/* Start Practice button */}
+          <Button
+            type="primary"
+            icon={countingIn ? <LoadingOutlined/> : <SoundOutlined/>}
+            onClick={handleStartPractice}
+            disabled={isPlaying || countingIn}
           >
-            {showAdvanced ? 'Hide Settings' : 'Settings'}
+            {countingIn ? 'Count-in...' : 'Start Practice'}
           </Button>
-        </Col>
-      </Row>
 
-      {/* Advanced Controls */}
+          {/* Restart button */}
+          <Button
+            icon={<RedoOutlined/>}
+            onClick={handleRestart}
+            disabled={countingIn}
+          />
+        </Space>
+
+        {/* Mode indicator */}
+        {isPracticing && (
+          <div style={{marginTop: 8}}>
+            <span style={{color: '#1890ff'}}>Practice Mode: Play the notes yourself</span>
+          </div>
+        )}
+      </ControlSection>
+
+      {/* Tempo Control with right-aligned settings button */}
+      <ControlSection>
+        <Row justify="space-between" align="middle">
+          <Col>
+            <SectionTitle>Tempo: {learnSongState.tempo} BPM</SectionTitle>
+          </Col>
+          <Col>
+            <Button
+              type="text"
+              icon={<SettingOutlined/>}
+              onClick={() => setShowAdvanced(!showAdvanced)}
+            >
+              {showAdvanced ? 'Hide' : 'Advanced Options'}
+            </Button>
+          </Col>
+        </Row>
+
+        <TempoSlider
+          min={40}
+          max={240}
+          defaultValue={learnSongState.tempo}
+          value={learnSongState.tempo}
+          onChange={handleTempoChange}
+        />
+      </ControlSection>
+
+      {/* Advanced Controls (conditional) */}
       {showAdvanced && (
-        <>
-          <Divider style={{margin: '12px 0'}}/>
+        <ControlSection>
+          <SectionTitle>Advanced Settings</SectionTitle>
+          <Space direction="vertical">
+            <div>
+              <span style={{marginRight: 10}}>Metronome:</span>
+              <Switch
+                checked={learnSongState.metronomeEnabled}
+                onChange={handleMetronomeToggle}
+              />
+              <Tooltip title="Enable metronome during playback">
+                <InfoCircleOutlined style={{marginLeft: 8}}/>
+              </Tooltip>
+            </div>
 
-          <Row gutter={[24, 16]}>
-            <Col span={8}>
-              <ControlSection>
-                <SectionTitle>Learning Mode</SectionTitle>
-                <Radio.Group
-                  value={learnSongState.mode}
-                  onChange={handleModeChange}
-                  buttonStyle="solid"
-                >
-                  <Space direction="vertical">
-                    <Tooltip title="Follow along with highlighted notes">
-                      <Radio.Button value="guided">
-                        Guided <InfoCircleOutlined/>
-                      </Radio.Button>
-                    </Tooltip>
-                    <Tooltip title="Practice freely without assessment">
-                      <Radio.Button value="practice">
-                        Practice <InfoCircleOutlined/>
-                      </Radio.Button>
-                    </Tooltip>
-                    <Tooltip title="Play through for assessment and scoring">
-                      <Radio.Button value="assessment">
-                        Assessment <InfoCircleOutlined/>
-                      </Radio.Button>
-                    </Tooltip>
-                  </Space>
-                </Radio.Group>
-              </ControlSection>
-            </Col>
+            <Divider style={{margin: '12px 0'}}/>
 
-            <Col span={8}>
-              <ControlSection>
-                <SectionTitle>Visual Aids</SectionTitle>
-                <Space direction="vertical">
-                  <div>
-                    <Switch
-                      checked={learnSongState.highlightEnabled}
-                      onChange={handleHighlightToggle}
-                    /> {' '}
-                    Note Highlighting
-                  </div>
-                  <div>
-                    <Switch
-                      checked={learnSongState.metronomeEnabled}
-                      onChange={handleMetronomeToggle}
-                    /> {' '}
-                    Metronome
-                  </div>
-                </Space>
-              </ControlSection>
-            </Col>
-
-            <Col span={8}>
-              <ControlSection>
-                <SectionTitle>Progress</SectionTitle>
-                <div>Current Note: {currentPosition + 1} / {totalNotes}</div>
-                <Slider
-                  min={0}
-                  max={totalNotes - 1}
-                  value={currentPosition}
-                  onChange={(value) => {
-                    dispatch(seekToPosition(value))
-                    onSeek(value)
-                  }}
-                  tooltip={{
-                    formatter: (value) => `Note ${value + 1}`
-                  }}
-                />
-              </ControlSection>
-            </Col>
-          </Row>
-        </>
+            <div>
+              <span style={{marginRight: 10}}>Mode:</span>
+              <Radio.Group
+                value={learnSongState.mode}
+                onChange={handleModeChange}
+                buttonStyle="solid"
+              >
+                <Radio.Button value="practice">Practice</Radio.Button>
+                <Radio.Button value="play">Play</Radio.Button>
+                <Radio.Button value="learn">Learn</Radio.Button>
+              </Radio.Group>
+            </div>
+          </Space>
+        </ControlSection>
       )}
     </ControlsContainer>
   )

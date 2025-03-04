@@ -54,7 +54,7 @@ const LearnSongPage: React.FC = () => {
       if (songId) {
         try {
           dispatch(initializeSession({ songId }));
-          await dispatch(loadSheetMusicThunk(songId)).unwrap();
+          await dispatch(loadSheetMusicThunk(songId));
           setLoading(false);
         } catch (err) {
           console.error('Failed to load sheet music:', err);
@@ -141,6 +141,24 @@ const LearnSongPage: React.FC = () => {
     setShowSummary(true)
   }
 
+  const handleStartPractice = (practiceMode: boolean) => {
+    if (practiceMode) {
+      // Set up for user practice mode (without auto-playing)
+      dispatch(updateSettings({ mode: 'practice' }));
+
+      // Reset to initial position if needed
+      if (sessionProgress.currentPosition > 0) {
+        dispatch(seekToPosition(0));
+      }
+
+      // Important: Don't start playing automatically in practice mode
+      // Focus on the virtual piano for keyboard input
+      containerRef.current?.focus();
+    } else {
+      // Regular playback mode
+      dispatch(startPlaying());
+    }
+  };
   /* Render */
   if (loading) {
     return (
@@ -179,6 +197,7 @@ const LearnSongPage: React.FC = () => {
         {/* Controls */}
         <LearnSongControls
           onTempoChange={handleTempoChange}
+          onStartPractice={handleStartPractice}
           onSeek={handleSeek}
           currentPosition={sessionProgress.currentPosition}
           totalNotes={sessionProgress.totalNotes}
@@ -192,7 +211,6 @@ const LearnSongPage: React.FC = () => {
           isPlaying={isPlaying}
           currentPosition={sessionProgress.currentPosition}
           onNotePlay={handleNotePlay}
-          highlightEnabled={learnSongState.highlightEnabled}
           onSongComplete={handleSessionComplete}
         />
 

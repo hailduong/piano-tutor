@@ -23,7 +23,6 @@ const initialState: ILearnSongState = {
   startTime: null,
   elapsedTime: 0,
   metronomeEnabled: true,
-  highlightEnabled: true,
   mode: 'practice',
   sheetMusic: null
 }

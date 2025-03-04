@@ -4,6 +4,7 @@ import Soundfont from 'soundfont-player'
 interface UseMIDIHandlerResult {
   midiAccess: WebMidi.MIDIAccess | null;
   playNote: (midiNote: number, duration?: number, velocity?: number) => void;
+  playMetronomeSound: (velocity?: number) => boolean;
   hasSupport: boolean;
   instrumentLoading: boolean;
 }
@@ -24,7 +25,7 @@ export const useMIDIHandler = (): UseMIDIHandlerResult => {
 
       // Load piano soundfont
       setInstrumentLoading(true)
-      Soundfont.instrument(ac, 'acoustic_grand_piano', {soundfont: '/soundfonts/roland_gm.sf2'})
+      Soundfont.instrument(ac, 'acoustic_grand_piano', {soundfont: '/sound/roland_gm.sf2'})
         .then(piano => {
           instrument.current = piano
           console.log('Piano soundfont loaded successfully')
@@ -67,9 +68,24 @@ export const useMIDIHandler = (): UseMIDIHandlerResult => {
     }
   }
 
+  const playMetronomeSound = (velocity = 0.7) => {
+    if (instrument.current && audioContext.current) {
+      // Use a higher pitch note (B4 = 71) for the metronome sound
+      const metronomeNote = 71;
+      const options = {
+        duration: 0.1, // Short duration for click sound
+        gain: velocity
+      };
+      instrument.current.play(metronomeNote, audioContext.current.currentTime, options);
+      return true;
+    }
+    return false;
+  };
+
   return {
     midiAccess,
     playNote,
+    playMetronomeSound,
     hasSupport,
     instrumentLoading
   }

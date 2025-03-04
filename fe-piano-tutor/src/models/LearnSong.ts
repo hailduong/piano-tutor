@@ -34,7 +34,6 @@ export interface ILearnSongState {
   startTime: number | null;
   elapsedTime: number;
   metronomeEnabled: boolean;
-  highlightEnabled: boolean;
   mode: 'practice' | 'assessment' | 'guided';
   // Reference to the parsed sheet music
   sheetMusic: any | null;
@@ -44,7 +43,6 @@ export interface ILearnSongState {
 export interface ILearnSongSettings {
   tempo: number;
   metronomeEnabled: boolean;
-  highlightEnabled: boolean;
   mode: 'practice' | 'assessment' | 'guided';
 }
 
