@@ -24,7 +24,7 @@ import {
   ControlSection,
   SectionTitle,
   ControlsContainer
-} from 'pages/LearnSong/styles/LearnSongControls.styled'
+} from 'pages/SongLibrary/LearnSong/styles/LearnSongControls.styled'
 
 interface ILearnSongControlsProps {
   onTempoChange: (tempo: number) => void;

@@ -18,7 +18,7 @@ import store from 'store'
 import Results from 'pages/Results'
 import MusicTheory from 'pages/MusicTheory'
 import SongLibrary from 'pages/SongLibrary'
-import LearnSongPage from 'pages/LearnSong/LearnSongPage'
+import LearnSongPage from 'pages/SongLibrary/LearnSong'
 import SoundTest from 'pages/SoundTest'
 import Settings from 'pages/Settings'
 

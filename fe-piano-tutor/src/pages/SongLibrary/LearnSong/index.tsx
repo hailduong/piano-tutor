@@ -18,11 +18,11 @@ import {
 
 import {selectSongDetails} from 'store/slices/songLibrarySlice'
 import {RootState} from 'store'
-import AdvancedMusicSheet from 'pages/LearnSong/AdvancedMusicSheet'
-import LearnSongControls from './LearnSongControls'
-import LearnSongKeyboardAdapter from '../../common/VirtualPiano/LearnSongKeyboardAdapter'
+import AdvancedMusicSheet from 'pages/SongLibrary/LearnSong/AdvancedMusicSheet'
+import LearnSongControls from 'pages/SongLibrary/LearnSong/LearnSongControls'
+import LearnSongKeyboardAdapter from 'common/VirtualPiano/LearnSongKeyboardAdapter'
 import {IPerformanceSummary} from 'models/LearnSong'
-import {ProgressContainer, LearnSongContainer} from 'pages/LearnSong/styles/LearnSongPage.styled'
+import {ProgressContainer, LearnSongContainer} from 'pages/SongLibrary/LearnSong/styles/LearnSongPage.styled'
 
 const {Title, Text} = Typography
 

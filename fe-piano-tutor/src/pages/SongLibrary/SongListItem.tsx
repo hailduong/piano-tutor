@@ -1,12 +1,14 @@
 import React, {useState} from 'react'
 import {Link} from 'react-router-dom'
-import {Card, Typography, Tag, Button, Space} from 'antd'
+import {Card, Typography, Tag, Button} from 'antd'
 import styled from 'styled-components'
 import {RightOutlined, InfoCircleOutlined} from '@ant-design/icons'
 import {Song} from '../../models/Song'
 import SongDetailModal from 'pages/SongLibrary/SongDetailModal'
 import {selectSong} from 'store/slices/songLibrarySlice'
-import { useDispatch } from 'react-redux'
+import {useDispatch} from 'react-redux'
+import {materialColors} from 'styles/themeVariables'
+
 
 const {Title, Text} = Typography
 
@@ -29,14 +31,18 @@ const SongContainer = styled.div`
 `
 
 const ThumbnailContainer = styled.div`
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
     overflow: hidden;
     border-radius: 4px;
     margin-right: 16px;
-    background-color: lightgray;
-    background-size: cover;
-    background-position: center;
+    display: flex;
+    align-items: center;
+    color: #ffffff;
+    justify-content: center;
+    background-color: #f5f5f5;
+    font-size: 24px;
+    font-weight: bold;
 `
 
 const Thumbnail = styled.img`
@@ -44,17 +50,6 @@ const Thumbnail = styled.img`
     height: 100%;
     object-fit: cover;
     background-color: lightgray;
-`
-
-const PlaceholderThumbnail = styled.div`
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #f5f5f5;
-    font-size: 24px;
-    font-weight: bold;
 `
 
 const DetailsContainer = styled.div`
@@ -80,6 +75,23 @@ const StyledLink = styled(Link)`
         align-items: center;
     }
 `
+
+// Material Design colors at 500 level
+
+
+// Function to get a consistent random color based on a string
+const getColorFromString = (str: string): string => {
+  // Simple hash function to get a number from a string
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i)
+    hash = hash & hash // Convert to 32bit integer
+  }
+
+  // Use the absolute value of hash to pick a color
+  const index = Math.abs(hash) % materialColors.length
+  return materialColors[index]
+}
 
 const SongListItem: React.FC<SongListItemProps> = ({song}) => {
   const dispatch = useDispatch()
@@ -107,26 +119,22 @@ const SongListItem: React.FC<SongListItemProps> = ({song}) => {
     return 'default'
   }
 
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false)
 
   const handleClick = () => {
-    dispatch(selectSong(song.id));
-    setIsModalVisible(true);
-  };
+    dispatch(selectSong(song.id))
+    setIsModalVisible(true)
+  }
 
   const handleClose = () => {
-    setIsModalVisible(false);
-  };
+    setIsModalVisible(false)
+  }
 
   return (
     <StyledCard>
       <SongContainer>
-        <ThumbnailContainer style={{backgroundImage: song.thumbnailUrl ? `url(${song.thumbnailUrl})` : 'none'}}>
-          {!song.thumbnailUrl && (
-            <PlaceholderThumbnail>
-              {song.title.substring(0, 2)}
-            </PlaceholderThumbnail>
-          )}
+        <ThumbnailContainer style={{backgroundColor: getColorFromString(song.title)}} className='shadow'>
+          {song.title.substring(0, 2)}
         </ThumbnailContainer>
 
         <DetailsContainer>
@@ -165,7 +173,7 @@ const SongListItem: React.FC<SongListItemProps> = ({song}) => {
           </Button>
         </ActionsContainer>
       </SongContainer>
-      <SongDetailModal songId={song.id} visible={isModalVisible} onClose={handleClose} />
+      <SongDetailModal songId={song.id} visible={isModalVisible} onClose={handleClose}/>
     </StyledCard>
   )
 }

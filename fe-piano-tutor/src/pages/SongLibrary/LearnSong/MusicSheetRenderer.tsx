@@ -1,6 +1,6 @@
 import React, {useEffect, useRef} from 'react'
 import Vex from 'vexflow'
-import {groupNotesByMeasure} from 'pages/LearnSong/sheetUtils'
+import {groupNotesByMeasure} from 'pages/SongLibrary/LearnSong/sheetUtils'
 
 interface MusicSheetRendererProps {
   vexNotes: Vex.StaveNote[]

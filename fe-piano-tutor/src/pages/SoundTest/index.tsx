@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { useMIDIHandler } from '../LearnSong/hooks/useMIDIHandler'
-import { useSheetMusicParser } from '../LearnSong/hooks/useSheetMusicParser'
+import { useMIDIHandler } from '../SongLibrary/LearnSong/hooks/useMIDIHandler'
+import { useSheetMusicParser } from '../SongLibrary/LearnSong/hooks/useSheetMusicParser'
 import { Card, Typography, Divider } from 'antd'
 import Vex from 'vexflow'
 

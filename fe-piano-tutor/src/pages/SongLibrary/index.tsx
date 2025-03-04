@@ -64,11 +64,13 @@ const SongLibrary: React.FC = () => {
 
   return (
     <PageContainer>
+      {/* Header */}
       <HeaderContainer>
         <Title level={1}>Browse Songs</Title>
         <Paragraph>Discover and select songs to learn on the piano</Paragraph>
       </HeaderContainer>
 
+      {/* Search & Filters */}
       <Row gutter={[16, 16]}>
         <Col xs={24}>
           <SongSearch />
@@ -81,6 +83,7 @@ const SongLibrary: React.FC = () => {
 
       <Divider />
 
+      {/* Sort */}
       <SortContainer>
         <SortText>Sort by:</SortText>
         <Space>
@@ -107,6 +110,7 @@ const SongLibrary: React.FC = () => {
         </Space>
       </SortContainer>
 
+      {/* Song List */}
       <SongList />
     </PageContainer>
   );

@@ -1,11 +1,11 @@
 import React, {useState, useEffect, useRef} from 'react'
 import {Spin} from 'antd'
-import {useSheetMusicParser} from './hooks/useSheetMusicParser'
-import {useMIDIHandler} from './hooks/useMIDIHandler'
-import {useNoteTimingTracking} from './hooks/useNoteTimingTracking'
-import MusicSheetRenderer from './MusicSheetRenderer'
+import {useSheetMusicParser} from 'pages/SongLibrary/LearnSong/hooks/useSheetMusicParser'
+import {useMIDIHandler} from 'pages/SongLibrary/LearnSong/hooks/useMIDIHandler'
+import {useNoteTimingTracking} from 'pages/SongLibrary/LearnSong/hooks/useNoteTimingTracking'
+import MusicSheetRenderer from 'pages/SongLibrary/LearnSong/MusicSheetRenderer'
 import Vex from 'vexflow'
-import {durationToBeats} from 'pages/LearnSong/sheetUtils'
+import {durationToBeats} from 'pages/SongLibrary/LearnSong/sheetUtils'
 
 interface AdvancedMusicSheetProps {
   sheetMusicXMLString: string;

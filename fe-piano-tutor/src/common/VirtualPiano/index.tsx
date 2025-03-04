@@ -13,13 +13,13 @@ import {
   OctaveContainer,
   PianoContainer
 } from 'common/VirtualPiano/styles/VirtualPiano.style'
-import {useMIDIHandler} from 'pages/LearnSong/hooks/useMIDIHandler'
+import {useMIDIHandler} from 'pages/SongLibrary/LearnSong/hooks/useMIDIHandler'
 import pianoUtils from 'common/VirtualPiano/pianoUtils'
 
 /* Styled Components */
 const ToggleButton = styled(Button)<{ isVisible: boolean }>`
     position: fixed;
-    bottom: ${props => props.isVisible ? '138px' : '20px'};
+    bottom: ${props => props.isVisible ? '138px' : '0'};
     right: 0;
     z-index: 1001;
     display: flex;

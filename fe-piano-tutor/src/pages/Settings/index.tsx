@@ -34,7 +34,8 @@ const Settings: React.FC = () => {
   return (
     <div style={{padding: '20px'}}>
       <h1>Settings</h1>
-      <h2>Music Theory</h2>
+      <h2>1. Music Theory</h2>
+      <h2>2. Learn Music Notes</h2>
       <Form
         layout="vertical"
         initialValues={localSettings}
