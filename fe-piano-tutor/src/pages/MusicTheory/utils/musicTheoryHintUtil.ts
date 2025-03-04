@@ -1,5 +1,5 @@
 import Vex from 'vexflow';
-import { Note } from 'store/slices/musicNotesSlice';
+import { INote } from 'store/slices/musicNotesSlice';
 import musicTheoryUtil from 'utils/musicTheoryUtil';
 
 /**
@@ -25,7 +25,7 @@ export const generateMusicTheoryHint = (
       octave,
       length,
       timestamp: Date.now()
-    } as Note;
+    } as INote;
   });
 
   // Use the existing musicTheoryUtil to generate the hint

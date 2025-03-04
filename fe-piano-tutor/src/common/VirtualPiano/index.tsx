@@ -74,31 +74,6 @@ const VirtualPiano: React.FC = () => {
     playNote(midiNote, 500, 100) // 500ms duration, medium velocity
   }
 
-  // Generate theory hints based on current concept and note
-  const getTheoryHint = (note: string, octave: number): string | null => {
-    if (!showTheoryAnnotations) return null
-
-    switch (currentTheoryConcept) {
-      case 'scales-keys':
-        if (note === 'C') return 'Root'
-        if (note === 'G') return 'Fifth'
-        if (note === 'E') return 'Third'
-        break
-      case 'chords':
-        if (note === 'C' && octave === 4) return 'Root'
-        if (note === 'E' && octave === 4) return 'Third'
-        if (note === 'G' && octave === 4) return 'Fifth'
-        break
-      case 'intervals':
-        if (note === 'C' && octave === 4) return 'Root'
-        if (note === 'E' && octave === 4) return 'M3'
-        if (note === 'G' && octave === 4) return 'P5'
-        break
-    }
-
-    return null
-  }
-
   /* Render */
   // Define octave range to display (3 octaves: lower, middle, upper)
   const octaves = [3, 4, 5]
@@ -146,7 +121,7 @@ const VirtualPiano: React.FC = () => {
                         bottom: '20px',
                         color: '#1677ff'
                       }}>
-                        {getTheoryHint(keyData.note, octave)}
+                        {pianoUtils.getTheoryHint(currentTheoryConcept, keyData.note, octave)}
                       </div>
                     )}
                   </WhiteKey>
@@ -186,7 +161,7 @@ const VirtualPiano: React.FC = () => {
                       bottom: '15px',
                       color: '#2196F3'
                     }}>
-                      {getTheoryHint(bk.note, octave)}
+                      {pianoUtils.getTheoryHint(currentTheoryConcept, bk.note, octave)}
                     </div>
                   )}
                 </BlackKey>

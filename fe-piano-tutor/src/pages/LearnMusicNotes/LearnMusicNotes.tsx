@@ -1,13 +1,12 @@
-import {useState, FC, useEffect, memo} from 'react'
+import React, {useState, FC, useEffect, memo} from 'react'
 import {Button, Typography, Space, Modal} from 'antd'
 import {MusicNoteGenerator} from 'utils/musicNoteGenerator'
 import SheetMusicRenderer from 'common/SheetMusicRenderer'
 import {StaveNote} from 'vexflow'
 import {useSelector, useDispatch} from 'react-redux'
 import {RootState} from 'store'
-import React from 'react'
 import {useNavigate} from 'react-router-dom'
-import {setLastSessionScore} from 'store/slices/musicNotesSlice'
+import {setLastSessionScore, setCurrentNote, setSuggestedNote} from 'store/slices/musicNotesSlice'
 import {recordNotePerformance, startSession, endSession} from 'store/slices/performanceSlice'
 
 const LearnMusicNotes: FC = memo(() => {
@@ -16,8 +15,9 @@ const LearnMusicNotes: FC = memo(() => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const musicNoteGeneratorService = new MusicNoteGenerator()
-  const { accuracyRate, totalNotesPlayed } = useSelector((state: RootState) => state.performance);
-  const NUMBER_OF_NOTES = useSelector((state: RootState) => state.settings.learnMusicNotes.NUMBER_OF_NOTES);
+  const {accuracyRate, totalNotesPlayed} = useSelector((state: RootState) => state.performance)
+  const NUMBER_OF_NOTES = useSelector((state: RootState) => state.settings.learnMusicNotes.NUMBER_OF_NOTES)
+  const TEMPO = useSelector((state: RootState) => state.settings.learnMusicNotes.TEMPO)
 
   /* States */
   const [notes, setNotes] = useState<StaveNote[]>([])
@@ -25,13 +25,13 @@ const LearnMusicNotes: FC = memo(() => {
   const [sessionScore, setSessionScore] = useState<number>(0)
   const [pendingLevel, setPendingLevel] = useState<number | null>(null)
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false)
-  const [expectedNoteStartTime, setExpectedNoteStartTime] = useState<number | null>(null);
+  const [expectedNoteStartTime, setExpectedNoteStartTime] = useState<number | null>(null)
 
   /* Handlers */
   const handleCorrectNote = (noteAttempted: string, timingDeviation: number) => {
     // Record performance data
     if (notes.length > 0) {
-      const expectedNote = notes[0].getKeys()[0]; // Gets the first key from the current note
+      const expectedNote = notes[0].getKeys()[0] // Gets the first key from the current note
 
       dispatch(recordNotePerformance({
         noteAttempted,
@@ -40,22 +40,22 @@ const LearnMusicNotes: FC = memo(() => {
         timingDeviation,
         difficultyLevel: level || 1,
         timestamp: Date.now()
-      }));
+      }))
 
       // Remove the played note
-      const newNotes = notes.slice(1);
-      setNotes(newNotes);
-      setSessionScore(prev => prev + 1);
+      const newNotes = notes.slice(1)
+      setNotes(newNotes)
+      setSessionScore(prev => prev + 1)
 
       // Set timing for next note
-      setExpectedNoteStartTime(Date.now());
+      setExpectedNoteStartTime(Date.now())
     }
-  };
+  }
 
   // Record incorrect note attempts
   const handleIncorrectNote = (noteAttempted: string, timingDeviation: number) => {
     if (notes.length > 0) {
-      const expectedNote = notes[0].getKeys()[0];
+      const expectedNote = notes[0].getKeys()[0]
 
       dispatch(recordNotePerformance({
         noteAttempted,
@@ -64,35 +64,44 @@ const LearnMusicNotes: FC = memo(() => {
         timingDeviation,
         difficultyLevel: level || 1,
         timestamp: Date.now()
-      }));
+      }))
     }
-  };
+  }
 
   // Start a new practice session
   const startNewLevel = (newLevel: number) => {
-    setLevel(newLevel);
-    const generatedNotes = musicNoteGeneratorService.generateNotes(newLevel, NUMBER_OF_NOTES);
-    setNotes(generatedNotes);
-    setSessionScore(0);
-    dispatch(startSession());
-    setExpectedNoteStartTime(Date.now());
-  };
+    // Clear previous session state
+    dispatch(setCurrentNote(null)) // Clear current note
+    dispatch(setSuggestedNote(null)) // Clear suggested note
+    setSessionScore(0)
+
+    // Set up new session
+    setLevel(newLevel)
+    dispatch(startSession())
+
+    // Generate new content
+    const generatedNotes = musicNoteGeneratorService.generateNotes(newLevel, NUMBER_OF_NOTES)
+    setNotes(generatedNotes)
+
+    // Start timing for the first note
+    setExpectedNoteStartTime(Date.now())
+  }
 
   // End session when complete or stopped
   const handleStopPractice = () => {
     if (level !== null && notes.length > 0) {
-      dispatch(setLastSessionScore(sessionScore));
-      dispatch(endSession());
+      dispatch(setLastSessionScore(sessionScore))
+      dispatch(endSession())
       navigate('/results', {
         state: {
           source: 'learn-music-notes',
           message: 'Practice Stopped'
         }
-      });
-      setNotes([]);
-      setLevel(null);
+      })
+      setNotes([])
+      setLevel(null)
     }
-  };
+  }
 
   const handleLevelSelect = (selectedLevel: number) => {
     // If there's already an active practice with notes remaining
@@ -124,8 +133,8 @@ const LearnMusicNotes: FC = memo(() => {
   // Navigate to results page when all notes are played
   useEffect(() => {
     if (level !== null && notes.length === 0 && sessionScore > 0) {
-      dispatch(setLastSessionScore(sessionScore));
-      dispatch(endSession());
+      dispatch(setLastSessionScore(sessionScore))
+      dispatch(endSession())
       navigate('/results', {
         state: {
           source: 'learn-music-notes',
@@ -147,11 +156,11 @@ const LearnMusicNotes: FC = memo(() => {
           {[1, 2, 3, 4, 5, 6, 7].map((levelNumber) => (
             <Button
               key={levelNumber}
-              type={level === levelNumber ? "primary" : "default"}
+              type={level === levelNumber ? 'primary' : 'default'}
               ghost={level === levelNumber}
               style={{
                 fontWeight: level === levelNumber ? 'bold' : 'normal',
-                borderColor: level === levelNumber ? '#1677ff' : '',
+                borderColor: level === levelNumber ? '#1677ff' : ''
               }}
               onClick={() => handleLevelSelect(levelNumber)}
             >
@@ -169,7 +178,7 @@ const LearnMusicNotes: FC = memo(() => {
                 <strong>Current Session Score: </strong> {sessionScore}
               </Typography.Text>
             </div>
-            <SheetMusicRenderer notes={notes} onCorrectNote={handleCorrectNote}/>
+            <SheetMusicRenderer notes={notes} onCorrectNote={handleCorrectNote} tempo={TEMPO}/>
             <div style={{marginTop: '20px'}}>
               <Button
                 danger

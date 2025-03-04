@@ -1,7 +1,7 @@
 // hooks/useMusicTheoryHint.ts
 import { useState, useMemo } from 'react';
 import Vex from 'vexflow';
-import { Note } from 'store/slices/musicNotesSlice';
+import { INote } from 'store/slices/musicNotesSlice';
 import musicTheoryUtil from 'utils/musicTheoryUtil';
 
 /**
@@ -31,7 +31,7 @@ export const useMusicTheoryHint = (
           octave,
           length,
           timestamp: Date.now()
-        } as Note;
+        } as INote;
       });
 
       const theoryConcept = musicTheoryContext.currentTheoryConcept || selectedConcept || '';

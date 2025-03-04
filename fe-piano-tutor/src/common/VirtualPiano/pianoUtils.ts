@@ -55,6 +55,34 @@ export class PianoUtils {
   public getNoteToMIDI(note: string, octave: number): number {
     return (octave + 1) * 12 + this.noteValues[note]
   }
+
+  /**
+   * Get theory hint based on current concept, note, and octave
+   * @param theoryConcept
+   * @param note
+   * @param octave
+   */
+  public getTheoryHint = (theoryConcept: string, note: string, octave: number): string | null => {
+    switch (theoryConcept) {
+      case 'scales-keys':
+        if (note === 'C') return 'Root'
+        if (note === 'G') return 'Fifth'
+        if (note === 'E') return 'Third'
+        break
+      case 'chords':
+        if (note === 'C' && octave === 4) return 'Root'
+        if (note === 'E' && octave === 4) return 'Third'
+        if (note === 'G' && octave === 4) return 'Fifth'
+        break
+      case 'intervals':
+        if (note === 'C' && octave === 4) return 'Root'
+        if (note === 'E' && octave === 4) return 'M3'
+        if (note === 'G' && octave === 4) return 'P5'
+        break
+    }
+
+    return null
+  }
 }
 
 const pianoUtils = new PianoUtils()

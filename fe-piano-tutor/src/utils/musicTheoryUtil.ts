@@ -1,4 +1,4 @@
-import { Note } from 'store/slices/musicNotesSlice'
+import { INote } from 'store/slices/musicNotesSlice'
 
 class MusicTheoryUtil {
   private static instance: MusicTheoryUtil
@@ -136,7 +136,7 @@ class MusicTheoryUtil {
   }
 
   // Generate music theory hints based on the displayed notes
-  public generateTheoryHint(notes: Note[], conceptType: string): string {
+  public generateTheoryHint(notes: INote[], conceptType: string): string {
     if (!notes || notes.length === 0) {
       return ''
     }
@@ -181,7 +181,7 @@ class MusicTheoryUtil {
   }
 
   // Generates a hint for the interval between two notes
-  public getIntervalHint(note1: Note, note2: Note): string {
+  public getIntervalHint(note1: INote, note2: INote): string {
     const value1 = this.noteValues[note1.note] + (note1.octave * 12)
     const value2 = this.noteValues[note2.note] + (note2.octave * 12)
     const semitones = Math.abs(value2 - value1)
@@ -190,7 +190,7 @@ class MusicTheoryUtil {
   }
 
   // Generates a hint for the scale or key based on the notes
-  public getScaleHint(notes: Note[]): string {
+  public getScaleHint(notes: INote[]): string {
     const firstNote = notes[0].note.replace('#', '').replace('b', '')
 
     // Check for C major scale pattern
@@ -205,7 +205,7 @@ class MusicTheoryUtil {
   }
 
   // Generates a hint for the chord based on the notes
-  public getChordHint(notes: Note[]): string {
+  public getChordHint(notes: INote[]): string {
     const rootNote = notes[0].note
 
     if (notes.length === 3) {
@@ -222,7 +222,7 @@ class MusicTheoryUtil {
   }
 
   // Returns the position of the note on the staff
-  public getNotePosition(note: Note): string {
+  public getNotePosition(note: INote): string {
     const key = note.note + (note.octave >= 5 ? note.octave : '')
     return this.notePositions[key] || 'On the staff'
   }

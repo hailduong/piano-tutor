@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import {Card, Typography, Button, Space, Divider, Row, Col, Tooltip} from 'antd'
 import {RootState, useAppDispatch, useAppSelector} from 'store'
-import {setSuggestedNote, Note} from 'store/slices/musicNotesSlice'
+import {setSuggestedNote, INote} from 'store/slices/musicNotesSlice'
 import SheetMusicRenderer from 'common/SheetMusicRenderer'
 import {QuestionCircleOutlined, SoundOutlined} from '@ant-design/icons'
 import musicNoteGenerator from 'utils/musicNoteGenerator'
@@ -17,7 +17,7 @@ interface TheoryInPracticeProps {
 interface PracticeExample {
   title: string;
   description: string;
-  notes: Note[];
+  notes: INote[];
   generationOptions?: {
     type: 'scale' | 'chord' | 'interval' | 'basic-notation';
     rootNote?: string;
@@ -246,7 +246,7 @@ const TheoryInPractice: React.FC<TheoryInPracticeProps> = ({conceptId}) => {
     if (!example || !example.generationOptions) return
 
     const options = example.generationOptions
-    let newNotes: Note[] = []
+    let newNotes: INote[] = []
 
     // Generate new notes based on the example type
     switch (options.type) {

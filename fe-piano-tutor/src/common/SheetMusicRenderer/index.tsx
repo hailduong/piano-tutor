@@ -1,9 +1,8 @@
 import React, {useEffect, useState, FC, useMemo} from 'react'
-import Vex, {Voice, Formatter} from 'vexflow'
+import Vex from 'vexflow'
 import {useDispatch, useSelector} from 'react-redux'
 import {RootState} from 'store'
-import {incrementScore, setSuggestedNote, Note} from 'store/slices/musicNotesSlice'
-import {USER_CONFIG} from 'config'
+import {incrementScore, setSuggestedNote, INote} from 'store/slices/musicNotesSlice'
 import {
   TheoryAnnotation,
   ScrollingSheetMusicDisplay,
@@ -14,7 +13,7 @@ import {generateMusicTheoryHint} from 'pages/MusicTheory/utils/musicTheoryHintUt
 
 // Interfaces
 interface SheetMusicRendererProps {
-  notes: Vex.StaveNote[] | Note[];
+  notes: Vex.StaveNote[] | INote[];
   onCorrectNote?: (noteAttempted: string, timingDeviation: number) => void;
   tempo?: number;
   showTheoryHints?: boolean;
@@ -40,7 +39,6 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
   // Get music theory state from Redux instead of context
   const showTheoryAnnotations = useSelector((state: RootState) => state.musicTheory.showTheoryAnnotations)
   const currentTheoryConcept = useSelector((state: RootState) => state.musicTheory.currentTheoryConcept)
-  const theoryHint = showTheoryAnnotations ? generateMusicTheoryHint(vexNotes, currentTheoryConcept) : '';
 
   /* State */
   // Track correctness and timing for note evaluation
@@ -48,7 +46,6 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
   const [expectedNoteTime, setExpectedNoteTime] = useState<number | null>(null)
 
   /* Hooks */
-
   // Convert input notes to VexFlow format if needed
   const vexNotes = useMemo(() => {
     // Check if notes are already Vex.StaveNote objects
@@ -57,7 +54,7 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
     }
 
     // Convert Note objects to Vex.StaveNote objects
-    return (notes as Note[]).map(note => {
+    return (notes as INote[]).map(note => {
       const staveNote = new Vex.Flow.StaveNote({
         keys: [`${note.note.toLowerCase()}/${note.octave}`],
         duration: note.length || 'q'
@@ -75,13 +72,15 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
   }, [notes])
 
   // Custom hooks for rendering
-  const {musicRef, clearMusicSheet, renderSheetMusic} = useVexFlowRenderer(
+  const {musicRef, renderSheet} = useVexFlowRenderer(
     vexNotes,
     currentNote,
     suggestedNote,
-    tempo
+    tempo,
+    setLastKeyPressIncorrect
   )
 
+  const theoryHint = showTheoryAnnotations ? generateMusicTheoryHint(vexNotes, currentTheoryConcept) : ''
   /* Effects */
   // Initialize expected note time when notes are loaded
   useEffect(() => {
@@ -93,42 +92,14 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
   // Render sheet music whenever notes or current note changes
   useEffect(() => {
     if (vexNotes.length === 0) {
-      clearMusicSheet()
+      renderSheet(null) // Pass null to clear the sheet
       return
     }
 
-    const VF = Vex.Flow
-    const staffWidth = Math.max(200, vexNotes.length * USER_CONFIG.NOTE_WIDTH)
+    renderSheet(vexNotes)
 
-    if (!musicRef.current) return
-
-    const renderer = new VF.Renderer(musicRef.current, VF.Renderer.Backends.SVG)
-    renderer.resize(staffWidth, 200)
-    const context = renderer.getContext()
-    context.clear()
-
-    const stave = new VF.Stave(10, 40, staffWidth)
-    stave.addClef('treble')
-    stave.setTempo({bpm: tempo, duration: 'q'}, 0)
-    stave.setContext(context).draw()
-
-    if (vexNotes.length > 0) {
-      const voice = new Voice({
-        num_beats: vexNotes.length,
-        beat_value: 4
-      })
-
-      voice.addTickables(vexNotes)
-      new Formatter().joinVoices([voice]).format([voice], staffWidth - 100)
-      voice.draw(context, stave)
-
-      renderSheetMusic(vexNotes, context, stave, currentNote, setLastKeyPressIncorrect)
-    }
-
-    return () => {
-      clearMusicSheet()
-    }
-  }, [vexNotes, currentNote, suggestedNote])
+    // No need for a cleanup function if it's handled in the hook
+  }, [vexNotes, currentNote, suggestedNote, renderSheet])
 
   // Process note input and handle correct/incorrect notes
   useEffect(() => {

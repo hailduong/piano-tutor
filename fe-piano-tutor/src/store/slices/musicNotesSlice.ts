@@ -1,6 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit'
 
-export interface Note {
+export interface INote {
   note: string;      // e.g., "C", "C#", etc.
   length: string;    // Default: "q" (quarter note)
   timestamp: number; // When the note was played
@@ -8,9 +8,9 @@ export interface Note {
 }
 
 export interface IMusicNotesState {
-  currentNote: Note | null;
-  history: Note[];
-  suggestedNote: Note | null; // The note that should be played (suggested by the system)
+  currentNote: INote | null;
+  suggestedNote: INote | null; // The note that should be played (suggested by the system)
+  history: INote[];
   score: number;  // Total accumulated score
   lastSessionScore: number; // Score from the most recent session
 }
@@ -20,34 +20,36 @@ const initialState: IMusicNotesState = {
   history: [],
   suggestedNote: null,
   score: 0,
-  lastSessionScore: 0,
-};
+  lastSessionScore: 0
+}
 
 const musicNotesSlice = createSlice({
   name: 'musicNotes',
   initialState,
   reducers: {
-    setCurrentNote: (state, action: PayloadAction<Note>) => {
-      state.currentNote = action.payload;
-      state.history.push(action.payload);
+    setCurrentNote: (state, action: PayloadAction<INote | null>) => {
+      state.currentNote = action.payload
+      if (action.payload) {
+        state.history.push(action.payload)
+      }
     },
-    setSuggestedNote: (state, action: PayloadAction<Note | null>) => {
-      state.suggestedNote = action.payload;
+    setSuggestedNote: (state, action: PayloadAction<INote | null>) => {
+      state.suggestedNote = action.payload
     },
     incrementScore: (state) => {
-      state.score += 1;
+      state.score += 1
     },
     resetScore: (state) => {
-      state.score = 0;
+      state.score = 0
     },
     setLastSessionScore: (state, action: PayloadAction<number>) => {
-      state.lastSessionScore = action.payload;
+      state.lastSessionScore = action.payload
     },
     clearHistory: (state) => {
-      state.history = [];
-    },
-  },
-});
+      state.history = []
+    }
+  }
+})
 
 export const {
   setCurrentNote,
@@ -56,5 +58,5 @@ export const {
   resetScore,
   setLastSessionScore,
   clearHistory
-} = musicNotesSlice.actions;
-export default musicNotesSlice.reducer;
+} = musicNotesSlice.actions
+export default musicNotesSlice.reducer
