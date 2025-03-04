@@ -1,6 +1,6 @@
 import React, {useState, FC, useEffect, memo} from 'react'
 import {Button, Typography, Space, Modal} from 'antd'
-import {MusicNoteGenerator} from 'utils/musicNoteGenerator'
+import {MusicNoteGenerator} from 'pages/LearnMusicNotes/utils/musicNoteGenerator'
 import SheetMusicRenderer from 'common/SheetMusicRenderer'
 import {StaveNote} from 'vexflow'
 import {useSelector, useDispatch} from 'react-redux'
@@ -26,6 +26,7 @@ const LearnMusicNotes: FC = memo(() => {
   const [pendingLevel, setPendingLevel] = useState<number | null>(null)
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false)
   const [expectedNoteStartTime, setExpectedNoteStartTime] = useState<number | null>(null)
+  const [keySignature, setKeySignature] = useState<string | null>(null)
 
   /* Handlers */
   const handleCorrectNote = (noteAttempted: string, timingDeviation: number) => {
@@ -71,8 +72,8 @@ const LearnMusicNotes: FC = memo(() => {
   // Start a new practice session
   const startNewLevel = (newLevel: number) => {
     // Clear previous session state
-    dispatch(setCurrentNote(null)) // Clear current note
-    dispatch(setSuggestedNote(null)) // Clear suggested note
+    dispatch(setCurrentNote(null))
+    dispatch(setSuggestedNote(null))
     setSessionScore(0)
 
     // Set up new session
@@ -80,8 +81,10 @@ const LearnMusicNotes: FC = memo(() => {
     dispatch(startSession())
 
     // Generate new content
-    const generatedNotes = musicNoteGeneratorService.generateNotes(newLevel, NUMBER_OF_NOTES)
+    const {notes: generatedNotes, keySignature} = musicNoteGeneratorService.generateNotes(newLevel, NUMBER_OF_NOTES)
     setNotes(generatedNotes)
+    setKeySignature(keySignature)
+    console.log('keySignature', keySignature)
 
     // Start timing for the first note
     setExpectedNoteStartTime(Date.now())
@@ -178,7 +181,12 @@ const LearnMusicNotes: FC = memo(() => {
                 <strong>Current Session Score: </strong> {sessionScore}
               </Typography.Text>
             </div>
-            <SheetMusicRenderer notes={notes} onCorrectNote={handleCorrectNote} tempo={TEMPO}/>
+            <SheetMusicRenderer
+              notes={notes}
+              onCorrectNote={handleCorrectNote}
+              tempo={TEMPO}
+              keySignature={keySignature || undefined}
+            />
             <div style={{marginTop: '20px'}}>
               <Button
                 danger

@@ -4,7 +4,7 @@ import {RootState, useAppDispatch, useAppSelector} from 'store'
 import {setSuggestedNote, INote} from 'store/slices/musicNotesSlice'
 import SheetMusicRenderer from 'common/SheetMusicRenderer'
 import {QuestionCircleOutlined, SoundOutlined} from '@ant-design/icons'
-import musicNoteGenerator from 'utils/musicNoteGenerator'
+import musicNoteGenerator from 'pages/LearnMusicNotes/utils/musicNoteGenerator'
 import {setCurrentTheoryConcept} from 'store/slices/musicTheorySlice'
 
 const {Title, Paragraph, Text} = Typography

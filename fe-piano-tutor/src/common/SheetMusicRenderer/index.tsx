@@ -14,6 +14,7 @@ import {generateMusicTheoryHint} from 'pages/MusicTheory/utils/musicTheoryHintUt
 // Interfaces
 interface SheetMusicRendererProps {
   notes: Vex.StaveNote[] | INote[];
+  keySignature?: string;
   onCorrectNote?: (noteAttempted: string, timingDeviation: number) => void;
   tempo?: number;
   showTheoryHints?: boolean;
@@ -73,9 +74,7 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
 
   // Custom hooks for rendering
   const {musicRef, renderSheet} = useVexFlowRenderer(
-    vexNotes,
     currentNote,
-    suggestedNote,
     tempo,
     setLastKeyPressIncorrect
   )

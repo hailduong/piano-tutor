@@ -1,7 +1,6 @@
 // musicNoteGeneratorService.ts
 
 import Vex from 'vexflow'
-import {LEARN_MUSIC_NOTE_SETTINGS} from 'store/defaultConfigs'
 import {INote} from 'store/slices/musicNotesSlice'
 
 // Types for music theory concepts
@@ -10,6 +9,8 @@ export type ChordType = 'major' | 'minor' | 'diminished' | 'augmented' | 'major7
 export type IntervalType =
   'unison' | 'minor2' | 'major2' | 'minor3' | 'major3' | 'perfect4' |
   'tritone' | 'perfect5' | 'minor6' | 'major6' | 'minor7' | 'major7' | 'octave';
+
+export type TKeySignature = 'C' | 'G' | 'D' | 'A' | 'E' | 'B' | 'F#';
 
 export interface NoteGeneratorOptions {
   startingNote?: string;
@@ -21,19 +22,41 @@ export interface NoteGeneratorOptions {
 }
 
 export class MusicNoteGenerator {
-  private levels: { [key: number]: string[] }
+  private levels: { [key: number]: { notes: string[], keySignature: string } }
   private noteValues: { [key: string]: number }
   private notesByValue: string[]
 
   constructor() {
+    // Each level corresponds to a key signature with increasing number of sharps (0-6)
     this.levels = {
-      1: ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
-      2: ['G', 'A', 'B', 'C', 'D', 'E', 'F#', 'F', 'Bb'],
-      3: ['D', 'E', 'F#', 'G', 'A', 'B', 'C#', 'Bb', 'Eb'],
-      4: ['A', 'B', 'C#', 'D', 'E', 'F#', 'G#', 'Eb', 'Ab'],
-      5: ['E', 'F#', 'G#', 'A', 'B', 'C#', 'D#', 'Ab', 'Db'],
-      6: ['B', 'C#', 'D#', 'E', 'F#', 'G#', 'A#', 'Db', 'Eb'],
-      7: ['F#', 'G#', 'A#', 'B', 'C#', 'D#', 'E#', 'Gb', 'Ab']
+      1: {
+        notes: ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
+        keySignature: 'C' // C major - no sharps/flats
+      },
+      2: {
+        notes: ['G', 'A', 'B', 'C', 'D', 'E', 'F#'],
+        keySignature: 'G' // G major - 1 sharp (F#)
+      },
+      3: {
+        notes: ['D', 'E', 'F#', 'G', 'A', 'B', 'C#'],
+        keySignature: 'D' // D major - 2 sharps (F#, C#)
+      },
+      4: {
+        notes: ['A', 'B', 'C#', 'D', 'E', 'F#', 'G#'],
+        keySignature: 'A' // A major - 3 sharps (F#, C#, G#)
+      },
+      5: {
+        notes: ['E', 'F#', 'G#', 'A', 'B', 'C#', 'D#'],
+        keySignature: 'E' // E major - 4 sharps (F#, C#, G#, D#)
+      },
+      6: {
+        notes: ['B', 'C#', 'D#', 'E', 'F#', 'G#', 'A#'],
+        keySignature: 'B' // B major - 5 sharps (F#, C#, G#, D#, A#)
+      },
+      7: {
+        notes: ['F#', 'G#', 'A#', 'B', 'C#', 'D#', 'E#'],
+        keySignature: 'F#' // F# major - 6 sharps (F#, C#, G#, D#, A#, E#)
+      }
     }
 
     // Map of note values (0-11 representing C through B)
@@ -49,13 +72,17 @@ export class MusicNoteGenerator {
 
   /**
    * Generate random notes based on the difficulty level
+   * @returns An object containing the generated notes and the key signature
    */
-  generateNotes(level: number, numberOfNotes: number): Vex.StaveNote[] {
+  generateNotes(level: number, numberOfNotes: number): {
+    notes: Vex.StaveNote[],
+    keySignature: string
+  } {
     if (level < 1 || level > 7) {
       throw new Error('Level must be between 1 and 7.')
     }
 
-    const notePool = this.levels[level]
+    const {notes: notePool, keySignature} = this.levels[level]
     const notes: Vex.StaveNote[] = []
 
     // Generate random notes from the pool
@@ -69,7 +96,7 @@ export class MusicNoteGenerator {
       )
     }
 
-    return notes
+    return {notes, keySignature}
   }
 
   /**
