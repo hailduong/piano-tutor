@@ -6,8 +6,9 @@ import {StaveNote} from 'vexflow'
 import {useSelector, useDispatch} from 'react-redux'
 import {RootState} from 'store'
 import {useNavigate} from 'react-router-dom'
-import {setLastSessionScore, setCurrentNote, setSuggestedNote, setSelectedLevel} from 'store/slices/musicNotesSlice'
+import {setLastSessionScore, setSelectedLevel} from 'store/slices/musicNotesSlice'
 import {recordNotePerformance, startSession, endSession} from 'store/slices/performanceSlice'
+import {setSuggestedNote, setCurrentNote} from 'store/slices/virtualPianoSlice'
 
 const LearnMusicNotes: FC = memo(() => {
   /* Props & Store */

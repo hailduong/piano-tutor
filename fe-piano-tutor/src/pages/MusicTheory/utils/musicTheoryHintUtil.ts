@@ -1,6 +1,6 @@
 import Vex from 'vexflow';
-import { INote } from 'store/slices/musicNotesSlice';
 import musicTheoryUtil from 'utils/musicTheoryUtil';
+import {INote} from 'store/slices/types/INote'
 
 /**
  * Generates music theory hints based on notes

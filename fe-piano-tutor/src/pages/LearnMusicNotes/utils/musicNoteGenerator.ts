@@ -1,7 +1,8 @@
 // musicNoteGeneratorService.ts
 
 import Vex from 'vexflow'
-import {INote} from 'store/slices/musicNotesSlice'
+
+import {INote} from 'store/slices/types/INote'
 
 // Types for music theory concepts
 export type ScaleType = 'major' | 'minor' | 'pentatonicMajor' | 'pentatonicMinor' | 'chromatic' | 'blues';

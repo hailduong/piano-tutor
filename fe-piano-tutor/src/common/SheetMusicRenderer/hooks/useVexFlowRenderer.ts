@@ -2,8 +2,8 @@ import {useRef, useCallback} from 'react'
 import {useSelector} from 'react-redux'
 import Vex, {Voice, Formatter} from 'vexflow'
 import {RootState} from 'store'
-import {INote} from 'store/slices/musicNotesSlice'
 import {TKeySignature} from 'pages/LearnMusicNotes/utils/musicNoteGenerator'
+import {INote} from 'store/slices/types/INote'
 
 /**
  * Types and interfaces

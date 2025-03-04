@@ -2,7 +2,7 @@ import React, {useEffect, useState, FC, useMemo} from 'react'
 import Vex from 'vexflow'
 import {useDispatch, useSelector} from 'react-redux'
 import {RootState} from 'store'
-import {incrementScore, setSuggestedNote, INote} from 'store/slices/musicNotesSlice'
+import {incrementScore} from 'store/slices/musicNotesSlice'
 import {
   TheoryAnnotation,
   ScrollingSheetMusicDisplay,
@@ -11,6 +11,8 @@ import {
 import {useVexFlowRenderer} from './hooks/useVexFlowRenderer'
 import {generateMusicTheoryHint} from 'pages/MusicTheory/utils/musicTheoryHintUtil'
 import {TKeySignature} from 'pages/LearnMusicNotes/utils/musicNoteGenerator'
+import {INote} from 'store/slices/types/INote'
+import {setSuggestedNote} from 'store/slices/virtualPianoSlice'
 
 // Interfaces
 interface SheetMusicRendererProps {
@@ -31,9 +33,9 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
   const dispatch = useDispatch()
 
   // Access current and suggested notes from Redux store
-  const musicNotesState = useSelector((state: RootState) => state.musicNotes)
-  const currentNote = musicNotesState.currentNote
-  const suggestedNote = musicNotesState.suggestedNote
+  const virtualPianoState = useSelector((state: RootState) => state.virtualPiano)
+  const currentNote = virtualPianoState.currentNote
+  const suggestedNote = virtualPianoState.suggestedNote
 
   // Get music theory state from Redux instead of context
   const showTheoryAnnotations = useSelector((state: RootState) => state.musicTheory.showTheoryAnnotations)

@@ -1,4 +1,4 @@
-import { INote } from 'store/slices/musicNotesSlice'
+import {INote} from 'store/slices/types/INote'
 
 class MusicTheoryUtil {
   private static instance: MusicTheoryUtil

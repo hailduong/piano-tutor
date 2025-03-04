@@ -1,11 +1,12 @@
 import React, {useState, useEffect} from 'react'
 import {Card, Typography, Button, Space, Divider, Row, Col, Tooltip} from 'antd'
 import {RootState, useAppDispatch, useAppSelector} from 'store'
-import {setSuggestedNote, INote} from 'store/slices/musicNotesSlice'
 import SheetMusicRenderer from 'common/SheetMusicRenderer'
 import {QuestionCircleOutlined, SoundOutlined} from '@ant-design/icons'
 import musicNoteGenerator from 'pages/LearnMusicNotes/utils/musicNoteGenerator'
 import {setCurrentTheoryConcept} from 'store/slices/musicTheorySlice'
+import {INote} from 'store/slices/types/INote'
+import {setSuggestedNote} from 'store/slices/virtualPianoSlice'
 
 const {Title, Paragraph, Text} = Typography
 
@@ -333,7 +334,6 @@ const TheoryInPractice: React.FC<TheoryInPracticeProps> = ({conceptId}) => {
             <Col span={24}>
               <SheetMusicRenderer
                 notes={example.notes}
-                width={600}
                 height={150}
                 showTheoryHints={true}
                 selectedConcept={conceptId}

@@ -1,8 +1,8 @@
 // hooks/useMusicTheoryHint.ts
 import { useState, useMemo } from 'react';
 import Vex from 'vexflow';
-import { INote } from 'store/slices/musicNotesSlice';
 import musicTheoryUtil from 'utils/musicTheoryUtil';
+import {INote} from 'store/slices/types/INote'
 
 /**
  * Hook to generate music theory hints, e.g. "This is a C Major chord"
