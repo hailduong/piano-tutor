@@ -2,7 +2,7 @@
 import { useState, useMemo } from 'react';
 import Vex from 'vexflow';
 import musicTheoryUtil from 'utils/musicTheoryUtil';
-import {INote} from 'store/slices/types/INote'
+import {IPianoNote} from 'store/slices/types/IPianoNote'
 
 /**
  * Hook to generate music theory hints, e.g. "This is a C Major chord"
@@ -31,7 +31,7 @@ export const useMusicTheoryHint = (
           octave,
           length,
           timestamp: Date.now()
-        } as INote;
+        } as IPianoNote;
       });
 
       const theoryConcept = musicTheoryContext.currentTheoryConcept || selectedConcept || '';

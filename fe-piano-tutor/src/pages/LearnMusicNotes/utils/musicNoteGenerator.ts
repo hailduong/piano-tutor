@@ -2,7 +2,7 @@
 
 import Vex from 'vexflow'
 
-import {INote} from 'store/slices/types/INote'
+import {IPianoNote} from 'store/slices/types/IPianoNote'
 
 // Types for music theory concepts
 export type ScaleType = 'major' | 'minor' | 'pentatonicMajor' | 'pentatonicMinor' | 'chromatic' | 'blues';
@@ -103,7 +103,7 @@ export class MusicNoteGenerator {
   /**
    * Convert our Note objects to VexFlow StaveNote objects
    */
-  notesToVexNotes(notes: INote[]): Vex.StaveNote[] {
+  notesToVexNotes(notes: IPianoNote[]): Vex.StaveNote[] {
     return notes.map(note => {
       const staveNote = new Vex.Flow.StaveNote({
         keys: [`${note.note.toLowerCase()}/${note.octave}`],
@@ -129,7 +129,7 @@ export class MusicNoteGenerator {
     octave: number = 4,
     scaleType: ScaleType = 'major',
     options: NoteGeneratorOptions = {}
-  ): INote[] {
+  ): IPianoNote[] {
     const {
       noteLength = 'q',
       ascending = true,
@@ -164,7 +164,7 @@ export class MusicNoteGenerator {
     const finalIntervals = noteCount ? intervals.slice(0, noteCount) : intervals
 
     // Create notes array
-    const notes: INote[] = []
+    const notes: IPianoNote[] = []
     const rootValue = this.noteValues[rootNote]
 
     if (rootValue === undefined) {
@@ -200,7 +200,7 @@ export class MusicNoteGenerator {
     octave: number = 4,
     chordType: ChordType = 'major',
     options: NoteGeneratorOptions = {}
-  ): INote[] {
+  ): IPianoNote[] {
     const {
       noteLength = 'q',
       ascending = true
@@ -234,7 +234,7 @@ export class MusicNoteGenerator {
     }
 
     // Create notes array
-    const notes: INote[] = []
+    const notes: IPianoNote[] = []
     const rootValue = this.noteValues[rootNote]
 
     if (rootValue === undefined) {
@@ -270,7 +270,7 @@ export class MusicNoteGenerator {
     octave: number = 4,
     intervalType: IntervalType = 'perfect5',
     options: NoteGeneratorOptions = {}
-  ): INote[] {
+  ): IPianoNote[] {
     const {noteLength = 'q'} = options
 
     // Map interval types to semitone counts
@@ -305,7 +305,7 @@ export class MusicNoteGenerator {
     const secondOctave = octave + Math.floor((rootValue + semitones) / 12)
 
     // Create notes array
-    const notes: INote[] = [
+    const notes: IPianoNote[] = [
       {
         note: rootNote,
         octave: octave,
@@ -329,7 +329,7 @@ export class MusicNoteGenerator {
   generateBasicNotationNotes(
     clef: 'treble' | 'bass' = 'treble',
     options: NoteGeneratorOptions = {}
-  ): INote[] {
+  ): IPianoNote[] {
     const {
       noteCount = 5,
       noteLength = 'q'
@@ -342,7 +342,7 @@ export class MusicNoteGenerator {
     const bassNotes = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
     const bassOctaves = [2, 3]
 
-    const notes: INote[] = []
+    const notes: IPianoNote[] = []
     const noteSet = clef === 'treble' ? trebleNotes : bassNotes
     const octaveSet = clef === 'treble' ? trebleOctaves : bassOctaves
 

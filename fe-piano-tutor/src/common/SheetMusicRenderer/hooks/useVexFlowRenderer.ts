@@ -3,7 +3,7 @@ import {useSelector} from 'react-redux'
 import Vex, {Voice, Formatter} from 'vexflow'
 import {RootState} from 'store'
 import {TKeySignature} from 'pages/LearnMusicNotes/utils/musicNoteGenerator'
-import {INote} from 'store/slices/types/INote'
+import {IPianoNote} from 'store/slices/types/IPianoNote'
 
 /**
  * Types and interfaces
@@ -24,7 +24,7 @@ type TKeySignatureMap = {
  * Hook that handles rendering sheet music using VexFlow
  */
 export const useVexFlowRenderer = (
-  currentNote: INote | null,
+  currentNote: IPianoNote | null,
   tempo: number,
   setLastKeyPressIncorrect?: React.Dispatch<React.SetStateAction<boolean>>,
   keySignature?: TKeySignature

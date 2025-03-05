@@ -1,11 +1,15 @@
 import React, {useState, useEffect, useRef} from 'react'
 import {Spin} from 'antd'
-import {useSheetMusicParser} from 'pages/SongLibrary/LearnSong/hooks/useSheetMusicParser'
-import {useMIDIHandler} from 'pages/SongLibrary/LearnSong/hooks/useMIDIHandler'
-import {useNoteTimingTracking} from 'pages/SongLibrary/LearnSong/hooks/useNoteTimingTracking'
-import AdvancedMusicSheetRenderer from 'pages/SongLibrary/LearnSong/AdvancedMusicSheetRenderer'
+import {useSheetMusicParser} from 'pages/LearnSong/hooks/useSheetMusicParser'
+import {useMIDIHandler} from 'pages/LearnSong/hooks/useMIDIHandler'
+import {useNoteTimingTracking} from 'pages/LearnSong/hooks/useNoteTimingTracking'
+import SheetMusicRenderer from 'pages/LearnSong/SheetMusicRenderer'
 import Vex from 'vexflow'
-import {durationToBeats} from 'pages/SongLibrary/LearnSong/sheetUtils'
+import {durationToBeats} from 'pages/LearnSong/sheetUtils'
+import {useSelector, useDispatch} from 'react-redux'
+import {selectIsPracticing, updateProgress} from 'store/slices/learnSongSlice'
+import {setSuggestedNote, selectPianoCurrentNote} from 'store/slices/virtualPianoSlice'
+import {IPianoNote} from 'store/slices/types/IPianoNote'
 
 interface AdvancedMusicSheetProps {
   songId: string | null;
@@ -17,9 +21,16 @@ interface AdvancedMusicSheetProps {
   onSongComplete: () => void;
 }
 
-const AdvancedMusicSheet: React.FC<AdvancedMusicSheetProps> = (props) => {
+const MusicSheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
   /* Props */
   const {songId, sheetMusicXMLString, isPlaying, tempo, currentPosition, onNotePlay, onSongComplete} = props
+
+
+  /* Redux State */
+  const dispatch = useDispatch()
+  const isPracticing = useSelector(selectIsPracticing)
+  const pianoCurrentNote: null | IPianoNote = useSelector(selectPianoCurrentNote)
+
 
   /* States */
   const [currentNote, setCurrentNote] = useState<string | null>(null)
@@ -28,28 +39,22 @@ const AdvancedMusicSheet: React.FC<AdvancedMusicSheetProps> = (props) => {
   const [noteElements, setNoteElements] = useState<Map<string, HTMLElement>>(new Map())
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [vexNotes, setVexNotes] = useState<Vex.StaveNote[]>([])
-  const [isPracticeMode, setIsPracticeMode] = useState<boolean>(false)
   const [incorrectAttempt, setIncorrectAttempt] = useState<boolean>(false)
 
   /* Refs */
-  const currentNoteRef = useRef(currentNote)
-  currentNoteRef.current = currentNote
   const containerRef = useRef<HTMLDivElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const isPracticingRef = useRef(isPracticeMode)
-  isPracticingRef.current = isPracticeMode
+  const currentNoteRef = useRef(currentNote)
+  currentNoteRef.current = currentNote
+  const isPracticingRef = useRef(isPracticing)
+  isPracticingRef.current = isPracticing
+  const lastPianoNoteRef = useRef<string | null>(null)
+
 
   /* Hooks */
   const {parseSheetMusic, calculateNotePositions, convertKeyToMIDINote} = useSheetMusicParser()
   const {midiAccess, playNote, hasSupport} = useMIDIHandler()
   const {expectedNoteTime, lastNoteTimestamp, handleNotePlay, initializeTiming} = useNoteTimingTracking()
-
-  // Update practice mode when isPlaying changes
-  useEffect(() => {
-    // If we're not playing automatically, we're in practice mode
-    const practiceMode = !isPlaying && currentNote !== null;
-    setIsPracticeMode(practiceMode);
-  }, [isPlaying, currentNote]);
 
   /* Effects */
   useEffect(() => {
@@ -59,6 +64,10 @@ const AdvancedMusicSheet: React.FC<AdvancedMusicSheetProps> = (props) => {
       setIsLoading(false)
     }
   }, [sheetMusicXMLString])
+
+  useEffect(() => {
+    isPracticingRef.current = isPracticing
+  }, [isPracticing])
 
   // Update note positions when vexNotes change
   useEffect(() => {
@@ -78,8 +87,8 @@ const AdvancedMusicSheet: React.FC<AdvancedMusicSheetProps> = (props) => {
       }
 
       // Initialize timing when notes are ready
-        initializeTiming(isPlaying)
-      }
+      initializeTiming(isPlaying)
+    }
   }, [vexNotes, noteElements, isPlaying])
 
   // Initialize timing when starting to play
@@ -159,97 +168,96 @@ const AdvancedMusicSheet: React.FC<AdvancedMusicSheetProps> = (props) => {
     return () => {
       isActive = false // Clean up on unmount
     }
-  }, [isPlaying, tempo, isPracticeMode])
+  }, [isPlaying, tempo])
 
-  // Handle piano key press for practice mode
-  const handlePianoKeyPress = (midiNote: number) => {
-    // Only process key presses in practice mode
-    if (!isPracticeMode || !currentNote) return;
 
-    // Get the current note's expected MIDI value
-    const currentIndex = vexNotes.findIndex(note => note.getAttribute('id') === currentNote);
-    if (currentIndex === -1) return;
+  // Effect to handle piano key presses during practice mode
+  useEffect(() => {
+    if (!isPracticing || !currentNote || !pianoCurrentNote || pianoCurrentNote === lastPianoNoteRef.current) {
+      return
+    }
 
-    const currentVexNote = vexNotes[currentIndex];
-    const key = currentVexNote.getKeys()[0]; // Get the first key of the VexFlow note
-    const expectedMidiNote = convertKeyToMIDINote(key);
+    // Update ref to prevent duplicate processing
+    lastPianoNoteRef.current = pianoCurrentNote
 
-    // Check if played note matches expected note
-    if (midiNote === expectedMidiNote) {
-      // Correct note
-      setIncorrectAttempt(false);
+    // Get expected note information
+    const currentIndex = vexNotes.findIndex(note => note.getAttribute('id') === currentNote)
+    if (currentIndex === -1) return
 
-      // Play the note sound
-      playNote(midiNote, 500, 96);
+    const currentVexNote = vexNotes[currentIndex]
+    const key = currentVexNote.getKeys()[0]
+    const expectedMidiNote = convertKeyToMIDINote(key)
 
-      // Record the correct note
-    handleNotePlay(
-      currentNote,
-      vexNotes,
-      false, // Not auto-playing
-      tempo,
-      onNotePlay,
-      playNote,
-      convertKeyToMIDINote
-      );
+    // Get the MIDI note number from the piano note object
+    // Instead of parsing from a string, access the note and octave properties
+    const playedNote = pianoCurrentNote.note
+    const playedOctave = pianoCurrentNote.octave
+    // Convert note name and octave to MIDI note number
+    const playedMidiNote = convertKeyToMIDINote(`${playedNote}/${playedOctave}`)
+
+    // Compare the played note with the expected note
+    if (playedMidiNote === expectedMidiNote) {
+      // Correct note was played
+      setIncorrectAttempt(false)
+
+      // Calculate timing deviation
+      const now = Date.now()
+      const timingDeviation = expectedNoteTime ? now - expectedNoteTime : 0
+
+      // Call the parent component's handler
+      onNotePlay(currentNote, timingDeviation)
 
       // Move to next note
-    if (currentIndex < vexNotes.length - 1) {
-        const nextNoteId = vexNotes[currentIndex + 1].getAttribute('id');
-        setCurrentNote(nextNoteId);
+      if (currentIndex < vexNotes.length - 1) {
+        const nextNoteId = vexNotes[currentIndex + 1].getAttribute('id')
+        setCurrentNote(nextNoteId)
 
         // Update next note reference
-      if (currentIndex + 2 < vexNotes.length) {
-          const nextNextNoteId = vexNotes[currentIndex + 2].getAttribute('id');
-          setNextNote(nextNextNoteId);
+        if (currentIndex + 2 < vexNotes.length) {
+          const nextNextNoteId = vexNotes[currentIndex + 2].getAttribute('id')
+          setNextNote(nextNextNoteId)
+        } else {
+          setNextNote(null)
+        }
+
+        // Set expected time for next note based on tempo
+        initializeTiming(false)
       } else {
-          setNextNote(null);
+        // End of song
+        onSongComplete()
+        setCurrentNote(null)
+        setNextNote(null)
       }
-    } else {
-      // End of song
-        onSongComplete();
-        setCurrentNote(null);
-        setNextNote(null);
-    }
     } else {
       // Incorrect note
-      setIncorrectAttempt(true);
-      // Still play the note but with lower velocity to give feedback
-      playNote(midiNote, 200, 50);
+      setIncorrectAttempt(true)
 
-      // Highlight the correct note more prominently
-      const noteElement = noteElements.get(currentNote);
-      if (noteElement) {
-        // Add a temporary class for incorrect attempt
-        noteElement.classList.add('incorrect-attempt');
-        setTimeout(() => {
-          noteElement.classList.remove('incorrect-attempt');
-        }, 300);
+      // Suggest the correct note in the piano UI
+      const nextKey = currentVexNote.getKeys()[0]
+
+      // Parse the key to get note name and octave
+      // Example key format: "C/4" where "C" is the note and "4" is the octave
+      const [noteName, octaveStr] = nextKey.split('/')
+
+      // Create a proper IPianoNote object
+      const suggestedNote: IPianoNote = {
+        note: noteName,           // e.g., "C", "C#", etc.
+        length: 'q',              // Default to quarter note
+        timestamp: Date.now(),    // Current timestamp
+        octave: parseInt(octaveStr, 10)  // Parse octave number
       }
+
+      dispatch(setSuggestedNote(suggestedNote))
+
+      // Update incorrect notes count
+      dispatch(updateProgress({
+        incorrectNotes: 1,
+        accuracy: -0.05 // Reduce accuracy by 5% (adjust as needed)
+      }))
     }
-  };
+  }, [isPracticing, pianoCurrentNote, currentNote, vexNotes])
 
   /* Handlers */
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    // Map keyboard keys to MIDI notes for testing on computer keyboard
-    // This is a simplified example - in a real app, you'd have a more complete mapping
-    const keyMap: Record<string, number> = {
-      'a': 60, // C4
-      's': 62, // D4
-      'd': 64, // E4
-      'f': 65, // F4
-      'g': 67, // G4
-      'h': 69, // A4
-      'j': 71, // B4
-      'k': 72, // C5
-    };
-
-    const midiNote = keyMap[event.key.toLowerCase()];
-    if (midiNote) {
-      handlePianoKeyPress(midiNote);
-    }
-  }
-
   // Store note element references from the rendered sheet
   const handleNoteElementsUpdate = (elements: Map<string, HTMLElement>) => {
     setNoteElements(elements)
@@ -263,7 +271,6 @@ const AdvancedMusicSheet: React.FC<AdvancedMusicSheetProps> = (props) => {
   return (
     <div
       ref={containerRef}
-      onKeyDown={handleKeyDown}
       tabIndex={0}
       style={{width: '100%', outline: 'none'}}
     >
@@ -271,9 +278,9 @@ const AdvancedMusicSheet: React.FC<AdvancedMusicSheetProps> = (props) => {
         {hasSupport ? 'MIDI support detected' : 'MIDI not supported in your browser'}
       </div>
       <div>
-        {isPracticeMode
-          ? "Practice Mode: Play the highlighted note on the piano"
-          : "Playback Mode: Listen to the song"}
+        {isPracticing
+          ? 'Practice Mode: Play the highlighted note on the piano'
+          : 'Playback Mode: Listen to the song'}
       </div>
       <div
         ref={scrollContainerRef}
@@ -284,7 +291,7 @@ const AdvancedMusicSheet: React.FC<AdvancedMusicSheetProps> = (props) => {
           overflowY: 'hidden'
         }}
       >
-        <AdvancedMusicSheetRenderer
+        <SheetMusicRenderer
           vexNotes={vexNotes}
           onNoteElementsUpdate={handleNoteElementsUpdate}
           currentNote={currentNote}
@@ -296,4 +303,4 @@ const AdvancedMusicSheet: React.FC<AdvancedMusicSheetProps> = (props) => {
   )
 }
 
-export default AdvancedMusicSheet
+export default MusicSheetContainer

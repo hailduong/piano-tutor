@@ -1,6 +1,6 @@
 import Vex from 'vexflow';
 import musicTheoryUtil from 'utils/musicTheoryUtil';
-import {INote} from 'store/slices/types/INote'
+import {IPianoNote} from 'store/slices/types/IPianoNote'
 
 /**
  * Generates music theory hints based on notes
@@ -25,7 +25,7 @@ export const generateMusicTheoryHint = (
       octave,
       length,
       timestamp: Date.now()
-    } as INote;
+    } as IPianoNote;
   });
 
   // Use the existing musicTheoryUtil to generate the hint

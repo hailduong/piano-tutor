@@ -4,8 +4,8 @@ import {useDispatch, useSelector} from 'react-redux'
 import {RootState} from 'store'
 import {
   setCurrentNote as setVirtualPianoCurrentNote,
-  selectCurrentNote,
-  selectSuggestedNote,
+  selectPianoCurrentNote,
+  selectPianoSuggestedNote,
   selectPianoVisibility,
   togglePianoVisibility
 } from 'store/slices/virtualPianoSlice'
@@ -19,7 +19,7 @@ import {
   OctaveContainer,
   PianoContainer
 } from 'common/VirtualPiano/styles/VirtualPiano.style'
-import {useMIDIHandler} from 'pages/SongLibrary/LearnSong/hooks/useMIDIHandler'
+import {useMIDIHandler} from 'pages/LearnSong/hooks/useMIDIHandler'
 import pianoUtils from 'common/VirtualPiano/pianoUtils'
 
 /* Styled Components */
@@ -40,8 +40,8 @@ const VirtualPiano: React.FC = () => {
   const dispatch = useDispatch()
 
   // Get piano state from Redux
-  const currentNote = useSelector(selectCurrentNote)
-  const suggestedNote = useSelector(selectSuggestedNote)
+  const currentNote = useSelector(selectPianoCurrentNote)
+  const suggestedNote = useSelector(selectPianoSuggestedNote)
   const isVisible = useSelector(selectPianoVisibility)
 
   // Get music theory state from Redux
@@ -65,9 +65,10 @@ const VirtualPiano: React.FC = () => {
     dispatch(setVirtualPianoCurrentNote({
       note,
       octave,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      length: 'q'
     }))
-    
+
     // Convert to MIDI note number and play using the MIDI handler
     const midiNote = pianoUtils.getNoteToMIDI(note, octave)
     playNote(midiNote, 500, 100) // 500ms duration, medium velocity

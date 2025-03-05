@@ -26,8 +26,8 @@ import {
   ControlSection,
   SectionTitle,
   ControlsContainer
-} from 'pages/SongLibrary/LearnSong/styles/LearnSongControls.styled'
-import {useMIDIHandler} from './hooks/useMIDIHandler'
+} from 'pages/LearnSong/styles/LearnSongControls.styled'
+import {useMIDIHandler} from 'pages/LearnSong/hooks/useMIDIHandler'
 
 /* Interfaces */
 interface ILearnSongControlsProps {
@@ -35,12 +35,13 @@ interface ILearnSongControlsProps {
   onSeek: (position: number) => void;
   currentPosition: number;
   totalNotes: number;
-  onStartPractice?: () => void;
+  isPracticing: boolean;
+  onTogglePractice: () => void;
 }
 
 const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
   /* Props & Store */
-  const {onTempoChange, onSeek, currentPosition, totalNotes, onStartPractice} = props
+  const {onTempoChange, onSeek, currentPosition, totalNotes, isPracticing, onTogglePractice} = props
   const dispatch = useDispatch()
   const isPlaying = useSelector(selectIsPlaying)
   const learnSongState = useSelector(selectLearnSongState)
@@ -55,9 +56,6 @@ const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
   // UI states
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [countingIn, setCountingIn] = useState(false)
-
-  // Mode states
-  const [isPracticing, setIsPracticing] = useState(false)
 
   /* Hooks */
   // MIDI sounds handling
@@ -78,7 +76,7 @@ const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
   const handlePlayPause = () => {
     // Reset practice mode when using play mode
     if (isPracticing) {
-      setIsPracticing(false)
+      onTogglePractice() // Call parent toggle instead of setting local state
     }
 
     if (isPlaying) {
@@ -105,7 +103,7 @@ const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
 
     // Reset practice mode if active
     if (isPracticing) {
-      setIsPracticing(false)
+      onTogglePractice() // Call parent toggle instead of setting local state
     }
   }
 
@@ -145,11 +143,12 @@ const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
   }
 
   // Start practice button handler with metronome count-in
-  const handleStartPractice = () => {
+  const handleTogglePractice = () => {
     // Prevent starting if already counting in or playing
-    if (countingIn || isPlaying) return
+    if (countingIn) return
 
-    // Set counting in state and reset counter
+    if (!isPracticing) {
+      // Starting practice mode with count-in
     setCountingIn(true)
     countRef.current = 0
 
@@ -158,28 +157,24 @@ const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
 
     // Start count-in with metronome
     intervalRef.current = setInterval(() => {
-      // TODO: should retrieve the number of count beats based on the time signature
       if (countRef.current < 4) {
-        // Play metronome sound for each beat
         playMetronomeSound(0.8)
         countRef.current++
       } else {
-        // After 4 beats, clear interval and enter practice mode
         if (intervalRef.current) {
           clearInterval(intervalRef.current)
           intervalRef.current = null
         }
         setCountingIn(false)
 
-        // Enter practice mode instead of auto-playing
-        setIsPracticing(true)
-
-        // Notify parent component to set up practice mode
-        if (onStartPractice) {
-          onStartPractice()
-        }
+          // Call parent toggle method instead of setting local state
+          onTogglePractice()
       }
     }, beatDuration)
+    } else {
+      // Directly stop practice mode
+      onTogglePractice()
+    }
   }
 
   /* Render */
@@ -217,11 +212,11 @@ const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
           {/* Start Practice button */}
           <Button
             type="primary"
-            icon={countingIn ? <LoadingOutlined/> : <SoundOutlined/>}
-            onClick={handleStartPractice}
+            icon={countingIn ? <LoadingOutlined /> : isPracticing ? <PauseCircleOutlined /> : <SoundOutlined />}
+            onClick={handleTogglePractice}
             disabled={isPlaying || countingIn}
           >
-            {countingIn ? 'Count-in...' : 'Start Practice'}
+            {countingIn ? 'Count-in...' : isPracticing ? 'Stop Practice' : 'Start Practice'}
           </Button>
 
           {/* Restart button */}

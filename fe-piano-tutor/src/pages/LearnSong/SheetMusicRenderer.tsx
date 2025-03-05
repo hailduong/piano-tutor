@@ -1,8 +1,9 @@
-import React, {useEffect, useRef} from 'react'
+import React, { useEffect, useRef } from 'react'
 import Vex from 'vexflow'
-import {groupNotesByMeasure} from 'pages/SongLibrary/LearnSong/sheetUtils'
+import { groupNotesByMeasure } from 'pages/LearnSong/sheetUtils'
 
-interface AdvancedMusicSheetRendererProps {
+/* Types */
+interface IAdvancedMusicSheetRendererProps {
   vexNotes: Vex.StaveNote[];
   onNoteElementsUpdate: (elements: Map<string, HTMLElement>) => void;
   currentNote: string | null;
@@ -10,60 +11,81 @@ interface AdvancedMusicSheetRendererProps {
   incorrectAttempt?: boolean;
 }
 
-const AdvancedMusicSheetRenderer: React.FC<AdvancedMusicSheetRendererProps> = (props) => {
-  const {vexNotes, onNoteElementsUpdate, currentNote, nextNote, incorrectAttempt} = props
+// CSS classes for note highlighting
+const CSS_CLASSES = {
+  CURRENT_NOTE: 'current-note',
+  NEXT_NOTE: 'next-note',
+  INCORRECT_ATTEMPT: 'incorrect-attempt'
+}
+
+const SheetMusicRenderer: React.FC<IAdvancedMusicSheetRendererProps> = (props) => {
+  const { vexNotes, onNoteElementsUpdate, currentNote, nextNote, incorrectAttempt } = props
   const rendererRef = useRef<HTMLDivElement>(null)
   const prevNoteRef = useRef<string | null>(null)
 
+  /* Main rendering effect */
   useEffect(() => {
+    // Skip rendering if container or notes aren't available
     if (!rendererRef.current || vexNotes.length === 0) return
 
+    // Clear previous rendering
     rendererRef.current.innerHTML = ''
+
+    // Initialize VexFlow renderer
     const VF = Vex.Flow
     const renderer = new VF.Renderer(rendererRef.current, VF.Renderer.Backends.SVG)
 
-    // Group notes by measure
+    /* Layout calculations */
+    // Group notes by measure for proper rendering
     const measures = groupNotesByMeasure(vexNotes)
     const measureCount = measures.length
-    const extra = 60
-    // Total width is extra plus the width per measure
-    const totalWidth = Math.max(800, extra + measureCount * 150)
-    // Common width for each measure except the first one gets the extra width
-    const commonWidth = (totalWidth - extra) / measureCount
+    const extraWidthForFirstMeasure = 60
+
+    // Calculate total width and width per measure
+    const totalWidth = Math.max(800, extraWidthForFirstMeasure + measureCount * 150)
+    const commonWidth = (totalWidth - extraWidthForFirstMeasure) / measureCount
 
     renderer.resize(totalWidth, 200)
     const context = renderer.getContext()
-    let offsetX = 0
 
+    /* Draw music staves and notes */
+    let offsetX = 0
     measures.forEach((measureNotes, i) => {
-      // First stave gets additional extra space
-      const currentWidth = i === 0 ? commonWidth + extra : commonWidth
+      // First stave gets additional space for clef and time signature
+      const currentWidth = i === 0 ? commonWidth + extraWidthForFirstMeasure : commonWidth
       const stave = new VF.Stave(offsetX, 10, currentWidth)
 
+      // Add notation elements to first stave
       if (i === 0) {
-        // TODO: Add key signature and time signature for multiple staves
-        // TODO: Dynamically get key/time signature from notes
         stave.addClef('treble').addTimeSignature('4/4')
         stave.setBegBarType(VF.Barline.type.SINGLE)
       }
+
+      // Set appropriate bar line type
       if (i === measureCount - 1) {
         stave.setEndBarType(VF.Barline.type.END)
       } else {
         stave.setEndBarType(VF.Barline.type.SINGLE)
       }
+
+      // Draw the stave
       stave.setContext(context).draw()
 
-      const voice = new VF.Voice({num_beats: 4, beat_value: 4})
+      // Create and draw the voice containing the notes
+      const voice = new VF.Voice({ num_beats: 4, beat_value: 4 })
       voice.addTickables(measureNotes)
+
       try {
         new VF.Formatter().joinVoices([voice]).format([voice], currentWidth - 40)
         voice.draw(context, stave)
       } catch (e) {
         console.error('Error rendering voice for measure', e)
       }
+
       offsetX += currentWidth
     })
 
+    /* Note highlighting */
     // Collect note element references for highlighting
     const noteElements = new Map<string, HTMLElement>()
     vexNotes.forEach(note => {
@@ -76,53 +98,59 @@ const AdvancedMusicSheetRenderer: React.FC<AdvancedMusicSheetRendererProps> = (p
         }
       }
     })
+
+    // Notify parent component about available note elements
     onNoteElementsUpdate(noteElements)
 
-    // Apply highlighting after rendering
+    // Reset previous highlights
+    document.querySelectorAll(`.${CSS_CLASSES.CURRENT_NOTE}, .${CSS_CLASSES.NEXT_NOTE}, .${CSS_CLASSES.INCORRECT_ATTEMPT}`)
+      .forEach(el => {
+        el.classList.remove(
+          CSS_CLASSES.CURRENT_NOTE,
+          CSS_CLASSES.NEXT_NOTE,
+          CSS_CLASSES.INCORRECT_ATTEMPT
+        )
+      })
 
-    // Reset any previous highlights
-    document.querySelectorAll('.current-note, .next-note, .incorrect-attempt').forEach(el => {
-      el.classList.remove('current-note', 'next-note', 'incorrect-attempt')
-    })
-
-    // Apply highlight to current note
+    // Highlight current note
     if (currentNote) {
       const currentElement = noteElements.get(currentNote)
       if (currentElement) {
-        currentElement.classList.add('current-note')
+        currentElement.classList.add(CSS_CLASSES.CURRENT_NOTE)
 
         // Add incorrect attempt highlight if applicable
         if (incorrectAttempt) {
-          currentElement.classList.add('incorrect-attempt')
+          currentElement.classList.add(CSS_CLASSES.INCORRECT_ATTEMPT)
         }
       }
     }
 
-    // Apply highlight to next note
+    // Highlight next note
     if (nextNote) {
       const nextElement = noteElements.get(nextNote)
       if (nextElement) {
-        nextElement.classList.add('next-note')
+        nextElement.classList.add(CSS_CLASSES.NEXT_NOTE)
       }
     }
 
+    /* CSS styling for notes */
+    // Create or update CSS styles for highlighting
+    const styleId = 'vexflow-highlight-styles'
+    const styleElement = document.getElementById(styleId) || document.createElement('style')
 
-    // Add CSS styles for highlighting
-    const styleElement = document.getElementById('vexflow-highlight-styles') ||
-      document.createElement('style')
-    styleElement.id = 'vexflow-highlight-styles'
+    styleElement.id = styleId
     styleElement.textContent = `
-      .current-note {
+      .${CSS_CLASSES.CURRENT_NOTE} {
         fill: #1890ff;
         stroke: #1890ff;
         filter: drop-shadow(0 0 3px rgba(24, 144, 255, 0.5));
       }
-      .next-note {
+      .${CSS_CLASSES.NEXT_NOTE} {
         fill: #52c41a;
         stroke: #52c41a;
         opacity: 0.7;
       }
-      .incorrect-attempt {
+      .${CSS_CLASSES.INCORRECT_ATTEMPT} {
         fill: #ff4d4f !important;
         stroke: #ff4d4f !important;
         animation: pulse 0.3s infinite alternate;
@@ -132,16 +160,17 @@ const AdvancedMusicSheetRenderer: React.FC<AdvancedMusicSheetRendererProps> = (p
         100% { opacity: 1; }
       }
     `
-    if (!document.getElementById('vexflow-highlight-styles')) {
+
+    if (!document.getElementById(styleId)) {
       document.head.appendChild(styleElement)
     }
 
-    // Remember the current note for future renders
+    // Remember current note for future renders
     prevNoteRef.current = currentNote
 
   }, [vexNotes, onNoteElementsUpdate, currentNote, nextNote, incorrectAttempt])
 
-  return <div ref={rendererRef} className="sheet-music-container"/>
+  return <div ref={rendererRef} className="sheet-music-container" />
 }
 
-export default AdvancedMusicSheetRenderer
+export default SheetMusicRenderer

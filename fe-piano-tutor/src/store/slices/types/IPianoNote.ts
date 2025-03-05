@@ -1,4 +1,4 @@
-export interface INote {
+export interface IPianoNote {
   note: string;      // e.g., "C", "C#", etc.
   length: string;    // Default: "q" (quarter note)
   timestamp: number; // When the note was played

@@ -1,6 +1,6 @@
 // src/pages/LearnSong/hooks/useNoteTimingTracking.tsx
 import { useState, useEffect } from 'react';
-import { INoteTiming } from 'models/LearnSong';
+import { INoteTiming } from 'pages/LearnSong/types/LearnSong';
 import { useDispatch } from 'react-redux';
 import { recordNoteTiming } from 'store/slices/learnSongSlice';
 import Vex from 'vexflow';

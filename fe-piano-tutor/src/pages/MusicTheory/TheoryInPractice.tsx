@@ -5,7 +5,7 @@ import SheetMusicRenderer from 'common/SheetMusicRenderer'
 import {QuestionCircleOutlined, SoundOutlined} from '@ant-design/icons'
 import musicNoteGenerator from 'pages/LearnMusicNotes/utils/musicNoteGenerator'
 import {setCurrentTheoryConcept} from 'store/slices/musicTheorySlice'
-import {INote} from 'store/slices/types/INote'
+import {IPianoNote} from 'store/slices/types/IPianoNote'
 import {setSuggestedNote} from 'store/slices/virtualPianoSlice'
 
 const {Title, Paragraph, Text} = Typography
@@ -18,7 +18,7 @@ interface TheoryInPracticeProps {
 interface PracticeExample {
   title: string;
   description: string;
-  notes: INote[];
+  notes: IPianoNote[];
   generationOptions?: {
     type: 'scale' | 'chord' | 'interval' | 'basic-notation';
     rootNote?: string;
@@ -247,7 +247,7 @@ const TheoryInPractice: React.FC<TheoryInPracticeProps> = ({conceptId}) => {
     if (!example || !example.generationOptions) return
 
     const options = example.generationOptions
-    let newNotes: INote[] = []
+    let newNotes: IPianoNote[] = []
 
     // Generate new notes based on the example type
     switch (options.type) {
@@ -334,7 +334,6 @@ const TheoryInPractice: React.FC<TheoryInPracticeProps> = ({conceptId}) => {
             <Col span={24}>
               <SheetMusicRenderer
                 notes={example.notes}
-                height={150}
                 showTheoryHints={true}
                 selectedConcept={conceptId}
               />

@@ -11,12 +11,12 @@ import {
 import {useVexFlowRenderer} from './hooks/useVexFlowRenderer'
 import {generateMusicTheoryHint} from 'pages/MusicTheory/utils/musicTheoryHintUtil'
 import {TKeySignature} from 'pages/LearnMusicNotes/utils/musicNoteGenerator'
-import {INote} from 'store/slices/types/INote'
+import {IPianoNote} from 'store/slices/types/IPianoNote'
 import {setSuggestedNote} from 'store/slices/virtualPianoSlice'
 
 // Interfaces
 interface SheetMusicRendererProps {
-  notes: Vex.StaveNote[] | INote[];
+  notes: Vex.StaveNote[] | IPianoNote[];
   keySignature?: TKeySignature;
   onCorrectNote?: (noteAttempted: string, timingDeviation: number) => void;
   onIncorrectNote?: (noteAttempted: string, timingDeviation: number) => void;
@@ -55,7 +55,7 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
     }
 
     // Convert Note objects to Vex.StaveNote objects
-    return (notes as INote[]).map(note => {
+    return (notes as IPianoNote[]).map(note => {
       const staveNote = new Vex.Flow.StaveNote({
         keys: [`${note.note.toLowerCase()}/${note.octave}`],
         duration: note.length || 'q'

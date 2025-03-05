@@ -1,5 +1,5 @@
 import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit'
-import {ILearnSongState, INoteTiming, ISessionProgress, ILearnSongSettings} from 'models/LearnSong'
+import {ILearnSongState, INoteTiming, ISessionProgress, ILearnSongSettings} from 'pages/LearnSong/types/LearnSong'
 import {RootState} from 'store/index'
 
 
@@ -23,7 +23,7 @@ const initialState: ILearnSongState = {
   startTime: null,
   elapsedTime: 0,
   metronomeEnabled: true,
-  mode: 'practice',
+  isPracticing: false,
   sheetMusic: null
 }
 
@@ -88,6 +88,12 @@ const learnSongSlice = createSlice({
       state.isPaused = false
       state.elapsedTime = 0
       state.startTime = null
+    },
+
+    // Toggle practicing state
+    togglePracticing: (state, action: PayloadAction<boolean | undefined>) => {
+      // If a specific value is provided, use it, otherwise toggle the current value
+      state.isPracticing = action.payload !== undefined ? action.payload : !state.isPracticing;
     },
 
     // Update current note being played
@@ -164,6 +170,7 @@ export const {
   pauseSession,
   resumeSession,
   endSession,
+  togglePracticing,
   setCurrentNote,
   setNextNote,
   recordNoteTiming,
@@ -181,6 +188,7 @@ export const selectNextNote = (state: RootState) => state.learnSong.nextNote
 export const selectSessionProgress = (state: RootState) => state.learnSong.sessionProgress
 export const selectCurrentSongId = (state: RootState) => state.learnSong.songId
 export const selectSheetMusic = (state: RootState) => state.learnSong.sheetMusic
+export const selectIsPracticing = (state: RootState) => state.learnSong.isPracticing
 
 // Export reducer
 const learnSongReducer = learnSongSlice.reducer

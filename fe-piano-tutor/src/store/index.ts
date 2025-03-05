@@ -11,7 +11,7 @@ import learnSongReducer from 'store/slices/learnSongSlice'
 import virtualPianoReducer, {IVirtualPianoState} from 'store/slices/virtualPianoSlice'
 import settingsReducer, {ISettingsState} from 'store/slices/settingsSlice'
 import {TypedUseSelectorHook, useSelector, useDispatch} from 'react-redux'
-import {ILearnSongState} from 'models/LearnSong' // Import the new settings slice
+import {ILearnSongState} from 'pages/LearnSong/types/LearnSong' // Import the new settings slice
 
 // Persist configuration
 const persistConfig = {

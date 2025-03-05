@@ -34,16 +34,15 @@ export interface ILearnSongState {
   startTime: number | null;
   elapsedTime: number;
   metronomeEnabled: boolean;
-  mode: 'practice' | 'assessment' | 'guided';
-  // Reference to the parsed sheet music
+  isPracticing: boolean;
   sheetMusic: any | null;
 }
 
 // Song learning settings
 export interface ILearnSongSettings {
-  tempo: number;
-  metronomeEnabled: boolean;
-  mode: 'practice' | 'assessment' | 'guided';
+  tempo?: number;
+  metronomeEnabled?: boolean;
+  isPracticing?: boolean;
 }
 
 // Performance summary for the session

@@ -1,14 +1,14 @@
 // src/store/slices/virtualPianoSlice.ts
 import {createSlice, PayloadAction} from '@reduxjs/toolkit'
 import {RootState} from 'store'
-import {INote} from 'store/slices/types/INote'
+import {IPianoNote} from 'store/slices/types/IPianoNote'
 
 
 export interface IVirtualPianoState {
-  currentNote: INote | null;    // Last played note
-  suggestedNote: INote | null;  // Note to highlight/suggest
+  currentNote: IPianoNote | null;    // Last played note on the piano
+  suggestedNote: IPianoNote | null;  // Note to highlight/suggest from the sheet music
   isVisible: boolean;                // Piano visibility
-  history: INote[];             // History of played notes
+  history: IPianoNote[];             // History of played notes
 }
 
 const initialState: IVirtualPianoState = {
@@ -22,14 +22,14 @@ const virtualPianoSlice = createSlice({
   name: 'virtualPiano',
   initialState,
   reducers: {
-    setCurrentNote: (state, action: PayloadAction<INote | null>) => {
+    setCurrentNote: (state, action: PayloadAction<IPianoNote | null>) => {
       state.currentNote = action.payload
       // Add to history if it's a valid note
       if (action.payload) {
         state.history.push(action.payload)
       }
     },
-    setSuggestedNote: (state, action: PayloadAction<INote | null>) => {
+    setSuggestedNote: (state, action: PayloadAction<IPianoNote | null>) => {
       state.suggestedNote = action.payload
     },
     setPianoVisibility: (state, action: PayloadAction<boolean>) => {
@@ -61,8 +61,8 @@ export const {
 } = virtualPianoSlice.actions
 
 // Export selectors
-export const selectCurrentNote = (state: RootState) => state.virtualPiano.currentNote
-export const selectSuggestedNote = (state: RootState) => state.virtualPiano.suggestedNote
+export const selectPianoCurrentNote = (state: RootState) => state.virtualPiano.currentNote
+export const selectPianoSuggestedNote = (state: RootState) => state.virtualPiano.suggestedNote
 export const selectPianoVisibility = (state: RootState) => state.virtualPiano.isVisible
 export const selectNoteHistory = (state: RootState) => state.virtualPiano.history
 
