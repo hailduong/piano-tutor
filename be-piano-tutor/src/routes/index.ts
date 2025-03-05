@@ -10,7 +10,7 @@ const router: Router = Router()
 
 /* Routes Integration */
 // Mount the authentication routes under "/api/auth" for all auth-related endpoints.
-router.use('/api/auth', authRoutes)
+router.use('/auth', authRoutes)
 
 /* Future expansion:
    Additional route modules for other features can be mounted here.

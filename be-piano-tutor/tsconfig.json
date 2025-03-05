@@ -5,29 +5,29 @@
     "lib": ["ES2020"],                   
     "strict": true,
     "baseUrl": "./",
-    "esModuleInterop": true,                 
-    "skipLibCheck": true,                     
-    "forceConsistentCasingInFileNames": true,
     "paths": {
       "@src/*": ["src/*"]
     },
+    "esModuleInterop": true,
+    "skipLibCheck": true,                     
+    "forceConsistentCasingInFileNames": true,
     "useUnknownInCatchVariables": false
   },
   "ts-node": {
     "swc": true,
     "require": [
-      "tsconfig-paths/register",
-      "./config.ts"
-    ],
+      "tsconfig-paths/register"
+    ]
   },
   "include": [
     "src/**/*.ts",
     "spec/**/*.ts",
     "config.ts",
-    "scripts",
+    "scripts/**/*.ts",
     "eslint.config.ts"
   ],
   "exclude": [
-    "src/public/*"
+    "node_modules",
+    "src/public"
   ]
 }

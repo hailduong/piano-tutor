@@ -4,7 +4,7 @@
   "scripts": {
     "build": "ts-node ./scripts/build.ts",
     "clean-install": "rm -rf ./node_modules && rm -r package-lock.json && npm i",
-    "dev": "NODE_ENV=development ts-node ./src",
+    "dev": "NODE_ENV=development ts-node ./src/index.ts",
     "dev:hot": "nodemon --exec \"npm run dev\" --watch ./src --ext .ts",
     "lint": "eslint --flag unstable_ts_config",
     "start": "NODE_ENV=production node -r ./config.js ./dist",
@@ -16,7 +16,7 @@
     "node": ">=16.0.0"
   },
   "dependencies": {
-    "@prisma/client": "6.4.1",
+    "@prisma/client": "^6.4.1",
     "bcrypt": "5.1.1",
     "cookie-parser": "^1.4.7",
     "dayjs": "^1.11.13",
@@ -33,14 +33,17 @@
     "jsonfile": "^6.1.0",
     "jsonwebtoken": "9.0.2",
     "module-alias": "^2.2.3",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "prisma": "^6.4.1",
+    "nodemailer": "6.10.0",
+    "express-validator": "7.2.1"
   },
   "devDependencies": {
-    "@types/bcrypt": "5.0.2",
     "@eslint/js": "^9.21.0",
     "@stylistic/eslint-plugin-js": "^4.2.0",
     "@stylistic/eslint-plugin-ts": "^4.2.0",
     "@swc/core": "^1.11.7",
+    "@types/bcrypt": "5.0.2",
     "@types/cookie-parser": "^1.4.8",
     "@types/eslint__js": "^8.42.3",
     "@types/express": "^5.0.0",
