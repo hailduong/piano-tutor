@@ -1,0 +1,20 @@
+// Prisma schema defining the data model for PostgreSQL
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id               Int       @id @default(autoincrement())
+  email            String    @unique
+  password         String
+  resetToken       String?   // Token used for password resets
+  resetTokenExpiry DateTime? // Expiration for the reset token
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
