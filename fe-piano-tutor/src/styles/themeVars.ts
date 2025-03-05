@@ -4,15 +4,15 @@ import { DefaultTheme } from 'styled-components';
 // Augment the DefaultTheme interface to match your theme structure
 declare module 'styled-components' {
   export interface DefaultTheme {
-    colors: typeof themeVariables.colors;
-    fonts: typeof themeVariables.fonts;
-    fontWeights: typeof themeVariables.fontWeights;
-    breakpoints: typeof themeVariables.breakpoints;
-    spacing: typeof themeVariables.spacing;
+    colors: typeof themeVars.colors;
+    fonts: typeof themeVars.fonts;
+    fontWeights: typeof themeVars.fontWeights;
+    breakpoints: typeof themeVars.breakpoints;
+    spacing: typeof themeVars.spacing;
   }
 }
 
-const themeVariables = {
+const themeVars = {
   colors: {
     primary: '#673ab7',
     success: '#388e3c',
@@ -74,4 +74,4 @@ export const materialColors = [
   '#ff5722', // Deep Orange
 ];
 
-export default themeVariables;
+export default themeVars;

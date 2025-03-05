@@ -59,7 +59,17 @@ export const BlackKey = styled.div<{ leftOffset: number } & KeyProps>`
     cursor: pointer;
     z-index: 2;
     user-select: none;
-    transition: background 0.2s, border 0.2s;
+    transition: background 0.2s, border 0.2s, box-shadow 0.2s;
+    text-align: center;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0/ 0.9);
+    
+    &:hover {
+        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5);
+    }
+    
+    &:active {
+        box-shadow: none;
+    }
 `
 export const KeyLabel = styled.span`
     font-size: 10px;

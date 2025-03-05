@@ -1,25 +1,23 @@
-import React, { useEffect, useRef } from 'react'
+import React, {useEffect, useRef} from 'react'
 import Vex from 'vexflow'
-import { groupNotesByMeasure } from 'pages/LearnSong/sheetUtils'
+import {groupNotesByMeasure} from 'pages/LearnSong/sheetUtils'
 
 /* Types */
 interface IAdvancedMusicSheetRendererProps {
   vexNotes: Vex.StaveNote[];
   onNoteElementsUpdate: (elements: Map<string, HTMLElement>) => void;
   currentNote: string | null;
-  nextNote: string | null;
   incorrectAttempt?: boolean;
 }
 
 // CSS classes for note highlighting
 const CSS_CLASSES = {
   CURRENT_NOTE: 'current-note',
-  NEXT_NOTE: 'next-note',
   INCORRECT_ATTEMPT: 'incorrect-attempt'
 }
 
 const SheetMusicRenderer: React.FC<IAdvancedMusicSheetRendererProps> = (props) => {
-  const { vexNotes, onNoteElementsUpdate, currentNote, nextNote, incorrectAttempt } = props
+  const {vexNotes, onNoteElementsUpdate, currentNote, incorrectAttempt} = props
   const rendererRef = useRef<HTMLDivElement>(null)
   const prevNoteRef = useRef<string | null>(null)
 
@@ -72,7 +70,7 @@ const SheetMusicRenderer: React.FC<IAdvancedMusicSheetRendererProps> = (props) =
       stave.setContext(context).draw()
 
       // Create and draw the voice containing the notes
-      const voice = new VF.Voice({ num_beats: 4, beat_value: 4 })
+      const voice = new VF.Voice({num_beats: 4, beat_value: 4})
       voice.addTickables(measureNotes)
 
       try {
@@ -103,11 +101,10 @@ const SheetMusicRenderer: React.FC<IAdvancedMusicSheetRendererProps> = (props) =
     onNoteElementsUpdate(noteElements)
 
     // Reset previous highlights
-    document.querySelectorAll(`.${CSS_CLASSES.CURRENT_NOTE}, .${CSS_CLASSES.NEXT_NOTE}, .${CSS_CLASSES.INCORRECT_ATTEMPT}`)
+    document.querySelectorAll(`.${CSS_CLASSES.CURRENT_NOTE}, .${CSS_CLASSES.INCORRECT_ATTEMPT}`)
       .forEach(el => {
         el.classList.remove(
           CSS_CLASSES.CURRENT_NOTE,
-          CSS_CLASSES.NEXT_NOTE,
           CSS_CLASSES.INCORRECT_ATTEMPT
         )
       })
@@ -125,14 +122,6 @@ const SheetMusicRenderer: React.FC<IAdvancedMusicSheetRendererProps> = (props) =
       }
     }
 
-    // Highlight next note
-    if (nextNote) {
-      const nextElement = noteElements.get(nextNote)
-      if (nextElement) {
-        nextElement.classList.add(CSS_CLASSES.NEXT_NOTE)
-      }
-    }
-
     /* CSS styling for notes */
     // Create or update CSS styles for highlighting
     const styleId = 'vexflow-highlight-styles'
@@ -144,11 +133,6 @@ const SheetMusicRenderer: React.FC<IAdvancedMusicSheetRendererProps> = (props) =
         fill: #1890ff;
         stroke: #1890ff;
         filter: drop-shadow(0 0 3px rgba(24, 144, 255, 0.5));
-      }
-      .${CSS_CLASSES.NEXT_NOTE} {
-        fill: #52c41a;
-        stroke: #52c41a;
-        opacity: 0.7;
       }
       .${CSS_CLASSES.INCORRECT_ATTEMPT} {
         fill: #ff4d4f !important;
@@ -168,9 +152,9 @@ const SheetMusicRenderer: React.FC<IAdvancedMusicSheetRendererProps> = (props) =
     // Remember current note for future renders
     prevNoteRef.current = currentNote
 
-  }, [vexNotes, onNoteElementsUpdate, currentNote, nextNote, incorrectAttempt])
+  }, [currentNote])
 
-  return <div ref={rendererRef} className="sheet-music-container" />
+  return <div ref={rendererRef} className="sheet-music-container"/>
 }
 
 export default SheetMusicRenderer

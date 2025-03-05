@@ -5,20 +5,20 @@ import {Provider} from 'react-redux'
 import {PersistGate} from 'redux-persist/integration/react'
 import {store, persistor} from 'store'
 import App from './App'
-import GlobalStyle from 'styles/GlobalStyles'
+import GlobalStyle from 'styles/globalStyles'
 import 'bootstrap/dist/css/bootstrap-utilities.min.css'
 import 'antd/dist/reset.css'
-import 'styles/index.css'
-import themeVariables from 'styles/themeVariables'
+import 'styles/bootstrapVars.css'
+import themeVars from 'styles/themeVars'
 
 const theme: ThemeConfig = {
   token: {
-    colorPrimary: themeVariables.colors.primary,
-    colorSuccess: themeVariables.colors.success,
-    colorWarning: themeVariables.colors.warning,
-    colorError: themeVariables.colors.error,
+    colorPrimary: themeVars.colors.primary,
+    colorSuccess: themeVars.colors.success,
+    colorWarning: themeVars.colors.warning,
+    colorError: themeVars.colors.error,
     borderRadius: 4,
-    fontFamily: themeVariables.fonts.primary,
+    fontFamily: themeVars.fonts.primary,
     fontSize: 16,
     borderRadiusLG: 8
   },

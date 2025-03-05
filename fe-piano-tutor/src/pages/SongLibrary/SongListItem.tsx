@@ -7,7 +7,7 @@ import {Song} from '../../models/Song'
 import SongDetailModal from 'pages/SongLibrary/SongDetailModal'
 import {selectSong} from 'store/slices/songLibrarySlice'
 import {useDispatch} from 'react-redux'
-import {materialColors} from 'styles/themeVariables'
+import {materialColors} from 'styles/themeVars'
 
 
 const {Title, Text} = Typography

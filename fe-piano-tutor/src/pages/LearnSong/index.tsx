@@ -68,7 +68,7 @@ const LearnSongPage: React.FC = () => {
     }
 
     initializeAndLoadSheetMusic()
-  }, [dispatch, songId, navigate])
+  }, [dispatch, songId])
 
   // Track session time
   useEffect(() => {

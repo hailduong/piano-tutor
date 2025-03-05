@@ -48,7 +48,7 @@ const MusicSheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
   currentNoteRef.current = currentNote
   const isPracticingRef = useRef(isPracticing)
   isPracticingRef.current = isPracticing
-  const lastPianoNoteRef = useRef<string | null>(null)
+  const lastPianoNoteRef = useRef<IPianoNote | null>(null)
 
 
   /* Hooks */
@@ -89,7 +89,7 @@ const MusicSheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
       // Initialize timing when notes are ready
       initializeTiming(isPlaying)
     }
-  }, [vexNotes, noteElements, isPlaying])
+  }, [vexNotes])
 
   // Initialize timing when starting to play
   useEffect(() => {
@@ -171,9 +171,11 @@ const MusicSheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
   }, [isPlaying, tempo])
 
 
-  // Effect to handle piano key presses during practice mode
+  /**
+   * Play a note > Check if the played note matches the expected note
+   */
   useEffect(() => {
-    if (!isPracticing || !currentNote || !pianoCurrentNote || pianoCurrentNote === lastPianoNoteRef.current) {
+    if (!isPracticing || !currentNote || !pianoCurrentNote) {
       return
     }
 
@@ -255,7 +257,7 @@ const MusicSheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
         accuracy: -0.05 // Reduce accuracy by 5% (adjust as needed)
       }))
     }
-  }, [isPracticing, pianoCurrentNote, currentNote, vexNotes])
+  }, [pianoCurrentNote])
 
   /* Handlers */
   // Store note element references from the rendered sheet

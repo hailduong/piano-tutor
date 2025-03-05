@@ -38,7 +38,7 @@ function App() {
       <Router>
         <Layout style={{minHeight: '100vh'}}>
           {/* Vertical Menu */}
-          <Sider width={280} style={{background: '#fff'}}>
+          <Sider width={280} style={{background: '#fff'}} className='shadow-lg'>
             <div style={{
               padding: '16px',
               textAlign: 'center',

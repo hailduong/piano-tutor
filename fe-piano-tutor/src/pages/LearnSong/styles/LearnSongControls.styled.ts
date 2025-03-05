@@ -10,12 +10,13 @@ export const ControlsContainer = styled.div`
     margin-bottom: 16px;
 `
 export const SectionTitle = styled.h4`
-    margin: 0 0 8px 0;
+    margin: 0 8px 0 32px;
     color: #555;
     font-size: 14px;
 `
 export const ControlSection = styled.div`
-    margin-bottom: 16px;
+    display:flex;
+    align-items: center;
 `
 export const TempoSlider = styled(Slider)`
     width: 200px;

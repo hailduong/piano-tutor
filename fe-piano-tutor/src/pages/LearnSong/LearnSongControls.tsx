@@ -1,6 +1,6 @@
 import React, {FC, useRef, useState, useEffect} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
-import {Button, Space, Radio, Tooltip, Divider, Switch, Row, Col} from 'antd'
+import {Button, Space, Radio, Tooltip, Divider, Switch} from 'antd'
 import {
   PlayCircleOutlined,
   PauseCircleOutlined,
@@ -149,28 +149,28 @@ const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
 
     if (!isPracticing) {
       // Starting practice mode with count-in
-    setCountingIn(true)
-    countRef.current = 0
+      setCountingIn(true)
+      countRef.current = 0
 
-    // Calculate beat duration based on current tempo
-    const beatDuration = (60 / learnSongState.tempo) * 1000
+      // Calculate beat duration based on current tempo
+      const beatDuration = (60 / learnSongState.tempo) * 1000
 
-    // Start count-in with metronome
-    intervalRef.current = setInterval(() => {
-      if (countRef.current < 4) {
-        playMetronomeSound(0.8)
-        countRef.current++
-      } else {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current)
-          intervalRef.current = null
-        }
-        setCountingIn(false)
+      // Start count-in with metronome
+      intervalRef.current = setInterval(() => {
+        if (countRef.current < 4) {
+          playMetronomeSound(0.8)
+          countRef.current++
+        } else {
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current)
+            intervalRef.current = null
+          }
+          setCountingIn(false)
 
           // Call parent toggle method instead of setting local state
           onTogglePractice()
-      }
-    }, beatDuration)
+        }
+      }, beatDuration)
     } else {
       // Directly stop practice mode
       onTogglePractice()
@@ -179,10 +179,28 @@ const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
 
   /* Render */
   return (
-    <ControlsContainer>
+    <ControlsContainer className='shadow'>
       {/* Main Controls */}
       <ControlSection>
-        <SectionTitle>Playback Controls</SectionTitle>
+        {/* Start Practice button */}
+        <Button
+          type="primary"
+          className="me-2"
+          icon={countingIn ? <LoadingOutlined/> : isPracticing ? <PauseCircleOutlined/> : <SoundOutlined/>}
+          onClick={handleTogglePractice}
+          disabled={isPlaying || countingIn}
+        >
+          {countingIn ? 'Count-in...' : isPracticing ? 'Stop Practice' : 'Start Practice'}
+        </Button>
+
+        {/* Restart button */}
+        <Button
+          icon={<RedoOutlined/>}
+          onClick={handleRestart}
+          disabled={countingIn}
+        />
+
+        <SectionTitle>Playback: </SectionTitle>
         <Space size="middle">
           {/* Previous button */}
           <Button
@@ -203,27 +221,9 @@ const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
 
           {/* Next button */}
           <Button
-            className='me-4'
             icon={<StepForwardOutlined/>}
             onClick={handleNext}
             disabled={currentPosition >= totalNotes - 1 || countingIn}
-          />
-
-          {/* Start Practice button */}
-          <Button
-            type="primary"
-            icon={countingIn ? <LoadingOutlined /> : isPracticing ? <PauseCircleOutlined /> : <SoundOutlined />}
-            onClick={handleTogglePractice}
-            disabled={isPlaying || countingIn}
-          >
-            {countingIn ? 'Count-in...' : isPracticing ? 'Stop Practice' : 'Start Practice'}
-          </Button>
-
-          {/* Restart button */}
-          <Button
-            icon={<RedoOutlined/>}
-            onClick={handleRestart}
-            disabled={countingIn}
           />
         </Space>
 
@@ -233,25 +233,10 @@ const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
             <span style={{color: '#1890ff'}}>Practice Mode: Play the notes yourself</span>
           </div>
         )}
-      </ControlSection>
 
-      {/* Tempo Control with right-aligned settings button */}
-      <ControlSection>
-        <Row justify="space-between" align="middle">
-          <Col>
-            <SectionTitle>Tempo: {learnSongState.tempo} BPM</SectionTitle>
-          </Col>
-          <Col>
-            <Button
-              type="text"
-              icon={<SettingOutlined/>}
-              onClick={() => setShowAdvanced(!showAdvanced)}
-            >
-              {showAdvanced ? 'Hide' : 'Advanced Options'}
-            </Button>
-          </Col>
-        </Row>
 
+        {/* Tempo Control with right-aligned settings button */}
+        <SectionTitle>Tempo: {learnSongState.tempo} BPM</SectionTitle>
         <TempoSlider
           min={40}
           max={240}
@@ -259,6 +244,17 @@ const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
           value={learnSongState.tempo}
           onChange={handleTempoChange}
         />
+
+        {/* Advanced Options */}
+        <Button
+          className="ms-auto"
+          type="text"
+          icon={<SettingOutlined/>}
+          onClick={() => setShowAdvanced(!showAdvanced)}
+        >
+          {showAdvanced ? 'Hide' : 'Advanced Options'}
+        </Button>
+
       </ControlSection>
 
       {/* Advanced Controls (conditional) */}
