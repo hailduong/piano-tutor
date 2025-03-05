@@ -106,7 +106,7 @@ export class MusicNoteGenerator {
   notesToVexNotes(notes: IPianoNote[]): Vex.StaveNote[] {
     return notes.map(note => {
       const staveNote = new Vex.Flow.StaveNote({
-        keys: [`${note.note.toLowerCase()}/${note.octave}`],
+        keys: [`${note.note.toUpperCase()}/${note.octave}`],
         duration: note.length || 'q'
       })
 

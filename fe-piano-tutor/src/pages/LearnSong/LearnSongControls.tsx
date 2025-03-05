@@ -61,16 +61,6 @@ const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
   // MIDI sounds handling
   const {playMetronomeSound} = useMIDIHandler()
 
-  /* Effects */
-  // Clean up interval on unmount
-  useEffect(() => {
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-      }
-    }
-  }, [])
-
   /* Handlers */
   // Play/Pause button handler
   const handlePlayPause = () => {
@@ -177,9 +167,26 @@ const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
     }
   }
 
+  /* Effects */
+  // Clean up interval on unmount
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+    }
+  }, [])
+
+  // If the user refresh the page, reset the practice mode
+  useEffect(() => {
+    if (isPracticing) {
+      onTogglePractice(false)
+    }
+  }, [])
+
   /* Render */
   return (
-    <ControlsContainer className='shadow'>
+    <ControlsContainer className="shadow">
       {/* Main Controls */}
       <ControlSection>
         {/* Start Practice button */}
@@ -226,13 +233,6 @@ const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
             disabled={currentPosition >= totalNotes - 1 || countingIn}
           />
         </Space>
-
-        {/* Mode indicator */}
-        {isPracticing && (
-          <div style={{marginTop: 8}}>
-            <span style={{color: '#1890ff'}}>Practice Mode: Play the notes yourself</span>
-          </div>
-        )}
 
 
         {/* Tempo Control with right-aligned settings button */}

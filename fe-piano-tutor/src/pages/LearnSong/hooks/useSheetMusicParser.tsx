@@ -26,7 +26,7 @@ interface UseSheetMusicParserResult {
     scrollContainer: HTMLDivElement | null
   ) => Map<string, NotePosition>;
   /**
-   * Converts a key string (e.g., 'c/4') to a MIDI note number.
+   * Converts a key string (e.g., 'C/4') to a MIDI note number.
    * @param key - The key string to convert.
    * @returns The corresponding MIDI note number.
    */
@@ -38,10 +38,10 @@ export const useSheetMusicParser = (): UseSheetMusicParserResult => {
   // Helper to convert a key string (e.g. `c/4`) to a MIDI note number.
   const convertKeyToMIDINote = (key: string): number => {
     const noteMap: { [key: string]: number } = {
-      c: 0, d: 2, e: 4, f: 5, g: 7, a: 9, b: 11
+      C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11
     }
     const parts = key.split('/')
-    const step = parts[0].toLowerCase()
+    const step = parts[0].toUpperCase()
     const octave = parseInt(parts[1])
     const midiNote = 12 * (octave + 1) + (noteMap[step] || 0)
     console.log(`Converting key: ${key} to MIDI note: ${midiNote}`)

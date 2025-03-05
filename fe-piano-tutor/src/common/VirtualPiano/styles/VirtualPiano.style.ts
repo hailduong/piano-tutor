@@ -1,5 +1,6 @@
 // Modified piano container to accept visibility prop
 import styled from 'styled-components'
+import themeVars from 'styles/themeVars'
 
 export const PianoContainer = styled.div<{ isVisible: boolean }>`
     position: fixed;
@@ -34,9 +35,9 @@ export const WhiteKey = styled.div<KeyProps>`
     width: 40px;
     height: 150px;
     background: ${({active, suggested}) =>
-            active ? '#4caf50' : suggested ? '#2196F3' : 'white'};
+            active ? themeVars.colors.success : suggested ? themeVars.colors.error : 'white'};
     border: 1px solid ${({active, suggested}) =>
-            active ? '#4caf50' : suggested ? '#2196F3' : '#000'};
+            active ? themeVars.colors.success : suggested ? themeVars.colors.error : '#000'};
     position: relative;
     cursor: pointer;
     display: flex;

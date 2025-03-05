@@ -167,8 +167,8 @@ export const useVexFlowRenderer = (
     notesToRender.forEach((note, index) => {
       // Style the first note based on current input
       if (index === 0 && currentNote) {
-        const expectedKey = note.getKeys()[0].toLowerCase()
-        const playedKey = `${currentNote.note.toLowerCase()}/${currentNote.octave}`
+        const expectedKey = note.getKeys()[0].toUpperCase()
+        const playedKey = `${currentNote.note.toUpperCase()}/${currentNote.octave}`
         const isCorrect = expectedKey === playedKey
 
         // Apply different styles based on correctness

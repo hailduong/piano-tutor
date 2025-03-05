@@ -13,8 +13,9 @@ import {
   pauseSession,
   setCurrentNote,
   setNextNote,
-  updateProgress,
-  updateSettings, seekToPosition, selectIsPracticing, togglePracticing
+  seekToPosition,
+  selectIsPracticing,
+  togglePracticing
 } from 'store/slices/learnSongSlice'
 
 import {selectSongDetails} from 'store/slices/songLibrarySlice'
@@ -97,39 +98,14 @@ const LearnSongPage: React.FC = () => {
     dispatch(setNextNote(nextNoteId))
   }
 
-  const handleNotePlay = (noteId: string, timingDeviation: number) => {
-    // Update progress
-    const totalNotes = learnSongState.sessionProgress.totalNotes
-    const notesPlayed = learnSongState.sessionProgress.notesPlayed + 1
-    const accuracy = timingDeviation < 300 ?
-      (learnSongState.sessionProgress.accuracy * (notesPlayed - 1) + 1) / notesPlayed :
-      (learnSongState.sessionProgress.accuracy * (notesPlayed - 1)) / notesPlayed
-
-    dispatch(updateProgress({
-      notesPlayed,
-      currentPosition: notesPlayed,
-      accuracy
-    }))
-
-    // Set the next note
-    const currentIndex = noteId.split('-')[1] ? parseInt(noteId.split('-')[1]) : 0
-    const nextNoteId = `note-${currentIndex + 1}`
-    dispatch(setNextNote(nextNoteId))
-
-    // Check if session is complete
-    if (notesPlayed >= totalNotes) {
-      // handleSessionComplete()
-    }
-  }
-
   const handleSessionComplete = () => {
     // Stop playing
     dispatch(pauseSession())
 
-  // End practice mode if active
-  if (isPracticing) {
-    handleEndPractice()
-  }
+    // End practice mode if active
+    if (isPracticing) {
+      handleEndPractice()
+    }
 
     // Generate performance summary
     const summary: IPerformanceSummary = {
@@ -147,8 +123,8 @@ const LearnSongPage: React.FC = () => {
     setShowSummary(true)
   }
 
-  const handleTogglePractice = () => {
-    const newPracticingState = !isPracticing
+  const handleTogglePractice = (shouldPractice?: boolean) => {
+    const newPracticingState = shouldPractice !== undefined ? shouldPractice : !isPracticing
     dispatch(togglePracticing(newPracticingState))
 
     if (newPracticingState) {
@@ -215,7 +191,6 @@ const LearnSongPage: React.FC = () => {
         tempo={learnSongState.tempo}
         isPlaying={isPlaying}
         currentPosition={sessionProgress.currentPosition}
-        onNotePlay={handleNotePlay}
         onSongComplete={handleSessionComplete}
       />
 
@@ -232,14 +207,14 @@ const LearnSongPage: React.FC = () => {
           <Col span={6}>
             <Alert
               message="Correct Notes"
-              description={sessionProgress.correctNotes}
+              description={sessionProgress.correctNotes || '0'}
               type="success"
             />
           </Col>
           <Col span={6}>
             <Alert
               message="Incorrect Notes"
-              description={sessionProgress.incorrectNotes}
+              description={sessionProgress.incorrectNotes || '0'}
               type="error"
             />
           </Col>

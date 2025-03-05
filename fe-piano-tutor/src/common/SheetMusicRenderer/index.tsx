@@ -57,7 +57,7 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
     // Convert Note objects to Vex.StaveNote objects
     return (notes as IPianoNote[]).map(note => {
       const staveNote = new Vex.Flow.StaveNote({
-        keys: [`${note.note.toLowerCase()}/${note.octave}`],
+        keys: [`${note.note.toUpperCase()}/${note.octave}`],
         duration: note.length || 'q'
       })
 
@@ -105,8 +105,8 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
   useEffect(() => {
     if (notes.length === 0 || !currentNote || !expectedNoteTime) return
 
-    const expectedNoteKey = vexNotes[0].getKeys()[0].toLowerCase()
-    const playedNoteKey = currentNote.note.toLowerCase() + '/' + currentNote.octave
+    const expectedNoteKey = vexNotes[0].getKeys()[0].toUpperCase()
+    const playedNoteKey = currentNote.note.toUpperCase() + '/' + currentNote.octave
 
     // Calculate timing deviation
     const currentTime = Date.now()

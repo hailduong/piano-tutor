@@ -6,10 +6,11 @@ import {useNoteTimingTracking} from 'pages/LearnSong/hooks/useNoteTimingTracking
 import SheetMusicRenderer from 'pages/LearnSong/SheetMusicRenderer'
 import Vex from 'vexflow'
 import {durationToBeats} from 'pages/LearnSong/sheetUtils'
-import {useSelector, useDispatch} from 'react-redux'
+import {useSelector} from 'react-redux'
 import {selectIsPracticing, updateProgress} from 'store/slices/learnSongSlice'
 import {setSuggestedNote, selectPianoCurrentNote} from 'store/slices/virtualPianoSlice'
 import {IPianoNote} from 'store/slices/types/IPianoNote'
+import {useAppDispatch} from 'store'
 
 interface AdvancedMusicSheetProps {
   songId: string | null;
@@ -17,17 +18,16 @@ interface AdvancedMusicSheetProps {
   isPlaying: boolean;
   tempo: number;
   currentPosition: number;
-  onNotePlay: (noteId: string, timingDeviation: number) => void;
   onSongComplete: () => void;
 }
 
 const MusicSheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
   /* Props */
-  const {songId, sheetMusicXMLString, isPlaying, tempo, currentPosition, onNotePlay, onSongComplete} = props
+  const {songId, sheetMusicXMLString, isPlaying, tempo, currentPosition, onSongComplete} = props
 
 
   /* Redux State */
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const isPracticing = useSelector(selectIsPracticing)
   const pianoCurrentNote: null | IPianoNote = useSelector(selectPianoCurrentNote)
 
@@ -201,13 +201,7 @@ const MusicSheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
     if (playedMidiNote === expectedMidiNote) {
       // Correct note was played
       setIncorrectAttempt(false)
-
-      // Calculate timing deviation
-      const now = Date.now()
-      const timingDeviation = expectedNoteTime ? now - expectedNoteTime : 0
-
-      // Call the parent component's handler
-      onNotePlay(currentNote, timingDeviation)
+      dispatch(setSuggestedNote(null))
 
       // Move to next note
       if (currentIndex < vexNotes.length - 1) {
@@ -230,6 +224,9 @@ const MusicSheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
         setCurrentNote(null)
         setNextNote(null)
       }
+
+      // Update correct notes count
+      dispatch(updateProgress({correctNotes: 1}))
     } else {
       // Incorrect note
       setIncorrectAttempt(true)
@@ -243,7 +240,7 @@ const MusicSheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
 
       // Create a proper IPianoNote object
       const suggestedNote: IPianoNote = {
-        note: noteName,           // e.g., "C", "C#", etc.
+        note: noteName.toUpperCase(),           // e.g., "C", "C#", etc.
         length: 'q',              // Default to quarter note
         timestamp: Date.now(),    // Current timestamp
         octave: parseInt(octaveStr, 10)  // Parse octave number
@@ -252,10 +249,7 @@ const MusicSheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
       dispatch(setSuggestedNote(suggestedNote))
 
       // Update incorrect notes count
-      dispatch(updateProgress({
-        incorrectNotes: 1,
-        accuracy: -0.05 // Reduce accuracy by 5% (adjust as needed)
-      }))
+      dispatch(updateProgress({incorrectNotes: 1}))
     }
   }, [pianoCurrentNote])
 
@@ -277,12 +271,12 @@ const MusicSheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
       style={{width: '100%', outline: 'none'}}
     >
       <div>
-        {hasSupport ? 'MIDI support detected' : 'MIDI not supported in your browser'}
+        {hasSupport ? '' : 'MIDI not supported in your browser'}
       </div>
       <div>
         {isPracticing
-          ? 'Practice Mode: Play the highlighted note on the piano'
-          : 'Playback Mode: Listen to the song'}
+          ? <span><strong>Practice Mode:</strong> Play the highlighted note on the piano</span>
+          : <span><strong>Playback Mode:</strong> Listen to the song</span>}
       </div>
       <div
         ref={scrollContainerRef}
@@ -297,7 +291,6 @@ const MusicSheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
           vexNotes={vexNotes}
           onNoteElementsUpdate={handleNoteElementsUpdate}
           currentNote={currentNote}
-          nextNote={nextNote}
           incorrectAttempt={incorrectAttempt}
         />
       </div>

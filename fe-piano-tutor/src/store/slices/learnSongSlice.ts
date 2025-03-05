@@ -31,11 +31,11 @@ const initialState: ILearnSongState = {
 export const loadSheetMusicThunk = createAsyncThunk(
   'learnSong/loadSheetMusic',
   async (songId: string) => {
-    const response = await fetch(`${process.env.PUBLIC_URL}/songs/${songId}.musicxml`);
-    const text = await response.text();
-    return { songId, sheetMusic: text };
+    const response = await fetch(`${process.env.PUBLIC_URL}/songs/${songId}.musicxml`)
+    const text = await response.text()
+    return {songId, sheetMusic: text}
   }
-);
+)
 
 // Create the learn song slice
 const learnSongSlice = createSlice({
@@ -93,7 +93,7 @@ const learnSongSlice = createSlice({
     // Toggle practicing state
     togglePracticing: (state, action: PayloadAction<boolean | undefined>) => {
       // If a specific value is provided, use it, otherwise toggle the current value
-      state.isPracticing = action.payload !== undefined ? action.payload : !state.isPracticing;
+      state.isPracticing = action.payload !== undefined ? action.payload : !state.isPracticing
     },
 
     // Update current note being played
@@ -106,7 +106,7 @@ const learnSongSlice = createSlice({
       state.nextNote = action.payload
     },
 
-    // Record a played note's timing information
+    // TODO: Record a played note's timing information
     recordNoteTiming: (state, action: PayloadAction<INoteTiming>) => {
       state.noteTimings.push(action.payload)
       state.sessionProgress.notesPlayed += 1
@@ -124,10 +124,21 @@ const learnSongSlice = createSlice({
 
     // Update session progress
     updateProgress: (state, action: PayloadAction<Partial<ISessionProgress>>) => {
-      state.sessionProgress = {
-        ...state.sessionProgress,
-        ...action.payload
+      const {correctNotes, incorrectNotes} = action.payload
+      debugger
+      if (correctNotes !== undefined) {
+        state.sessionProgress.notesPlayed += correctNotes
+        state.sessionProgress.correctNotes += correctNotes
+        state.sessionProgress.currentPosition += correctNotes
       }
+
+      if (incorrectNotes !== undefined) {
+        state.sessionProgress.notesPlayed += incorrectNotes
+        state.sessionProgress.incorrectNotes += incorrectNotes
+      }
+
+      // Recalculate accuracy
+      state.sessionProgress.accuracy = state.sessionProgress.correctNotes / state.sessionProgress.notesPlayed
     },
 
     // Update learning settings
@@ -154,8 +165,8 @@ const learnSongSlice = createSlice({
         // Handle loading state if needed
       })
       .addCase(loadSheetMusicThunk.fulfilled, (state, action) => {
-        state.songId = action.payload.songId;
-        state.sheetMusic = action.payload.sheetMusic;
+        state.songId = action.payload.songId
+        state.sheetMusic = action.payload.sheetMusic
       })
       .addCase(loadSheetMusicThunk.rejected, (state, action) => {
         // Handle error state if needed
