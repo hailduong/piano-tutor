@@ -22,8 +22,10 @@ import LearnSongPage from 'pages/LearnSong'
 import SoundTest from 'pages/SoundTest'
 import Settings from 'pages/Settings'
 
-// Placeholder components for the new menu items
-const ChallengeYourself = () => <div><h2>Challenge Yourself</h2></div>
+// Import new authentication pages
+import Register from 'pages/Auth/Register'
+import Login from 'pages/Auth/Login'
+import PasswordReset from 'pages/Auth/PasswordReset'
 
 const {Sider, Content} = Layout
 
@@ -38,7 +40,7 @@ function App() {
       <Router>
         <Layout style={{minHeight: '100vh'}}>
           {/* Vertical Menu */}
-          <Sider width={280} style={{background: '#fff'}} className='shadow-lg'>
+          <Sider width={280} style={{background: '#fff'}} className="shadow-lg">
             <div style={{
               padding: '16px',
               textAlign: 'center',
@@ -67,6 +69,15 @@ function App() {
               <Menu.Item key="7" icon={<SettingOutlined/>}>
                 <Link to="/settings">Settings</Link>
               </Menu.Item>
+              <Menu.Item key="8" icon={<ReadOutlined/>}>
+                <Link to="/auth/register">Register</Link>
+              </Menu.Item>
+              <Menu.Item key="9" icon={<ReadOutlined/>}>
+                <Link to="/auth/login">Login</Link>
+              </Menu.Item>
+              <Menu.Item key="10" icon={<ReadOutlined/>}>
+                <Link to="/auth/password-reset">Password Reset</Link>
+              </Menu.Item>
             </Menu>
           </Sider>
 
@@ -86,10 +97,13 @@ function App() {
                 <Route path="/learn-music-notes" element={<LearnMusicNotes/>}/>
                 <Route path="/learn-songs" element={<SongLibrary/>}/>
                 <Route path="/learn-songs/:songId" element={<LearnSongPage/>}/>
-                <Route path="/challenge-yourself" element={<ChallengeYourself/>}/>
+                <Route path="/challenge-yourself" element={<div><h2>Challenge Yourself</h2></div>}/>
                 <Route path="/results" element={<Results/>}/>
                 <Route path="/sound-test" element={<SoundTest/>}/>
                 <Route path="/settings" element={<Settings/>}/>
+                <Route path="/auth/register" element={<Register/>}/>
+                <Route path="/auth/login" element={<Login/>}/>
+                <Route path="/auth/password-reset" element={<PasswordReset/>}/>
                 <Route path="/" element={<LearnMusicNotes/>}/>
               </Routes>
             </Content>

@@ -9,9 +9,11 @@ import musicTheoryReducer, {IMusicTheoryState} from 'store/slices/musicTheorySli
 import songLibraryReducer, {ISongLibraryState} from 'store/slices/songLibrarySlice'
 import learnSongReducer from 'store/slices/learnSongSlice'
 import virtualPianoReducer, {IVirtualPianoState} from 'store/slices/virtualPianoSlice'
+import authReducer, {IAuthState} from 'store/slices/authSlice'
 import settingsReducer, {ISettingsState} from 'store/slices/settingsSlice'
 import {TypedUseSelectorHook, useSelector, useDispatch} from 'react-redux'
-import {ILearnSongState} from 'pages/LearnSong/types/LearnSong' // Import the new settings slice
+import {ILearnSongState} from 'pages/LearnSong/types/LearnSong'
+
 
 // Persist configuration
 const persistConfig = {
@@ -38,7 +40,8 @@ export const store = configureStore({
     songLibrary: persistedSongLibraryReducer,
     learnSong: persistedLearnSongReducer,
     settings: persistedSettingsReducer,
-    virtualPiano: virtualPianoReducer
+    virtualPiano: virtualPianoReducer,
+    auth: authReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -52,13 +55,14 @@ export const store = configureStore({
 export const persistor = persistStore(store)
 
 export type RootState = {
+  auth: IAuthState
   learnSong: ILearnSongState & PersistPartial;
   musicNotes: IMusicNotesState & PersistPartial;
   musicTheory: IMusicTheoryState & PersistPartial;
   performance: IPerformanceState & PersistPartial;
   settings: ISettingsState & PersistPartial;
   songLibrary: ISongLibraryState & PersistPartial;
-  virtualPiano: IVirtualPianoState & PersistPartial;
+  virtualPiano: IVirtualPianoState
 };
 
 export type AppDispatch = typeof store.dispatch;
