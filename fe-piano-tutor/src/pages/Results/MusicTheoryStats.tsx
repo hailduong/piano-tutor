@@ -9,11 +9,11 @@ const { Title, Text } = Typography;
 
 const MusicTheoryStats: FC = () => {
   const navigate = useNavigate();
-  const { concepts, completedConcepts, conceptProgress } = useSelector(
+  const { conceptList, completedConcepts, conceptProgress } = useSelector(
     (state: RootState) => state.musicTheory
   );
 
-  const totalConcepts = concepts.length;
+  const totalConcepts = conceptList.length;
   const completedCount = completedConcepts.length;
   const completionRate = totalConcepts > 0 ? Math.round((completedCount / totalConcepts) * 100) : 0;
 
@@ -44,7 +44,7 @@ const MusicTheoryStats: FC = () => {
       </Row>
 
       <Title level={5}>Topic Breakdown:</Title>
-      {concepts.map(concept => (
+      {conceptList.map(concept => (
         <div key={concept.id} style={{ marginBottom: 8, cursor: 'pointer' }} onClick={() => navigate('/music-theory')}>
           <Text strong>{concept.title}</Text>
           <div style={{ display: 'flex', alignItems: 'center' }}>

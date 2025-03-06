@@ -1,11 +1,11 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit'
 import {QuizQuestion, quizzes} from 'pages/MusicTheory/data/musicTheoryQuizzes'
-import {MusicTheoryConcept, concepts} from 'pages/MusicTheory/data/musicTheoryConceptDashboard'
+import {IMusicTheoryConcept, conceptList} from 'pages/MusicTheory/data/musicTheoryConceptList'
 
 
 // Define the state for the music theory slice
 export interface IMusicTheoryState {
-  concepts: MusicTheoryConcept[];
+  conceptList: IMusicTheoryConcept[];
   quizzes: Record<string, QuizQuestion[]>; // conceptId -> questions
   activeConceptId: string | null;
   activeQuizId: string | null;
@@ -15,9 +15,9 @@ export interface IMusicTheoryState {
   currentTheoryConcept: string;
 }
 
-// Initial state with sample music theory concepts
+// Initial state with sample music theory conceptList
 const initialState: IMusicTheoryState = {
-  concepts,
+  conceptList,
   quizzes,
   activeConceptId: null,
   activeQuizId: null,
@@ -42,7 +42,7 @@ const musicTheorySlice = createSlice({
       state.completedConcepts.push(conceptId)
 
       // Update the concept's completed status
-      const concept = state.concepts.find(c => c.id === conceptId)
+      const concept = state.conceptList.find(c => c.id === conceptId)
       if (concept) {
         concept.completed = true
       }

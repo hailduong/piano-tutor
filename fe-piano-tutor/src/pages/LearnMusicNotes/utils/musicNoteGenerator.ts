@@ -4,7 +4,7 @@ import Vex from 'vexflow'
 
 import {IPianoNote} from 'store/slices/types/IPianoNote'
 
-// Types for music theory concepts
+// Types for music theory conceptList
 export type ScaleType = 'major' | 'minor' | 'pentatonicMajor' | 'pentatonicMinor' | 'chromatic' | 'blues';
 export type ChordType = 'major' | 'minor' | 'diminished' | 'augmented' | 'major7' | 'minor7' | 'dominant7';
 export type IntervalType =

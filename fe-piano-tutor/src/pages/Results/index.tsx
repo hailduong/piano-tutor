@@ -36,7 +36,7 @@ const Results: FC = () => {
 
         <Tabs defaultActiveKey="performance" centered>
           <TabPane
-            tab={<span><TrophyOutlined /> Performance</span>}
+            tab={<span><TrophyOutlined /> Learn Music Notes</span>}
             key="performance"
           >
         <Row gutter={16} style={{marginBottom: 20}}>
