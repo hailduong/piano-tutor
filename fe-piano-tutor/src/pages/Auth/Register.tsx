@@ -4,29 +4,28 @@ import {useAppDispatch, useAppSelector} from 'store'
 import {registerUser} from 'store/slices/authSlice'
 import styled from 'styled-components'
 
-/* Props & Store: No additional props; Uses Redux store */
-interface IRegisterProps {
-}
-
-/* States: Local form state is managed by Ant Design Form */
 const RegisterContainer = styled.div`
     max-width: 400px;
     margin: 0 auto;
     padding: 24px;
 `
 
-/* Handlers: Will be defined inside the component */
+interface IFormValues {
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
 
-const Register: React.FC<IRegisterProps> = () => {
+
+const Register: React.FC = () => {
   const dispatch = useAppDispatch()
   const {loading, error} = useAppSelector((state) => state.auth)
 
   /* Handlers */
-  const onFinish = (values: any) => {
-    dispatch(registerUser(values))
+  const onFinish = (values: IFormValues) => {
+    const {confirmPassword, ...rest} = values
+    dispatch(registerUser(rest))
   }
-
-  /* Effects: None for now */
 
   /* Render */
   return (
@@ -48,6 +47,27 @@ const Register: React.FC<IRegisterProps> = () => {
             message: 'Password must be at least 6 characters!'
           }]}>
           <Input.Password placeholder="Password"/>
+        </Form.Item>
+        <Form.Item
+          name="confirmPassword"
+          label="Confirm Password"
+          dependencies={['password']}
+          rules={[
+            {
+              required: true,
+              message: 'Please confirm your password!'
+            },
+            ({getFieldValue}) => ({
+              validator(_, value) {
+                if (!value || getFieldValue('password') === value) {
+                  return Promise.resolve()
+                }
+
+                return Promise.reject(new Error('The two passwords that you entered do not match!'))
+              }
+            })
+          ]}>
+          <Input.Password placeholder="Confirm Password"/>
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit" loading={loading} block>
