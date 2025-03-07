@@ -7,6 +7,8 @@ import { sendEmail } from '@src/utils/email';
 export interface IRegisterData {
   email: string;
   password: string;
+  firstName: string;
+  lastName: string;
 }
 
 export interface ILoginData {
@@ -37,14 +39,14 @@ class AuthService {
   }
 
   // Registers a new user in the database.
-  public async registerUser({ email, password }: IRegisterData) {
+  public async registerUser({ email, password, firstName, lastName }: IRegisterData) {
     const existingUser = await this.db.user.findUnique({ where: { email } });
     if (existingUser) {
       throw new Error('User already exists');
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await this.db.user.create({
-      data: { email, password: hashedPassword },
+      data: { email, password: hashedPassword, firstName, lastName },
     });
     return user;
   }

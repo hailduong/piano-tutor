@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import * as AuthController from '@src/routes/auth/auth.controller'
+import authController from '@src/routes/auth/auth.controller'
 import {
   validateRegister,
   validateLogin,
@@ -9,29 +9,27 @@ import {
 
 const router: Router = Router()
 
-/* Refs: Authentication routes with integrated input validations */
-
 // User registration endpoint with validations.
-router.post('/register', validateRegister, AuthController.register)
+router.post('/register', validateRegister, authController.register)
 
 // User login endpoint with validations.
-router.post('/login', validateLogin, AuthController.login)
+router.post('/login', validateLogin, authController.login)
 
 // User logout endpoint (no input validation required).
-router.post('/logout', AuthController.logout)
+router.post('/logout', authController.logout)
 
 // Initiate password reset request with email validation.
 router.post(
   '/password-reset/request',
   validatePasswordResetRequest,
-  AuthController.passwordResetRequest
+  authController.passwordResetRequest
 )
 
 // Confirm password reset with token and new password validation.
 router.post(
   '/password-reset/confirm',
   validatePasswordResetConfirm,
-  AuthController.passwordResetConfirm
+  authController.passwordResetConfirm
 )
 
 export default router

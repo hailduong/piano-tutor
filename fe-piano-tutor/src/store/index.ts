@@ -31,6 +31,7 @@ const persistedMusicTheoryReducer = createPersistedReducer('musicTheory', musicT
 const persistedSongLibraryReducer = createPersistedReducer('songLibrary', songLibraryReducer)
 const persistedLearnSongReducer = createPersistedReducer('learnSong', learnSongReducer)
 const persistedSettingsReducer = createPersistedReducer('settings', settingsReducer)
+const persistedAuthReducer = createPersistedReducer('auth', authReducer)
 
 export const store = configureStore({
   reducer: {
@@ -41,7 +42,7 @@ export const store = configureStore({
     learnSong: persistedLearnSongReducer,
     settings: persistedSettingsReducer,
     virtualPiano: virtualPianoReducer,
-    auth: authReducer
+    auth: persistedAuthReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -55,7 +56,7 @@ export const store = configureStore({
 export const persistor = persistStore(store)
 
 export type RootState = {
-  auth: IAuthState
+  auth: IAuthState & PersistPartial
   learnSong: ILearnSongState & PersistPartial;
   musicNotes: IMusicNotesState & PersistPartial;
   musicTheory: IMusicTheoryState & PersistPartial;
