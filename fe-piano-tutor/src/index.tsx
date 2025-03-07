@@ -17,6 +17,8 @@ const theme: ThemeConfig = {
     colorSuccess: themeVars.colors.success,
     colorWarning: themeVars.colors.warning,
     colorError: themeVars.colors.error,
+    colorTextHeading: themeVars.colors.primary,
+    colorTextBase: themeVars.colors.gray[900],
     borderRadius: 4,
     fontFamily: themeVars.fonts.primary,
     fontSize: 16,

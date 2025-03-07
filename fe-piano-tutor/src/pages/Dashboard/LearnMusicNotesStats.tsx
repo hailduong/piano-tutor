@@ -1,4 +1,4 @@
-// src/pages/Results/LearnMusicNotesStats.tsx
+// src/pages/Dashboard/LearnMusicNotesStats.tsx
 import React from 'react'
 import {Row, Col, Card, Statistic} from 'antd'
 import {useSelector} from 'react-redux'

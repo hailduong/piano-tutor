@@ -2,8 +2,9 @@ import React, {useEffect} from 'react'
 import {Form, Input, Button, Typography, Alert, Card} from 'antd'
 import {Link} from 'react-router-dom'
 import {useAppDispatch, useAppSelector} from 'store'
-import {loginUser, logout} from 'store/slices/authSlice'
-import styled from 'styled-components'
+import {logout} from 'store/slices/auth/auth.slice'
+import {LinkContainer, ProfileContainer, LoginContainer} from 'pages/Auth/styles/Login.styled'
+import {loginUser} from 'store/slices/auth/auth.thunks'
 
 // Helper function to check token expiration
 const isTokenExpired = (token: string): boolean => {
@@ -17,27 +18,6 @@ const isTokenExpired = (token: string): boolean => {
 
 interface ILoginProps {
 }
-
-const LoginContainer = styled.div`
-    max-width: 480px;
-    margin: 0 auto;
-    padding: 24px;
-`
-
-const ProfileContainer = styled.div`
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 24px;
-    text-align: center;
-`
-
-const LinkContainer = styled.div`
-    margin-top: 16px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-`
 
 const Login: React.FC<ILoginProps> = () => {
   const dispatch = useAppDispatch()

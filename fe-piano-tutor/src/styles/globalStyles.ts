@@ -1,6 +1,8 @@
 import { createGlobalStyle } from 'styled-components';
+import themeVars from 'styles/themeVars'
 
 const GlobalStyle = createGlobalStyle`
+    
     .notation {
         font-family: 'Noto Music', sans-serif;
         display: inline-block;

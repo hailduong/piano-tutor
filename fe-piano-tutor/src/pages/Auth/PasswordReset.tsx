@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Typography, Alert, Tabs } from 'antd';
 import { useAppDispatch, useAppSelector } from 'store';
-import { requestPasswordReset, resetPassword } from 'store/slices/authSlice';
 import styled from 'styled-components';
+import {resetPassword, requestPasswordReset} from 'store/slices/auth/auth.thunks'
 
 /* Refs: None */
 

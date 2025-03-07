@@ -94,7 +94,7 @@ const LearnMusicNotes: FC = memo(() => {
     if (level !== null && notes.length > 0) {
       dispatch(setLastSessionScore(sessionScore))
       dispatch(endSession())
-      navigate('/results', {
+      navigate('/dashboard', {
         state: {
           source: 'learn-music-notes',
           message: 'Practice Stopped'
@@ -141,7 +141,7 @@ const LearnMusicNotes: FC = memo(() => {
     if (level !== null && notes.length === 0 && sessionScore > 0) {
       dispatch(setLastSessionScore(sessionScore))
       dispatch(endSession())
-      navigate('/results', {
+      navigate('/dashboard', {
         state: {
           source: 'learn-music-notes',
           message: 'Practice Complete'

@@ -9,7 +9,7 @@ import musicTheoryReducer, {IMusicTheoryState} from 'store/slices/musicTheorySli
 import songLibraryReducer, {ISongLibraryState} from 'store/slices/songLibrarySlice'
 import learnSongReducer from 'store/slices/learnSongSlice'
 import virtualPianoReducer, {IVirtualPianoState} from 'store/slices/virtualPianoSlice'
-import authReducer, {IAuthState} from 'store/slices/authSlice'
+import authReducer, {IAuthState} from 'store/slices/auth/auth.slice'
 import settingsReducer, {ISettingsState} from 'store/slices/settingsSlice'
 import {TypedUseSelectorHook, useSelector, useDispatch} from 'react-redux'
 import {ILearnSongState} from 'pages/LearnSong/types/LearnSong'

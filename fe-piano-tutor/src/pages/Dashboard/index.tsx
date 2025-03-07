@@ -4,9 +4,9 @@ import {useSelector} from 'react-redux'
 import {useNavigate, useLocation} from 'react-router-dom'
 import {RootState} from 'store'
 import {TrophyOutlined, ArrowLeftOutlined, ReloadOutlined, BookOutlined, SoundOutlined} from '@ant-design/icons'
-import MusicTheoryStats from 'pages/Results/MusicTheoryStats'
-import LearnMusicNotesStats from 'pages/Results/LearnMusicNotesStats'
-import SongPracticeStats from 'pages/Results/SongPracticeStats'
+import MusicTheoryStats from 'pages/Dashboard/MusicTheoryStats'
+import LearnMusicNotesStats from 'pages/Dashboard/LearnMusicNotesStats'
+import SongPracticeStats from 'pages/Dashboard/SongPracticeStats'
 
 const {TabPane} = Tabs
 
@@ -15,7 +15,7 @@ type TLocationState = {
   message?: string;
 }
 
-const Results: FC = () => {
+const Dashboard: FC = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const state = location.state as TLocationState
@@ -102,4 +102,4 @@ const Results: FC = () => {
   )
 }
 
-export default Results
+export default Dashboard

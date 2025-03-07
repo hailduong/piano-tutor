@@ -16,7 +16,7 @@ import LearnMusicNotes from 'pages/LearnMusicNotes/LearnMusicNotes'
 import VirtualPiano from 'common/VirtualPiano'
 import {Provider} from 'react-redux'
 import store from 'store'
-import Results from 'pages/Results'
+import Dashboard from 'pages/Dashboard'
 import MusicTheory from 'pages/MusicTheory'
 import SongLibrary from 'pages/SongLibrary'
 import LearnSongPage from 'pages/LearnSong'
@@ -25,7 +25,6 @@ import Settings from 'pages/Settings'
 import Register from 'pages/Auth/Register'
 import Login from 'pages/Auth/Login'
 import PasswordReset from 'pages/Auth/PasswordReset'
-import themeVars from 'styles/themeVars'
 
 const {Header, Sider, Content} = Layout
 
@@ -39,12 +38,13 @@ function App() {
       <Router>
         <Layout style={{minHeight: '100vh'}}>
           <Header style={{
-            background: themeVars.colors.primaries['900'], // dark background
+            background: `linear-gradient(135deg, #2A1E85 0%, #432FC7 50%, #6B5BEF 100%)`, // header gradient
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '0 16px',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)' // header shadow
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
+            zIndex: 1000
           }}>
             <div style={{fontSize: '18px', fontWeight: 700, color: '#fff'}}>
               AI Piano Tutor
@@ -61,7 +61,7 @@ function App() {
                 defaultSelectedKeys={['1']}
                 style={{height: 'calc(100% - 53px)', borderRight: 0}}
               >
-                <Menu.Item key="1" icon={<BarChartOutlined/>}><Link to="/results">Dashboard</Link></Menu.Item>
+                <Menu.Item key="1" icon={<BarChartOutlined/>}><Link to="/dashboard">Dashboard</Link></Menu.Item>
                 <Menu.Item key="2" icon={<BookOutlined/>}><Link to="/music-theory">Music Theory</Link></Menu.Item>
                 <Menu.Item key="5" icon={<ReadOutlined/>}><Link to="/learn-music-notes">Learn Music
                   Notes</Link>
@@ -92,13 +92,13 @@ function App() {
                   <Route path="/learn-music-notes" element={<LearnMusicNotes/>}/>
                   <Route path="/learn-songs" element={<SongLibrary/>}/>
                   <Route path="/learn-songs/:songId" element={<LearnSongPage/>}/>
-                  <Route path="/results" element={<Results/>}/>
+                  <Route path="/dashboard" element={<Dashboard/>}/>
                   <Route path="/sound-test" element={<SoundTest/>}/>
                   <Route path="/settings" element={<Settings/>}/>
                   <Route path="/auth/register" element={<Register/>}/>
                   <Route path="/auth/login" element={<Login/>}/>
                   <Route path="/auth/password-reset" element={<PasswordReset/>}/>
-                  <Route path="/" element={<Results/>}/>
+                  <Route path="/" element={<Dashboard/>}/>
                 </Routes>
               </Content>
             </Layout>

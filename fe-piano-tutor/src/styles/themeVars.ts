@@ -14,52 +14,65 @@ declare module 'styled-components' {
 
 const themeVars = {
   colors: {
-    primary: '#673ab7',
-    success: '#388e3c',
-    warning: '#ffc107',
-    error: '#f44336',
+    primary: '#432FC7', // Vibrant deep purple
+    secondary: '#00BCD4', // Bright cyan-blue
+    success: '#8BC34A',
+    warning: '#FFC107',
+    error: '#F44336',
+
     primaries: {
-      300: '#B39DDB',
-      500: '#673AB7',
-      900: '#311b92'
+      300: '#8576E8', // Lighter, soft lavender purple
+      500: '#432FC7', // Main bold purple
+      900: '#2A1E85'  // Deep, rich purple
     },
+
+    secondaries: {
+      300: '#6EE7F7', // Softer sky cyan
+      500: '#00BCD4', // Main bright cyan-blue
+      900: '#00869B'  // Darker, ocean cyan
+    },
+
     successes: {
-      300: '#81C784',
-      500: '#388e3c',
-      900: '#1b5e20'
+      300: '#AED581', // Softer green
+      500: '#8BC34A', // Main success green
+      900: '#558B2F'  // Deep forest green
     },
+
     warnings: {
-      300: '#FFD54F',
-      500: '#FFC107',
-      900: '#ff6f00'
+      300: '#FFE082', // Lighter warm yellow
+      500: '#FFC107', // Main alert yellow
+      900: '#FF8F00'  // Deeper warm amber
     },
+
     errors: {
-      300: '#e57373',
-      500: '#f44336',
-      900: '#b71c1c'
+      300: '#E57373', // Softer red
+      500: '#F44336', // Main danger red
+      900: '#B71C1C'  // Deep red alert
     },
+
     gray: {
-      100: '#f5f5f5',
-      200: '#eeeeee',
-      300: '#e0e0e0',
-      400: '#bdbdbd',
-      500: '#9e9e9e',
-      600: '#757575',
-      700: '#616161',
-      800: '#424242',
-      900: '#212121'
+      100: '#F4F4F9', // Slightly cool white
+      200: '#E9E9F2', // Soft light gray with indigo hue
+      300: '#D8D8E6', // Subtle bluish-gray
+      400: '#B6B6D0', // Muted soft indigo-gray
+      500: '#9696B8', // Balanced gray with indigo undertone
+      600: '#6F6F98', // Deeper gray with more indigo
+      700: '#5A5A7F', // Darker indigo-tinted gray
+      800: '#3F3F5E', // Richer, shadowy indigo-gray
+      900: '#212138'  // Deep, moody dark indigo-gray
     },
-    background: '#ffffff',
-    text: '#333333'
+
+    background: '#EAF5FF', // Soft dreamy blue background
+    text: '#3D3D5C' // Slightly muted dark grayish indigo
   },
   fonts: {
-    primary: 'Spectral, serif',
+    primary: '"Mona Sans", sans-serif',
     music: 'Noto Music, sans-serif'
   },
   fontWeights: {
-    light: 300,
+    light: 200,
     regular: 400,
-    bold: 700
+    bold: 600
   },
   breakpoints: {
     mobile: '576px',

@@ -1,8 +1,8 @@
 import React from 'react'
 import {Form, Input, Button, Typography, Alert} from 'antd'
 import {useAppDispatch, useAppSelector} from 'store'
-import {registerUser} from 'store/slices/authSlice'
 import styled from 'styled-components'
+import {registerUser} from 'store/slices/auth/auth.thunks'
 
 const RegisterContainer = styled.div`
     max-width: 400px;
