@@ -5,8 +5,8 @@ import {useNavigate, useLocation} from 'react-router-dom'
 import {RootState} from 'store'
 import {TrophyOutlined, ArrowLeftOutlined, ReloadOutlined, BookOutlined} from '@ant-design/icons'
 import MusicTheoryStats from 'pages/Results/MusicTheoryStats'
+import LearnMusicNotesStats from 'pages/Results/LearnMusicNotesStats'
 
-const {Title, Text} = Typography
 const {TabPane} = Tabs
 
 type TLocationState = {
@@ -30,7 +30,7 @@ const Results: FC = () => {
   /* Render */
   return (
     <div style={{padding: '20px', textAlign: 'center'}}>
-      <Card className='shadow' style={{maxWidth: 600, margin: '0 auto', padding: 20}}>
+      <Card className="shadow" style={{maxWidth: 600, margin: '0 auto', padding: 20}}>
         <TrophyOutlined style={{fontSize: 48, color: '#faad14', marginBottom: 16}}/>
         <h2>{message}</h2>
         <Tabs defaultActiveKey="musicTheory" centered>
@@ -42,61 +42,12 @@ const Results: FC = () => {
             <MusicTheoryStats/>
           </TabPane>
 
-          {/* Performance Stats */}
+          {/* Learn Music Notes Stats */}
           <TabPane
             tab={<span><TrophyOutlined/> Learn Music Notes</span>}
-            key="performance"
+            key="learnMusicNotes"
           >
-            <Row gutter={16} style={{marginBottom: 20}}>
-              <Col span={12}>
-                <Card>
-                  <Statistic
-                    title="Session Score"
-                    value={lastSessionScore}
-                    valueStyle={{color: '#3f8600'}}
-                  />
-                </Card>
-              </Col>
-              <Col span={12}>
-                <Card>
-                  <Statistic
-                    title="Total Score"
-                    value={score}
-                    valueStyle={{color: '#1677ff'}}
-                  />
-                </Card>
-              </Col>
-            </Row>
-
-            <Row gutter={16} style={{marginBottom: 20}}>
-              <Col span={8}>
-                <Card>
-                  <Statistic
-                    title="Accuracy"
-                    value={accuracyRate.toFixed(1)}
-                    suffix="%"
-                    valueStyle={{color: accuracyRate > 80 ? '#3f8600' : '#cf1322'}}
-                  />
-                </Card>
-              </Col>
-              <Col span={8}>
-                <Card>
-                  <Statistic
-                    title="Timing (ms)"
-                    value={averageTiming.toFixed(0)}
-                    valueStyle={{color: averageTiming < 300 ? '#3f8600' : '#cf1322'}}
-                  />
-                </Card>
-              </Col>
-              <Col span={8}>
-                <Card>
-                  <Statistic
-                    title="Notes Played"
-                    value={totalNotesPlayed}
-                  />
-                </Card>
-              </Col>
-            </Row>
+            <LearnMusicNotesStats/>
           </TabPane>
 
         </Tabs>
