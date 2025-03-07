@@ -21,6 +21,13 @@ export interface IMusicTheoryPerformance {
   quizzes: Record<string, IMusicTheoryQuizStats> // key: concept id
 }
 
+export interface ISongPracticeStats {
+  songId: string;
+  playedNotes: number;
+  correctNotes: number;
+  incorrectNotes: number;
+  noteAccuracy: number; // Calculated as a percentage (0 to 100)
+}
 
 export interface IPerformanceState {
   currentSessionPerformance: INotePerformance[];  // Current practice session data
@@ -35,6 +42,7 @@ export interface IPerformanceState {
     totalNotes: number; // Total notes played
   }
   musicTheory: IMusicTheoryPerformance
+  songPractice: ISongPracticeStats[]; // New state field for Song Practice stats
 }
 
 const initialState: IPerformanceState = {
@@ -46,34 +54,21 @@ const initialState: IPerformanceState = {
   sessionEnd: null,
   musicNotes: {
     totalScore: 0,
-    lastSessionScore: 0, // Initialize with default value
+    lastSessionScore: 0,
     totalNotes: 0
   },
   musicTheory: {
     conceptsCompleted: 0,
-    totalConcepts: 0, // to be set from your concepts data
+    totalConcepts: 0,
     quizzes: {}
-  }
+  },
+  songPractice: [] // Initialize as empty array
 }
 
 const performanceSlice = createSlice({
   name: 'performance',
   initialState,
   reducers: {
-    recordNotePerformance: (state, action: PayloadAction<INotePerformance>) => {
-      state.currentSessionPerformance.push(action.payload)
-      state.totalNotesPlayed++
-
-      // Update accuracy rate
-      const correctNotes = state.currentSessionPerformance.filter(note => note.isCorrect).length
-      state.accuracyRate = correctNotes / state.totalNotesPlayed * 100
-
-      // Update average timing
-      const totalDeviation = state.currentSessionPerformance.reduce(
-        (sum, note) => sum + Math.abs(note.timingDeviation), 0
-      )
-      state.averageTiming = totalDeviation / state.totalNotesPlayed
-    },
     startSession: (state) => {
       state.sessionStart = Date.now()
       state.sessionEnd = null
@@ -116,12 +111,23 @@ const performanceSlice = createSlice({
     ) => {
       const {conceptId, answered, total} = action.payload
       state.musicTheory.quizzes[conceptId] = {answered, total}
+    },
+    // New reducer to update song practice stats
+    updateSongPracticeStats: (state, action: PayloadAction<ISongPracticeStats>) => {
+      const index = state.songPractice.findIndex(
+        (stat) => stat.songId === action.payload.songId
+      )
+      if (index >= 0) {
+        state.songPractice[index] = action.payload
+      } else {
+        state.songPractice.push(action.payload)
+      }
+      /* Learn Songs */
     }
   }
 })
 
 export const {
-  recordNotePerformance,
   startSession,
   endSession,
   clearPerformanceData,
@@ -131,7 +137,8 @@ export const {
   setLastSessionScore, // Export the new action
   setTotalConcepts,
   markConceptCompleted,
-  updateQuizForConcept
+  updateQuizForConcept,
+  updateSongPracticeStats // Export the new action
 } = performanceSlice.actions
 
 export default performanceSlice.reducer

@@ -24,6 +24,7 @@ import MusicSheetContainer from 'pages/LearnSong/MusicSheetContainer'
 import LearnSongControls from 'pages/LearnSong/LearnSongControls'
 import {IPerformanceSummary} from 'pages/LearnSong/types/LearnSong'
 import {ProgressContainer, LearnSongContainer} from 'pages/LearnSong/styles/LearnSongPage.styled'
+import {updateSongPracticeStats} from 'store/slices/performanceSlice'
 
 const {Title, Text} = Typography
 
@@ -118,6 +119,18 @@ const LearnSongPage: React.FC = () => {
       songId: songId || '',
       date: new Date().toISOString()
     }
+
+    // Create song practice stats object
+    const practiceStats = {
+      songId: summary.songId,
+      playedNotes: summary.totalNotes,
+      correctNotes: summary.correctNotes,
+      incorrectNotes: summary.incorrectNotes,
+      noteAccuracy: summary.accuracy * 100 // converting fraction to percentage
+    }
+
+    // Dispatch the action to update song practice stats
+    dispatch(updateSongPracticeStats(practiceStats))
 
     setPerformanceSummary(summary)
     setShowSummary(true)

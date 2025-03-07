@@ -8,7 +8,6 @@ import {RootState} from 'store'
 import {useNavigate} from 'react-router-dom'
 import {setSelectedLevel} from 'store/slices/musicNotesSlice' // Changed import source
 import {
-  recordNotePerformance,
   startSession,
   endSession,
   setLastSessionScore,
@@ -43,15 +42,6 @@ const LearnMusicNotes: FC = memo(() => {
     if (notes.length > 0) {
       const expectedNote = notes[0].getKeys()[0] // Gets the first key from the current note
 
-      dispatch(recordNotePerformance({
-        noteAttempted,
-        noteExpected: expectedNote,
-        isCorrect: true,
-        timingDeviation,
-        difficultyLevel: level || 1,
-        timestamp: Date.now()
-      }))
-
       // Only increase totalScore if there was no incorrect attempt for this note
       if (!hasIncorrectAttempt) {
         setSessionScore(prev => prev + 1)
@@ -72,17 +62,6 @@ const LearnMusicNotes: FC = memo(() => {
   // Record incorrect note attempts
   const handleIncorrectNote = (noteAttempted: string, timingDeviation: number) => {
     if (notes.length > 0) {
-      const expectedNote = notes[0].getKeys()[0]
-
-      dispatch(recordNotePerformance({
-        noteAttempted,
-        noteExpected: expectedNote,
-        isCorrect: false,
-        timingDeviation,
-        difficultyLevel: level || 1,
-        timestamp: Date.now()
-      }))
-
       // Mark that this note has been attempted incorrectly
       setHasIncorrectAttempt(true)
     }

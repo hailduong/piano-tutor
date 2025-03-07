@@ -19,8 +19,10 @@ import {
   updateSettings,
   seekToPosition,
   selectIsPlaying,
-  selectLearnSongState
+  selectLearnSongState,
+  selectSessionProgress
 } from 'store/slices/learnSongSlice'
+import {updateSongPracticeStats} from 'store/slices/performanceSlice'
 import {
   TempoSlider,
   ControlSection,
@@ -37,14 +39,16 @@ interface ILearnSongControlsProps {
   totalNotes: number;
   isPracticing: boolean;
   onTogglePractice: () => void;
+  songId: string;
 }
 
 const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
   /* Props & Store */
-  const {onTempoChange, onSeek, currentPosition, totalNotes, isPracticing, onTogglePractice} = props
+  const {onTempoChange, onSeek, currentPosition, totalNotes, isPracticing, onTogglePractice, songId} = props
   const dispatch = useDispatch()
   const isPlaying = useSelector(selectIsPlaying)
   const learnSongState = useSelector(selectLearnSongState)
+  const sessionProgress = useSelector(selectSessionProgress)
 
   /* Refs */
   // Reference to track count-in beats
@@ -162,7 +166,15 @@ const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
         }
       }, beatDuration)
     } else {
-      // Directly stop practice mode
+      // When stopping practice mode, update stats with latest song info.
+      const practiceStats = {
+        songId: songId,
+        playedNotes: sessionProgress.totalNotes,
+        correctNotes: sessionProgress.correctNotes,
+        incorrectNotes: sessionProgress.incorrectNotes,
+        noteAccuracy: sessionProgress.accuracy * 100
+      }
+      dispatch(updateSongPracticeStats(practiceStats))
       onTogglePractice()
     }
   }
