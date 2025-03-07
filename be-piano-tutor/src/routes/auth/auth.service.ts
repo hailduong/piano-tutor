@@ -23,37 +23,35 @@ export interface IResetPasswordData {
   newPassword: string;
 }
 
-export class AuthService {
-  /* Generates a JWT token for an authenticated user.
-     Props & Store: Accepts a user id and email from the database.
-     Returns: A signed JWT token.
-  */
-  static generateToken(user: { id: number; email: string }): string {
-    // Use APP_SECRET from environment variables to sign the token
+class AuthService {
+  constructor(private db = prisma) {} // Dependency injection
+
+  // Generates a JWT token for an authenticated user.
+  private generateToken(user: { id: number; email: string }): string {
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.APP_SECRET as string,
-      { expiresIn: '1h' } // Token expires in 1 hour
+      { expiresIn: '1h' }
     );
     return token;
   }
 
-  /* Registers a new user using Prisma. */
-  static async registerUser({ email, password }: IRegisterData) {
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+  // Registers a new user in the database.
+  public async registerUser({ email, password }: IRegisterData) {
+    const existingUser = await this.db.user.findUnique({ where: { email } });
     if (existingUser) {
       throw new Error('User already exists');
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await prisma.user.create({
+    const user = await this.db.user.create({
       data: { email, password: hashedPassword },
     });
     return user;
   }
 
-  /* Logs in a user by validating credentials and generating a JWT. */
-  static async loginUser({ email, password }: ILoginData) {
-    const user = await prisma.user.findUnique({ where: { email } });
+  // Verifies user credentials and generates JWT upon successful authentication.
+  public async loginUser({ email, password }: ILoginData) {
+    const user = await this.db.user.findUnique({ where: { email } });
     if (!user) {
       throw new Error('Invalid credentials');
     }
@@ -61,20 +59,19 @@ export class AuthService {
     if (!passwordMatch) {
       throw new Error('Invalid credentials');
     }
-    // Generate and return a JWT token upon successful authentication
     const token = this.generateToken({ id: user.id, email: user.email });
     return { user, token };
   }
 
-  /* Initiates a password reset request by generating a reset token, storing it, and sending an email. */
-  static async requestPasswordReset({ email }: IResetRequestData) {
-    const user = await prisma.user.findUnique({ where: { email } });
+  // Handles password reset request by generating and sending a reset token.
+  public async requestPasswordReset({ email }: IResetRequestData) {
+    const user = await this.db.user.findUnique({ where: { email } });
     if (!user) {
       throw new Error('User not found');
     }
     const token = crypto.randomBytes(20).toString('hex');
     const expiry = new Date(Date.now() + 3600000);
-    await prisma.user.update({
+    await this.db.user.update({
       where: { email },
       data: { resetToken: token, resetTokenExpiry: expiry },
     });
@@ -88,9 +85,9 @@ export class AuthService {
     return { message: 'Password reset email sent' };
   }
 
-  /* Resets the user's password by verifying the token and updating the password. */
-  static async resetPassword({ token, newPassword }: IResetPasswordData) {
-    const user = await prisma.user.findFirst({
+  // Resets the user's password if the reset token is valid and not expired.
+  public async resetPassword({ token, newPassword }: IResetPasswordData) {
+    const user = await this.db.user.findFirst({
       where: {
         resetToken: token,
         resetTokenExpiry: { gt: new Date() },
@@ -100,7 +97,7 @@ export class AuthService {
       throw new Error('Invalid or expired token');
     }
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await this.db.user.update({
       where: { id: user.id },
       data: {
         password: hashedPassword,
@@ -111,3 +108,6 @@ export class AuthService {
     return updatedUser;
   }
 }
+
+const authService = new AuthService();
+export default authService;

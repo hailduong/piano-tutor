@@ -1,5 +1,5 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit'
-import {resetPassword, requestPasswordReset, loginUser, registerUser} from 'store/slices/auth/auth.thunks'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { resetPassword, requestPasswordReset, loginUser, registerUser } from 'store/slices/auth/auth.thunks'
 
 export interface IAuthState {
   user: any;
@@ -35,9 +35,9 @@ const authSlice = createSlice({
       state.user = action.payload.user;
       state.token = action.payload.token;
     });
-    builder.addCase(registerUser.rejected, (state, action: PayloadAction<any>) => {
+    builder.addCase(registerUser.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.payload;
+      state.error = (action.payload as string) || action.error.message || null;
     });
     // Login user
     builder.addCase(loginUser.pending, (state) => {
@@ -49,9 +49,8 @@ const authSlice = createSlice({
       state.user = action.payload.user;
       state.token = action.payload.token;
     });
-    builder.addCase(loginUser.rejected, (state, action: PayloadAction<any>) => {
+    builder.addCase(loginUser.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.payload;
     });
     // Request password reset
     builder.addCase(requestPasswordReset.pending, (state) => {
@@ -61,9 +60,9 @@ const authSlice = createSlice({
     builder.addCase(requestPasswordReset.fulfilled, (state) => {
       state.loading = false;
     });
-    builder.addCase(requestPasswordReset.rejected, (state, action: PayloadAction<any>) => {
+    builder.addCase(requestPasswordReset.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.payload;
+      state.error = (action.payload as string) || action.error.message || null;
     });
     // Reset password
     builder.addCase(resetPassword.pending, (state) => {
@@ -73,9 +72,9 @@ const authSlice = createSlice({
     builder.addCase(resetPassword.fulfilled, (state) => {
       state.loading = false;
     });
-    builder.addCase(resetPassword.rejected, (state, action: PayloadAction<any>) => {
+    builder.addCase(resetPassword.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.payload;
+      state.error = (action.payload as string) || action.error.message || null;
     });
   },
 });

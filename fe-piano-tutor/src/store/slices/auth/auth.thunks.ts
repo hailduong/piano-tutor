@@ -1,52 +1,55 @@
-// Async thunk for registration
 import {createAsyncThunk} from '@reduxjs/toolkit'
-import axios from 'axios'
+import {AxiosError} from 'axios'
+import authService from './auth.service'
+import {notification} from 'antd'
 
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
   async (data: { email: string; password: string }, {rejectWithValue}) => {
     try {
-      const {email, password} = data
-      const payload = {email, password}
-      const response = await axios.post('/api/auth/register', payload)
+      const response = await authService.register(data)
       return response.data
-    } catch (error: any) {
+    } catch (error: AxiosError) {
+      notification.error({message: error.response?.data.error || 'Failed to register user'})
       return rejectWithValue(error.response ? error.response.data : error.message)
     }
   }
 )
-// Async thunk for login
+
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async (data: { email: string; password: string }, {rejectWithValue}) => {
     try {
-      const response = await axios.post('/api/auth/login', data)
+      const response = await authService.login(data)
       return response.data
-    } catch (error: any) {
+    } catch (error: AxiosError) {
+      notification.error({message: error.response?.data.error || 'Failed to login'})
       return rejectWithValue(error.response ? error.response.data : error.message)
     }
   }
 )
-// Async thunk for password reset request
+
 export const requestPasswordReset = createAsyncThunk(
   'auth/requestPasswordReset',
   async (data: { email: string }, {rejectWithValue}) => {
     try {
-      const response = await axios.post('/api/auth/password-reset/request', data)
+      const response = await authService.requestPasswordReset(data)
       return response.data
-    } catch (error: any) {
+    } catch (error: AxiosError) {
+      notification.error(error.response.data.error)
       return rejectWithValue(error.response ? error.response.data : error.message)
     }
   }
 )
-// Async thunk for password reset confirm
+
 export const resetPassword = createAsyncThunk(
   'auth/resetPassword',
   async (data: { token: string; newPassword: string }, {rejectWithValue}) => {
     try {
-      const response = await axios.post('/api/auth/password-reset/confirm', data)
+      const response = await authService.resetPassword(data)
       return response.data
-    } catch (error: any) {
+    } catch (error: AxiosError) {
+      notification.error(error.response.data.error)
       return rejectWithValue(error.response ? error.response.data : error.message)
     }
   }

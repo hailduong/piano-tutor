@@ -34,11 +34,11 @@ const Login: React.FC<ILoginProps> = () => {
     dispatch(loginUser(values))
   }
 
-  if (user) {
+  if (token) {
     return (
       <ProfileContainer>
         <Card title="Profile">
-          <p>You are logged in as: {user.email || 'User'}</p>
+          <p>You are logged in as: {user?.email || 'User'}</p>
           <Button type="primary" danger onClick={() => dispatch(logout())}>
             Logout
           </Button>
