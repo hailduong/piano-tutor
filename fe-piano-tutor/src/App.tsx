@@ -62,7 +62,6 @@ function App() {
               <Menu.Item key="3" icon={<PlayCircleOutlined/>}>
                 <Link to="/learn-songs">Practice with Songs</Link>
               </Menu.Item>
-              <Menu.Item key="4" icon={<ThunderboltOutlined/>}><Link to="/challenge-yourself">Challenge Yourself</Link></Menu.Item>
               <Menu.Item key="5" icon={<BarChartOutlined/>}><Link to="/results">Results</Link></Menu.Item>
               <Menu.Item key="6" icon={<SoundOutlined/>}><Link to="/sound-test">Sound Test</Link></Menu.Item>
               <Menu.Item key="7" icon={<SettingOutlined/>}><Link to="/settings">Settings</Link></Menu.Item>
@@ -86,7 +85,6 @@ function App() {
                 <Route path="/learn-music-notes" element={<LearnMusicNotes/>}/>
                 <Route path="/learn-songs" element={<SongLibrary/>}/>
                 <Route path="/learn-songs/:songId" element={<LearnSongPage/>}/>
-                <Route path="/challenge-yourself" element={<div><h2>Challenge Yourself</h2></div>}/>
                 <Route path="/results" element={<Results/>}/>
                 <Route path="/sound-test" element={<SoundTest/>}/>
                 <Route path="/settings" element={<Settings/>}/>
