@@ -30,75 +30,78 @@ const Results: FC = () => {
   /* Render */
   return (
     <div style={{padding: '20px', textAlign: 'center'}}>
-      <Card style={{maxWidth: 600, margin: '0 auto', padding: 20}}>
+      <Card className='shadow' style={{maxWidth: 600, margin: '0 auto', padding: 20}}>
         <TrophyOutlined style={{fontSize: 48, color: '#faad14', marginBottom: 16}}/>
         <h2>{message}</h2>
-
-        <Tabs defaultActiveKey="performance" centered>
+        <Tabs defaultActiveKey="musicTheory" centered>
+          {/* Music Theory Stats */}
           <TabPane
-            tab={<span><TrophyOutlined /> Learn Music Notes</span>}
-            key="performance"
-          >
-        <Row gutter={16} style={{marginBottom: 20}}>
-          <Col span={12}>
-            <Card>
-              <Statistic
-                title="Session Score"
-                value={lastSessionScore}
-                valueStyle={{color: '#3f8600'}}
-              />
-            </Card>
-          </Col>
-          <Col span={12}>
-            <Card>
-              <Statistic
-                title="Total Score"
-                value={score}
-                valueStyle={{color: '#1677ff'}}
-              />
-            </Card>
-          </Col>
-        </Row>
-
-        <Row gutter={16} style={{marginBottom: 20}}>
-          <Col span={8}>
-            <Card>
-              <Statistic
-                title="Accuracy"
-                value={accuracyRate.toFixed(1)}
-                suffix="%"
-                valueStyle={{color: accuracyRate > 80 ? '#3f8600' : '#cf1322'}}
-              />
-            </Card>
-          </Col>
-          <Col span={8}>
-            <Card>
-              <Statistic
-                title="Timing (ms)"
-                value={averageTiming.toFixed(0)}
-                valueStyle={{color: averageTiming < 300 ? '#3f8600' : '#cf1322'}}
-              />
-            </Card>
-          </Col>
-          <Col span={8}>
-            <Card>
-              <Statistic
-                title="Notes Played"
-                value={totalNotesPlayed}
-              />
-            </Card>
-          </Col>
-        </Row>
-          </TabPane>
-
-          <TabPane
-            tab={<span><BookOutlined /> Music Theory</span>}
+            tab={<span><BookOutlined/> Music Theory</span>}
             key="musicTheory"
           >
-            <MusicTheoryStats />
+            <MusicTheoryStats/>
           </TabPane>
+
+          {/* Performance Stats */}
+          <TabPane
+            tab={<span><TrophyOutlined/> Learn Music Notes</span>}
+            key="performance"
+          >
+            <Row gutter={16} style={{marginBottom: 20}}>
+              <Col span={12}>
+                <Card>
+                  <Statistic
+                    title="Session Score"
+                    value={lastSessionScore}
+                    valueStyle={{color: '#3f8600'}}
+                  />
+                </Card>
+              </Col>
+              <Col span={12}>
+                <Card>
+                  <Statistic
+                    title="Total Score"
+                    value={score}
+                    valueStyle={{color: '#1677ff'}}
+                  />
+                </Card>
+              </Col>
+            </Row>
+
+            <Row gutter={16} style={{marginBottom: 20}}>
+              <Col span={8}>
+                <Card>
+                  <Statistic
+                    title="Accuracy"
+                    value={accuracyRate.toFixed(1)}
+                    suffix="%"
+                    valueStyle={{color: accuracyRate > 80 ? '#3f8600' : '#cf1322'}}
+                  />
+                </Card>
+              </Col>
+              <Col span={8}>
+                <Card>
+                  <Statistic
+                    title="Timing (ms)"
+                    value={averageTiming.toFixed(0)}
+                    valueStyle={{color: averageTiming < 300 ? '#3f8600' : '#cf1322'}}
+                  />
+                </Card>
+              </Col>
+              <Col span={8}>
+                <Card>
+                  <Statistic
+                    title="Notes Played"
+                    value={totalNotesPlayed}
+                  />
+                </Card>
+              </Col>
+            </Row>
+          </TabPane>
+
         </Tabs>
 
+        {/* Bottom Actions */}
         <Space style={{marginTop: 20}}>
           {sourceActivity === 'learn-music-notes' && (
             <Button

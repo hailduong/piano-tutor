@@ -1,4 +1,4 @@
-import React, {FC, useState} from 'react'
+import React, {FC, useState, useEffect} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
 import {RootState} from 'store'
 import {Card, Typography, Row, Col, Progress, Button, Space, Tabs, List, Radio, message, Modal, Result} from 'antd'
@@ -13,17 +13,12 @@ import {
   UnorderedListOutlined
 } from '@ant-design/icons'
 import type {QuizQuestion} from 'store/slices/musicTheorySlice'
-import {setActiveConcept, answerQuizQuestion, markConceptAsCompleted, resetQuiz} from 'store/slices/musicTheorySlice'
+import { setActiveConcept, setActiveQuiz, toggleTheoryAnnotations, setCurrentTheoryConcept } from 'store/slices/musicTheorySlice'
+import {updateQuizForConcept, markConceptCompleted, setTotalConcepts} from 'store/slices/performanceSlice'
 import styled from 'styled-components'
 import TheoryInPractice from 'pages/MusicTheory/TheoryInPractice'
 import musicTheoryConceptDetail from 'pages/MusicTheory/data/musicTheoryConceptDetail'
-import {
-  ConceptDetail,
-  ConceptList,
-  QuizContainer,
-  ConceptImage,
-  ConceptCard
-} from 'pages/MusicTheory/styles/MusicTheory.styled'
+import {ConceptDetail, QuizContainer} from './styles/MusicTheory.styled'
 
 const {Title, Text, Paragraph} = Typography
 export const {TabPane} = Tabs
@@ -46,14 +41,20 @@ const enum ELayout {
 
 const MusicTheory: FC = () => {
   const dispatch = useDispatch()
-  const {conceptList, quizzes, activeConceptId, completedConcepts, conceptProgress} = useSelector(
+  const { conceptList, quizzes, activeConceptId } = useSelector(
     (state: RootState) => state.musicTheory
   )
+  // Get performance quiz stats from performance slice.
+  const performanceQuizzes = useSelector((state: RootState) => state.performance.musicTheory.quizzes)
+
+  // Dispatch setTotalConcepts when conceptList changes.
+  useEffect(() => {
+    dispatch(setTotalConcepts(conceptList.length))
+  }, [dispatch, conceptList])
 
   // Local states
   const [view, setView] = useState<EView>(EView.CONCEPT_LIST)
   const [activeTab, setActiveTab] = useState<string>('learn')
-  // New state for layout, list is default
   const [layout, setLayout] = useState<ELayout>(ELayout.LIST)
   const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({})
   const [quizSubmitted, setQuizSubmitted] = useState<boolean>(false)
@@ -65,7 +66,6 @@ const MusicTheory: FC = () => {
   // Get quiz questions for active concept
   const activeQuiz = activeConceptId ? quizzes[activeConceptId] : []
 
-  // Handler to select a concept
   const handleConceptSelect = (conceptId: string) => {
     dispatch(setActiveConcept(conceptId))
     setView(EView.CONCEPT_DETAIL)
@@ -74,13 +74,11 @@ const MusicTheory: FC = () => {
     setQuizSubmitted(false)
   }
 
-  // Handler to go back to concept list
   const handleBackToList = () => {
     setView(EView.CONCEPT_LIST)
     dispatch(setActiveConcept(''))
   }
 
-  // Handler for quiz answer selection
   const handleQuizAnswer = (questionId: string, answer: string) => {
     setQuizAnswers({
       ...quizAnswers,
@@ -88,11 +86,9 @@ const MusicTheory: FC = () => {
     })
   }
 
-  // Handler to submit quiz
   const handleSubmitQuiz = () => {
     if (!activeConceptId) return
 
-    // Check if all questions have been answered
     const allQuestionsAnswered = activeQuiz.every(q => quizAnswers[q.id])
 
     if (!allQuestionsAnswered) {
@@ -100,7 +96,6 @@ const MusicTheory: FC = () => {
       return
     }
 
-    // Calculate score
     let correctAnswers = 0
 
     activeQuiz.forEach(question => {
@@ -108,51 +103,37 @@ const MusicTheory: FC = () => {
       if (userAnswer === question.correctAnswer) {
         correctAnswers++
       }
-
-      // Save answers to Redux
-      dispatch(answerQuizQuestion({
-        conceptId: activeConceptId,
-        questionId: question.id,
-        answer: userAnswer
-      }))
     })
 
     const score = Math.round((correctAnswers / activeQuiz.length) * 100)
     setQuizScore(score)
     setQuizSubmitted(true)
 
-    // Show result modal
-    setShowResultModal(true)
-
-    // Mark concept as completed if score is 70% or higher
+    dispatch(updateQuizForConcept({ conceptId: activeConceptId, answered: correctAnswers, total: activeQuiz.length }))
     if (score >= 70) {
-      dispatch(markConceptAsCompleted(activeConceptId))
+      dispatch(markConceptCompleted(activeConceptId))
     }
+    setShowResultModal(true)
   }
 
-  // Handler to reset quiz
   const handleResetQuiz = () => {
-    if (!activeConceptId) return
-
-    dispatch(resetQuiz(activeConceptId))
     setQuizAnswers({})
     setQuizSubmitted(false)
   }
 
-  // Render concept list view using list or card based on viewLayout state
   const renderConceptList = () => (
-    <ConceptList style={{padding: '20px'}}>
+    <div style={{ padding: '20px' }}>
       <div className="d-flex">
         <Title level={1}>Music Theory</Title>
         <Toolbar className="ms-auto">
           <Button
             className="me-2"
-            type={layout === 'list' ? 'primary' : 'default'}
+            type={layout === ELayout.LIST ? 'primary' : 'default'}
             icon={<UnorderedListOutlined/>}
             onClick={() => setLayout(ELayout.LIST)}
           />
           <Button
-            type={layout === 'card' ? 'primary' : 'default'}
+            type={layout === ELayout.CARD ? 'primary' : 'default'}
             icon={<AppstoreOutlined/>}
             onClick={() => setLayout(ELayout.CARD)}
           />
@@ -163,91 +144,93 @@ const MusicTheory: FC = () => {
         Each topic includes learning materials and a quiz to test your knowledge.
       </Paragraph>
 
-      {layout === 'list' ? (
+      {layout === ELayout.LIST ? (
         <List
           itemLayout="vertical"
           dataSource={conceptList}
-          renderItem={concept => (
+          renderItem={concept => {
+            const perfQuiz = performanceQuizzes[concept.id]
+            const progressPercent = perfQuiz && perfQuiz.total > 0 ? Math.round((perfQuiz.answered / perfQuiz.total) * 100) : 0
+            const isCompleted = progressPercent === 100
+            return (
             <Card className="mb-3">
               <List.Item
                 actions={[
                   <Space key="action">
-                    {concept.completed ? (
+                      {isCompleted ? (
                       <CheckCircleOutlined style={{color: '#52c41a'}}/>
                     ) : (
                       <RightOutlined/>
                     )}
-                    <Button type='default' size={'small'}>{concept.completed ? 'Completed' : 'Start Learning'}</Button>
+                      <Button type="default" size={'small'}>
+                        {isCompleted ? 'Completed' : 'Start Learning'}
+                      </Button>
                   </Space>
                 ]}
                 onClick={() => handleConceptSelect(concept.id)}
               >
                 <List.Item.Meta
-                  avatar={concept.image ? <ConceptImage/> : <ConceptImage><span>{concept.title}</span></ConceptImage>}
                   title={<strong>{concept.titlePrefix}: {concept.title}</strong>}
                   description={
                     <>
                       <div>{concept.description}</div>
                       <Progress
-                        percent={conceptProgress[concept.id] || 0}
+                          percent={progressPercent}
                         size="small"
-                        status={concept.completed ? 'success' : 'active'}
+                          status={isCompleted ? 'success' : 'active'}
                       />
                     </>
                   }
                 />
               </List.Item>
             </Card>
-          )}
+            )
+          }}
         />
       ) : (
         <Row gutter={[16, 16]}>
-          {conceptList.map(concept => (
+          {conceptList.map(concept => {
+            const perfQuiz = performanceQuizzes[concept.id]
+            const progressPercent = perfQuiz && perfQuiz.total > 0 ? Math.round((perfQuiz.answered / perfQuiz.total) * 100) : 0
+            const isCompleted = progressPercent === 100
+            return (
             <Col xs={24} sm={12} md={8} key={concept.id}>
-              <ConceptCard
-                completed={concept.completed}
+              <Card
                 onClick={() => handleConceptSelect(concept.id)}
                 actions={[
                   <Space>
-                    {concept.completed ? (
+                      {isCompleted ? (
                       <CheckCircleOutlined style={{color: '#52c41a'}}/>
                     ) : (
                       <RightOutlined/>
                     )}
-                    <Text>{concept.completed ? 'Completed' : 'Start Learning'}</Text>
+                      <Text>{isCompleted ? 'Completed' : 'Start Learning'}</Text>
                   </Space>
                 ]}
               >
-                {concept.image ? (
-                  <ConceptImage/>
-                ) : (
-                  <ConceptImage>
-                    <span>{concept.title}</span>
-                  </ConceptImage>
-                )}
                 <Card.Meta
                   title={concept.title}
                   description={
                     <div>
                       <div style={{minHeight: '50px'}}>{concept.description}</div>
                       <Progress
-                        percent={conceptProgress[concept.id] || 0}
+                          percent={progressPercent}
                         size="small"
-                        status={concept.completed ? 'success' : 'active'}
+                          status={isCompleted ? 'success' : 'active'}
                         style={{marginTop: '10px'}}
                       />
                     </div>
                   }
                 />
-              </ConceptCard>
+              </Card>
             </Col>
-          ))}
+            )
+          })}
         </Row>
       )}
-    </ConceptList>
+    </div>
   )
 
-  // Render concept detail view
   const renderConceptDetail = () => {
     if (!activeConcept) return null
 
@@ -299,7 +282,7 @@ const MusicTheory: FC = () => {
                   itemLayout="vertical"
                   dataSource={activeQuiz}
                   renderItem={(question: QuizQuestion, index) => (
-                    <List.Item>
+                    <List.Item key={question.id}>
                       <Card>
                         <Title level={4}>Question {index + 1}</Title>
                         <Paragraph>{question.question}</Paragraph>

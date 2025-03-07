@@ -2,27 +2,21 @@ import {createSlice, PayloadAction} from '@reduxjs/toolkit'
 import {QuizQuestion, quizzes} from 'pages/MusicTheory/data/musicTheoryQuizzes'
 import {IMusicTheoryConcept, conceptList} from 'pages/MusicTheory/data/musicTheoryConceptList'
 
-
-// Define the state for the music theory slice
+// Define the state for the music theory slice without performance metrics.
 export interface IMusicTheoryState {
   conceptList: IMusicTheoryConcept[];
   quizzes: Record<string, QuizQuestion[]>; // conceptId -> questions
   activeConceptId: string | null;
   activeQuizId: string | null;
-  completedConcepts: string[];
-  conceptProgress: Record<string, number>; // conceptId -> progress percentage
   showTheoryAnnotations: boolean;
   currentTheoryConcept: string;
 }
 
-// Initial state with sample music theory conceptList
 const initialState: IMusicTheoryState = {
   conceptList,
   quizzes,
   activeConceptId: null,
   activeQuizId: null,
-  completedConcepts: [],
-  conceptProgress: {},
   showTheoryAnnotations: false,
   currentTheoryConcept: ''
 }
@@ -37,50 +31,7 @@ const musicTheorySlice = createSlice({
     setActiveQuiz: (state, action: PayloadAction<string>) => {
       state.activeQuizId = action.payload
     },
-    markConceptAsCompleted: (state, action: PayloadAction<string>) => {
-      const conceptId = action.payload
-      state.completedConcepts.push(conceptId)
-
-      // Update the concept's completed status
-      const concept = state.conceptList.find(c => c.id === conceptId)
-      if (concept) {
-        concept.completed = true
-      }
-
-      // Set progress to 100% for this concept
-      state.conceptProgress[conceptId] = 100
-    },
-    answerQuizQuestion: (state, action: PayloadAction<{ conceptId: string, questionId: string, answer: string }>) => {
-      const {conceptId, questionId, answer} = action.payload
-      const conceptQuiz = state.quizzes[conceptId]
-
-      if (conceptQuiz) {
-        const questionIndex = conceptQuiz.findIndex(q => q.id === questionId)
-        if (questionIndex !== -1) {
-          conceptQuiz[questionIndex].userAnswer = answer
-        }
-      }
-
-      // Calculate and update progress for this concept
-      if (conceptQuiz) {
-        const total = conceptQuiz.length
-        const answered = conceptQuiz.filter(q => q.userAnswer !== undefined).length
-        state.conceptProgress[conceptId] = Math.round((answered / total) * 100)
-      }
-    },
-    resetQuiz: (state, action: PayloadAction<string>) => {
-      const conceptId = action.payload
-      const conceptQuiz = state.quizzes[conceptId]
-
-      if (conceptQuiz) {
-        conceptQuiz.forEach(question => {
-          question.userAnswer = undefined
-        })
-      }
-
-      // Reset progress for this concept
-      state.conceptProgress[conceptId] = 0
-    },
+    // Removed markConceptAsCompleted, answerQuizQuestion, and resetQuiz as performance data is tracked in performanceSlice.
     toggleTheoryAnnotations: (state) => {
       state.showTheoryAnnotations = !state.showTheoryAnnotations
     },
@@ -93,9 +44,6 @@ const musicTheorySlice = createSlice({
 export const {
   setActiveConcept,
   setActiveQuiz,
-  markConceptAsCompleted,
-  answerQuizQuestion,
-  resetQuiz,
   toggleTheoryAnnotations,
   setCurrentTheoryConcept
 } = musicTheorySlice.actions
