@@ -29,6 +29,11 @@ export interface IPerformanceState {
   totalNotesPlayed: number; // Total number of notes attempted in session
   sessionStart: number | null; // Timestamp when session started
   sessionEnd: number | null;   // Timestamp when session ended
+  musicNotes: {
+    totalScore: number,
+    lastSessionScore: number; // Added field for session totalScore
+    totalNotes: number; // Total notes played
+  }
   musicTheory: IMusicTheoryPerformance
 }
 
@@ -39,6 +44,11 @@ const initialState: IPerformanceState = {
   totalNotesPlayed: 0,
   sessionStart: null,
   sessionEnd: null,
+  musicNotes: {
+    totalScore: 0,
+    lastSessionScore: 0, // Initialize with default value
+    totalNotes: 0
+  },
   musicTheory: {
     conceptsCompleted: 0,
     totalConcepts: 0, // to be set from your concepts data
@@ -78,6 +88,19 @@ const performanceSlice = createSlice({
     clearPerformanceData: (state) => {
       return initialState
     },
+    /* Music Notes */
+    incrementScore: (state) => {
+      state.musicNotes.totalScore += 1
+    },
+    resetScore: (state) => {
+      state.musicNotes.totalScore = 0
+    },
+    setLastSessionScore: (state, action: PayloadAction<number>) => {
+      state.musicNotes.lastSessionScore = action.payload
+    },
+    increaseMusicNotesTotal: (state) => {
+      state.musicNotes.totalNotes++
+    },
     /* Music Theory */
     setTotalConcepts: (state, action: PayloadAction<number>) => {
       state.musicTheory.totalConcepts = action.payload
@@ -102,6 +125,10 @@ export const {
   startSession,
   endSession,
   clearPerformanceData,
+  incrementScore,
+  resetScore,
+  increaseMusicNotesTotal,
+  setLastSessionScore, // Export the new action
   setTotalConcepts,
   markConceptCompleted,
   updateQuizForConcept

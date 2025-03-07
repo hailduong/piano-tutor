@@ -2,7 +2,6 @@ import React, {useEffect, useState, FC, useMemo} from 'react'
 import Vex from 'vexflow'
 import {useDispatch, useSelector} from 'react-redux'
 import {RootState} from 'store'
-import {incrementScore} from 'store/slices/musicNotesSlice'
 import {
   TheoryAnnotation,
   ScrollingSheetMusicDisplay,
@@ -13,6 +12,7 @@ import {generateMusicTheoryHint} from 'pages/MusicTheory/utils/musicTheoryHintUt
 import {TKeySignature} from 'pages/LearnMusicNotes/utils/musicNoteGenerator'
 import {IPianoNote} from 'store/slices/types/IPianoNote'
 import {setSuggestedNote} from 'store/slices/virtualPianoSlice'
+import {incrementScore, increaseMusicNotesTotal} from 'store/slices/performanceSlice'
 
 // Interfaces
 interface SheetMusicRendererProps {
@@ -29,7 +29,15 @@ interface SheetMusicRendererProps {
 // Main component
 const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
   /* Store & Props */
-  const {notes, onCorrectNote, onIncorrectNote, tempo = 120, showTheoryHints = false, selectedConcept, keySignature} = props
+  const {
+    notes,
+    onCorrectNote,
+    onIncorrectNote,
+    tempo = 120,
+    showTheoryHints = false,
+    selectedConcept,
+    keySignature
+  } = props
   const dispatch = useDispatch()
 
   // Access current and suggested notes from Redux store
@@ -114,7 +122,7 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
     const timingDeviation = currentTime - expectedNoteTime
 
     if (expectedNoteKey === playedNoteKey) {
-      // Correct key pressed - update score and clear suggestion
+      // Correct key pressed - update totalScore and clear suggestion
       if (!suggestedNote) {
         dispatch(incrementScore())
       }
@@ -129,14 +137,14 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
 
       // Update timing expectation for next note
       setExpectedNoteTime(expectedNoteTime + beatDuration)
-  } else {
-    // Incorrect key pressed
-    setLastKeyPressIncorrect(true)
+    } else {
+      // Incorrect key pressed
+      setLastKeyPressIncorrect(true)
 
-    // Notify parent component of incorrect note
-    if (onIncorrectNote) {
-      onIncorrectNote(playedNoteKey, timingDeviation)
-    }
+      // Notify parent component of incorrect note
+      if (onIncorrectNote) {
+        onIncorrectNote(playedNoteKey, timingDeviation)
+      }
 
       // Set visual suggestion for incorrect attempt
       const key = vexNotes[0].getKeys()[0].split('/')[0].toUpperCase()
@@ -148,6 +156,9 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
         octave
       }))
     }
+
+    // Track total notes played in performance slice
+    dispatch(increaseMusicNotesTotal())
   }, [currentNote, dispatch])
 
   /* Render */
@@ -157,7 +168,7 @@ const SheetMusicRenderer: FC<SheetMusicRendererProps> = (props) => {
         <span>Training Complete! Well done!</span>
       ) : (
         <>
-          <span className='me-3'>Notes Remaining: <strong>{vexNotes.length}</strong></span>
+          <span className="me-3">Notes Remaining: <strong>{vexNotes.length}</strong></span>
           <span>Key: <strong>{keySignature}</strong></span>
           <ScrollingSheetMusicDisplay ref={musicRef}/>
 

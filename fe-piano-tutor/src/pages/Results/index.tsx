@@ -19,13 +19,9 @@ const Results: FC = () => {
   const location = useLocation()
   const state = location.state as TLocationState
 
-  const {score, lastSessionScore} = useSelector((state: RootState) => state.musicNotes)
   const sourceActivity = state?.source || 'practice'
   const message = state?.message || 'Practice Complete'
 
-  const {accuracyRate, averageTiming, totalNotesPlayed} = useSelector(
-    (state: RootState) => state.performance
-  )
 
   /* Render */
   return (
@@ -33,7 +29,7 @@ const Results: FC = () => {
       <Card className="shadow" style={{maxWidth: 600, margin: '0 auto', padding: 20}}>
         <TrophyOutlined style={{fontSize: 48, color: '#faad14', marginBottom: 16}}/>
         <h2>{message}</h2>
-        <Tabs defaultActiveKey="musicTheory" centered>
+        <Tabs defaultActiveKey={sourceActivity === 'learn-music-notes' ? 'learnMusicNotes' : 'musicTheory'} centered>
           {/* Music Theory Stats */}
           <TabPane
             tab={<span><BookOutlined/> Music Theory</span>}

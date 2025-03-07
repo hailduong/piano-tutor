@@ -1,24 +1,22 @@
 // src/pages/Results/LearnMusicNotesStats.tsx
-import React from 'react';
-import { Row, Col, Card, Statistic } from 'antd';
-import { useSelector } from 'react-redux';
-import { RootState } from 'store';
+import React from 'react'
+import {Row, Col, Card, Statistic} from 'antd'
+import {useSelector} from 'react-redux'
+import {RootState} from 'store'
 
 const LearnMusicNotesStats: React.FC = () => {
-  const { score, lastSessionScore } = useSelector((state: RootState) => state.musicNotes);
-  const { accuracyRate, totalNotesPlayed } = useSelector(
-    (state: RootState) => state.performance
-  );
+  const {totalScore, lastSessionScore, totalNotes} = useSelector((state: RootState) => state.performance.musicNotes) // Only get totalScore from musicNotes
+  const accuracyRate = totalNotes > 0 ? (totalScore / totalNotes) * 100 : 0
 
   return (
     <>
-      <Row gutter={16} style={{ marginBottom: 20 }}>
+      <Row gutter={16} style={{marginBottom: 20}}>
         <Col span={12}>
           <Card>
             <Statistic
-              title="Session Score"
+              title="Last Session Score"
               value={lastSessionScore}
-              valueStyle={{ color: '#3f8600' }}
+              valueStyle={{color: '#3f8600'}}
             />
           </Card>
         </Col>
@@ -26,21 +24,21 @@ const LearnMusicNotesStats: React.FC = () => {
           <Card>
             <Statistic
               title="Total Score"
-              value={score}
-              valueStyle={{ color: '#1677ff' }}
+              value={totalScore}
+              valueStyle={{color: '#1677ff'}}
             />
           </Card>
         </Col>
       </Row>
 
-      <Row gutter={16} style={{ marginBottom: 20 }}>
+      <Row gutter={16} style={{marginBottom: 20}}>
         <Col span={12}>
           <Card>
             <Statistic
               title="Accuracy"
               value={accuracyRate.toFixed(1)}
               suffix="%"
-              valueStyle={{ color: accuracyRate > 80 ? '#3f8600' : '#cf1322' }}
+              valueStyle={{color: accuracyRate > 80 ? '#3f8600' : '#cf1322'}}
             />
           </Card>
         </Col>
@@ -48,13 +46,13 @@ const LearnMusicNotesStats: React.FC = () => {
           <Card>
             <Statistic
               title="Notes Played"
-              value={totalNotesPlayed}
+              value={totalNotes}
             />
           </Card>
         </Col>
       </Row>
     </>
-  );
-};
+  )
+}
 
-export default LearnMusicNotesStats;
+export default LearnMusicNotesStats

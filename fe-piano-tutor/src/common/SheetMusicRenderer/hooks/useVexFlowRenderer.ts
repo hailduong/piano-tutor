@@ -84,7 +84,7 @@ export const useVexFlowRenderer = (
     Object.entries(keySignatures).forEach(([key, {pattern}]) => {
       let score = 0
 
-      // Calculate match score (pattern accidentals in the notes)
+      // Calculate match totalScore (pattern accidentals in the notes)
       pattern.forEach(accidental => {
         if (noteAccidentals.has(accidental)) {
           score++

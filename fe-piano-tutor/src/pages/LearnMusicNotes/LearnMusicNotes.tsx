@@ -6,13 +6,19 @@ import {StaveNote} from 'vexflow'
 import {useSelector, useDispatch} from 'react-redux'
 import {RootState} from 'store'
 import {useNavigate} from 'react-router-dom'
-import {setLastSessionScore, setSelectedLevel} from 'store/slices/musicNotesSlice'
-import {recordNotePerformance, startSession, endSession} from 'store/slices/performanceSlice'
+import {setSelectedLevel} from 'store/slices/musicNotesSlice' // Changed import source
+import {
+  recordNotePerformance,
+  startSession,
+  endSession,
+  setLastSessionScore,
+  increaseMusicNotesTotal
+} from 'store/slices/performanceSlice' // Added import
 import {setSuggestedNote, setCurrentNote} from 'store/slices/virtualPianoSlice'
 
 const LearnMusicNotes: FC = memo(() => {
   /* Props & Store */
-  const {score, selectedLevel: storedLevel} = useSelector((state: RootState) => state.musicNotes)
+  const {selectedLevel: storedLevel} = useSelector((state: RootState) => state.musicNotes)
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const musicNoteGeneratorService = new MusicNoteGenerator()
@@ -46,7 +52,7 @@ const LearnMusicNotes: FC = memo(() => {
         timestamp: Date.now()
       }))
 
-      // Only increase score if there was no incorrect attempt for this note
+      // Only increase totalScore if there was no incorrect attempt for this note
       if (!hasIncorrectAttempt) {
         setSessionScore(prev => prev + 1)
       }
@@ -136,7 +142,7 @@ const LearnMusicNotes: FC = memo(() => {
 
   const handleModalConfirm = () => {
     if (pendingLevel !== null) {
-      // Save the current session score to Redux before switching levels
+      // Save the current session totalScore to Redux before switching levels
       dispatch(setLastSessionScore(sessionScore))
       dispatch(setSelectedLevel(pendingLevel))
       startNewLevel(pendingLevel)
