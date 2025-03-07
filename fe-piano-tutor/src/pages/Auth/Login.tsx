@@ -19,7 +19,7 @@ interface ILoginProps {
 }
 
 const LoginContainer = styled.div`
-    max-width: 400px;
+    max-width: 480px;
     margin: 0 auto;
     padding: 24px;
 `

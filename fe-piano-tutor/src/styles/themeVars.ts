@@ -1,5 +1,5 @@
-import 'styled-components';
-import { DefaultTheme } from 'styled-components';
+import 'styled-components'
+import {DefaultTheme} from 'styled-components'
 
 // Augment the DefaultTheme interface to match your theme structure
 declare module 'styled-components' {
@@ -18,6 +18,26 @@ const themeVars = {
     success: '#388e3c',
     warning: '#ffc107',
     error: '#f44336',
+    primaries: {
+      300: '#B39DDB',
+      500: '#673AB7',
+      900: '#311b92'
+    },
+    successes: {
+      300: '#81C784',
+      500: '#388e3c',
+      900: '#1b5e20'
+    },
+    warnings: {
+      300: '#FFD54F',
+      500: '#FFC107',
+      900: '#ff6f00'
+    },
+    errors: {
+      300: '#e57373',
+      500: '#f44336',
+      900: '#b71c1c'
+    },
     gray: {
       100: '#f5f5f5',
       200: '#eeeeee',
@@ -53,7 +73,7 @@ const themeVars = {
     lg: '1.5rem',
     xl: '2rem'
   }
-} as const;
+} as const
 
 export const materialColors = [
   '#f44336', // Red
@@ -71,7 +91,8 @@ export const materialColors = [
   '#ffeb3b', // Yellow
   '#ffc107', // Amber
   '#ff9800', // Orange
-  '#ff5722', // Deep Orange
-];
+  '#ff5722' // Deep Orange
+]
 
-export default themeVars;
+
+export default themeVars
