@@ -9,7 +9,7 @@ export const enum EMusicTheoryConceptLevel {
 export interface IMusicTheoryConcept {
   id: string;
   titlePrefix: string;
-  level: EMusicTheoryConceptLevel;
+  level: EMusicTheoryConceptLevel | string;
   title: string;
   description: string;
   image?: string;
