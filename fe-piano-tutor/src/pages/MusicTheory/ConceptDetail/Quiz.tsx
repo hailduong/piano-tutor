@@ -1,9 +1,10 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {List, Radio, Button, Space, Typography, Card, message} from 'antd'
 import {QuizContainer} from 'pages/MusicTheory/styles/MusicTheory.styled'
-import {useDispatch} from 'react-redux'
-import {updateQuizForConcept, markConceptCompleted} from 'store/slices/performanceSlice'
+import {useDispatch, useSelector} from 'react-redux'
+import {updateQuizForConcept, markConceptCompleted, updateQuizAnswer} from 'store/slices/performanceSlice'
 import ResultModal from './ResultModal'
+import {RootState} from 'store'
 
 const {Title, Paragraph, Text} = Typography
 
@@ -26,7 +27,9 @@ const Quiz: React.FC<QuizProps> = (props) => {
 
   /* Store */
   const dispatch = useDispatch()
-
+  const storedQuizData = useSelector((state: RootState) =>
+    state.performance.musicTheory.quizzes[activeConceptId]
+  )
 
   /* States */
   const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({})
@@ -34,13 +37,39 @@ const Quiz: React.FC<QuizProps> = (props) => {
   const [showResultModal, setShowResultModal] = useState<boolean>(false)
   const [quizScore, setQuizScore] = useState<number>(0)
 
+  /* Effects */
+  useEffect(() => {
+    // Load stored answers if they exist
+    if (storedQuizData?.selectedAnswers) {
+      setQuizAnswers(storedQuizData.selectedAnswers)
+
+      // If we have answers for all questions, consider it submitted
+      if (activeQuiz.length > 0) {
+        const allAnswered = activeQuiz.every(q => storedQuizData.selectedAnswers[q.id])
+        if (allAnswered && storedQuizData.answered > 0) {
+          setQuizSubmitted(true)
+          setQuizScore(Math.round((storedQuizData.answered / storedQuizData.total) * 100))
+        }
+      }
+    }
+  }, [activeConceptId, storedQuizData, activeQuiz])
+
   /* Handlers */
   // Handle quiz answer
   const handleQuizAnswer = (questionId: string, answer: string) => {
-    setQuizAnswers({
+    const updatedAnswers = {
       ...quizAnswers,
       [questionId]: answer
-    })
+    }
+
+    setQuizAnswers(updatedAnswers)
+
+    // Store answer in Redux
+    dispatch(updateQuizAnswer({
+      conceptId: activeConceptId,
+      questionId,
+      answer
+    }))
   }
 
   // Handle submit quiz
@@ -67,7 +96,13 @@ const Quiz: React.FC<QuizProps> = (props) => {
     setQuizScore(score)
     setQuizSubmitted(true)
 
-    dispatch(updateQuizForConcept({conceptId: activeConceptId, answered: correctAnswers, total: activeQuiz.length}))
+    dispatch(updateQuizForConcept({
+      conceptId: activeConceptId,
+      answered: correctAnswers,
+      total: activeQuiz.length,
+      selectedAnswers: quizAnswers
+    }))
+
     if (score >= 70) {
       dispatch(markConceptCompleted(activeConceptId))
     }
@@ -76,8 +111,17 @@ const Quiz: React.FC<QuizProps> = (props) => {
 
   // Handle reset quiz
   const handleResetQuiz = () => {
-    setQuizAnswers({})
+    const emptyAnswers: Record<string, string> = {}
+    setQuizAnswers(emptyAnswers)
     setQuizSubmitted(false)
+
+    // Update Redux with empty answers
+    dispatch(updateQuizForConcept({
+      conceptId: activeConceptId,
+      answered: 0,
+      total: activeQuiz.length,
+      selectedAnswers: emptyAnswers
+    }))
   }
 
   /* Render */

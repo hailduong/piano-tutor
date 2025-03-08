@@ -11,14 +11,15 @@ export interface INotePerformance {
 }
 
 export interface IMusicTheoryQuizStats {
-  answered: number
-  total: number
+  answered: number;
+  total: number;
+  selectedAnswers: Record<string, string>; // key: questionId, value: selected answer
 }
 
 export interface IMusicTheoryPerformance {
-  conceptsCompleted: number
-  totalConcepts: number
-  quizzes: Record<string, IMusicTheoryQuizStats> // key: concept id
+  conceptsCompleted: number;
+  totalConcepts: number;
+  quizzes: Record<string, IMusicTheoryQuizStats>; // key: concept id
 }
 
 export interface ISongPracticeStats {
@@ -41,7 +42,7 @@ export interface IPerformanceState {
     lastSessionScore: number; // Added field for session totalScore
     totalNotes: number; // Total notes played
   }
-  musicTheory: IMusicTheoryPerformance
+  musicTheory: IMusicTheoryPerformance;
   songPractice: ISongPracticeStats[]; // New state field for Song Practice stats
 }
 
@@ -107,10 +108,58 @@ const performanceSlice = createSlice({
     },
     updateQuizForConcept: (
       state,
-      action: PayloadAction<{ conceptId: string; answered: number; total: number }>
+      action: PayloadAction<{
+        conceptId: string;
+        answered: number;
+        total: number;
+        selectedAnswers: Record<string, string>
+      }>
     ) => {
-      const {conceptId, answered, total} = action.payload
-      state.musicTheory.quizzes[conceptId] = {answered, total}
+      const {conceptId, answered, total, selectedAnswers} = action.payload
+
+      // If the quiz already exists, preserve any existing data not provided
+      if (state.musicTheory.quizzes[conceptId]) {
+        state.musicTheory.quizzes[conceptId] = {
+          ...state.musicTheory.quizzes[conceptId],
+          answered,
+          total,
+          selectedAnswers
+        }
+      } else {
+        state.musicTheory.quizzes[conceptId] = {
+          answered,
+          total,
+          selectedAnswers
+        }
+      }
+    },
+    // New reducer to update selected answer for a specific question
+    updateQuizAnswer: (
+      state,
+      action: PayloadAction<{
+        conceptId: string;
+        questionId: string;
+        answer: string
+      }>
+    ) => {
+      const {conceptId, questionId, answer} = action.payload
+
+      // Initialize the quiz entry if it doesn't exist
+      if (!state.musicTheory.quizzes[conceptId]) {
+        state.musicTheory.quizzes[conceptId] = {
+          answered: 0,
+          total: 0,
+          selectedAnswers: {}
+        }
+      }
+
+      // Initialize selectedAnswers if it doesn't exist
+      if (!state.musicTheory.quizzes[conceptId].selectedAnswers) {
+        state.musicTheory.quizzes[conceptId].selectedAnswers = {}
+      }
+
+      // Update the selected answer
+      state.musicTheory.quizzes[conceptId].selectedAnswers[questionId] = answer
     },
     // New reducer to update song practice stats
     updateSongPracticeStats: (state, action: PayloadAction<ISongPracticeStats>) => {
@@ -122,7 +171,6 @@ const performanceSlice = createSlice({
       } else {
         state.songPractice.push(action.payload)
       }
-      /* Learn Songs */
     }
   }
 })
@@ -134,11 +182,12 @@ export const {
   incrementScore,
   resetScore,
   increaseMusicNotesTotal,
-  setLastSessionScore, // Export the new action
+  setLastSessionScore,
   setTotalConcepts,
   markConceptCompleted,
   updateQuizForConcept,
-  updateSongPracticeStats // Export the new action
+  updateQuizAnswer,
+  updateSongPracticeStats
 } = performanceSlice.actions
 
 export default performanceSlice.reducer
