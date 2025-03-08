@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react'
 import {useState} from 'react'
 import {Form, Input, Button, Typography, Alert, Card} from 'antd'
-import {Link} from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {useAppDispatch, useAppSelector} from 'store'
 import {logout} from 'store/slices/auth/auth.slice'
 import {loginUser, updateUserProfile} from 'store/slices/auth/auth.thunks'
@@ -19,6 +19,7 @@ const isTokenExpired = (token: string): boolean => {
 
 const Login: React.FC = () => {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const {user, token, loading, error} = useAppSelector((state) => state.auth)
   const [updateError, setUpdateError] = useState<string | null>(null)
 
@@ -28,8 +29,11 @@ const Login: React.FC = () => {
     }
   }, [token, dispatch])
 
-  const onFinishLogin = (values: any) => {
-    dispatch(loginUser(values))
+ const onFinishLogin = async (values: any) => {
+    await dispatch(loginUser(values)).unwrap()
+    if (user && token && !isTokenExpired(token)) {
+      navigate('/dashboard')
+    }
   }
 
   const onFinishUpdate = (values: { firstName: string; lastName: string }) => {

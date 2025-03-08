@@ -56,7 +56,7 @@ const MusicTheoryStats: FC = () => {
         </Col>
       </Row>
 
-      <Title level={5}>Topic Breakdown:</Title>
+      {Object.keys(quizzes).length > 0 && <Title level={5}>Topic Breakdown:</Title>}
       {Object.keys(quizzes).map((conceptId, index) => {
         const {answered, total} = quizzes[conceptId]
         const progressPercent = total > 0 ? Math.round((answered / total) * 100) : 0

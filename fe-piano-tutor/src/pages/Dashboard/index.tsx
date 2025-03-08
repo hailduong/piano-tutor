@@ -1,7 +1,7 @@
 import React, {FC} from 'react'
 import {Button, Typography, Card, Space, Row, Col, Statistic, Tabs} from 'antd'
 import {useSelector} from 'react-redux'
-import {useNavigate, useLocation} from 'react-router-dom'
+import {useNavigate, useLocation, Link} from 'react-router-dom'
 import {RootState} from 'store'
 import {TrophyOutlined, ArrowLeftOutlined, ReloadOutlined, BookOutlined, SoundOutlined} from '@ant-design/icons'
 import MusicTheoryStats from 'pages/Dashboard/MusicTheoryStats'
@@ -19,9 +19,10 @@ const Dashboard: FC = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const state = location.state as TLocationState
+  const user = useSelector((state: RootState) => state.auth.user)
 
   const sourceActivity = state?.source || 'practice'
-  const message = state?.message || 'Practice Complete'
+  const message = user ? `Welcome, ${user.firstName}!` : (state?.message || 'Welcome!')
 
   /* Render */
   return (
@@ -29,6 +30,7 @@ const Dashboard: FC = () => {
       <Card className="shadow" style={{maxWidth: 768, margin: '0 auto', padding: 20}}>
         <TrophyOutlined style={{fontSize: 48, color: '#faad14', marginBottom: 16}}/>
         <h2>{message}</h2>
+        <p>{user ? 'Check out your stats to continue learning!' : <Link to="/auth/login">Log in to track your progress.</Link>}</p>
         <Tabs defaultActiveKey={sourceActivity === 'learn-music-notes' ? 'learnMusicNotes' : 'musicTheory'} centered>
           {/* Music Theory Stats */}
           <TabPane
@@ -89,13 +91,6 @@ const Dashboard: FC = () => {
               Practice Again
             </Button>
           )}
-          <Button
-            icon={<ArrowLeftOutlined/>}
-            block
-            onClick={() => navigate('/')}
-          >
-            Return to Main Menu
-          </Button>
         </Space>
       </Card>
     </div>
