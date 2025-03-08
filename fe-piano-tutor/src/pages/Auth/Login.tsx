@@ -43,7 +43,7 @@ const Login: React.FC = () => {
   if (user) {
     return (
       <ProfileContainer>
-        <Card className='mb-3'>
+        <Card className="mb-3">
           <Typography.Title level={3}>Update Profile</Typography.Title>
           {updateError && <Alert type="error" message={updateError} style={{marginBottom: 16}}/>}
           <Form
@@ -71,6 +71,12 @@ const Login: React.FC = () => {
                 Update Profile
               </Button>
             </Form.Item>
+            <LinkContainer>
+              <Typography.Text>
+                Want to change your password? <br/>
+                <Link to="/auth/password-reset">Reset Password</Link>
+              </Typography.Text>
+            </LinkContainer>
           </Form>
         </Card>
         <Card title="Account">
@@ -112,7 +118,7 @@ const Login: React.FC = () => {
         </Form>
         <LinkContainer>
           <Typography.Text>
-            Don\\'t have an account? <Link to="/auth/register">Register</Link>
+            Don't have an account? <Link to="/auth/register">Register</Link>
           </Typography.Text>
           <Typography.Text>
             Forgot your password? <Link to="/auth/password-reset">Reset Password</Link>

@@ -97,7 +97,7 @@ class AuthService {
       where: { email },
       data: { resetToken: token, resetTokenExpiry: expiry },
     });
-    const resetLink = `${process.env.APP_URL}/reset-password?token=${token}`;
+    const resetLink = `${process.env.APP_URL}/auth/password-reset?token=${token}`;
     const emailOptions = {
       to: email,
       subject: 'Password Reset Request',

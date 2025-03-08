@@ -43,8 +43,8 @@ const authSlice = createSlice({
     })
     builder.addCase(registerUser.rejected, (state, action) => {
       state.loading = false
-      state.error = (action.payload as string) || action.error.message || null
     })
+
     // Login user
     builder.addCase(loginUser.pending, (state) => {
       state.loading = true
@@ -57,8 +57,8 @@ const authSlice = createSlice({
     })
     builder.addCase(loginUser.rejected, (state, action) => {
       state.loading = false
-      state.error = (action.payload as string) || action.error.message || null
     })
+
     // Request password reset
     builder.addCase(requestPasswordReset.pending, (state) => {
       state.loading = true
@@ -69,8 +69,8 @@ const authSlice = createSlice({
     })
     builder.addCase(requestPasswordReset.rejected, (state, action) => {
       state.loading = false
-      state.error = (action.payload as string) || action.error.message || null
     })
+
     // Reset password
     builder.addCase(resetPassword.pending, (state) => {
       state.loading = true
@@ -81,7 +81,6 @@ const authSlice = createSlice({
     })
     builder.addCase(resetPassword.rejected, (state, action) => {
       state.loading = false
-      state.error = (action.payload as string) || action.error.message || null
     })
 
     // New updateUserProfile cases
@@ -96,7 +95,6 @@ const authSlice = createSlice({
     })
     builder.addCase(updateUserProfile.rejected, (state, action) => {
       state.loading = false
-      state.error = (action.payload as string) || action.error.message || null
     })
   }
 })

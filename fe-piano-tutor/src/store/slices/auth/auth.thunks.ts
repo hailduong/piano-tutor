@@ -11,10 +11,11 @@ export const registerUser = createAsyncThunk(
   ) => {
     try {
       const response = await authService.register(data)
+      notification.success({message: 'Registration successful'})
       return response.data
-    } catch (error: AxiosError) {
+    } catch (error: any) {
       notification.error({
-        message: error.response?.data.error || 'Failed to register user'
+        message: error.response?.data?.error || 'Failed to register user'
       })
       return rejectWithValue(error.response ? error.response.data : error.message)
     }
@@ -26,9 +27,12 @@ export const loginUser = createAsyncThunk(
   async (data: { email: string; password: string }, {rejectWithValue}) => {
     try {
       const response = await authService.login(data)
+      notification.success({message: 'Login successful'})
       return response.data
-    } catch (error: AxiosError) {
-      notification.error({message: error.response?.data.error || 'Failed to login'})
+    } catch (error: any) {
+      notification.error({
+        message: error.response?.data?.error || 'Failed to login'
+      })
       return rejectWithValue(error.response ? error.response.data : error.message)
     }
   }
@@ -41,9 +45,9 @@ export const updateUserProfile = createAsyncThunk(
       const response = await authService.updateProfile(data)
       notification.success({message: 'Profile updated successfully'})
       return response.data
-    } catch (error: AxiosError) {
+    } catch (error: any) {
       notification.error({
-        message: error.response?.data.error || 'Failed to update profile'
+        message: error.response?.data?.error || 'Failed to update profile'
       })
       return rejectWithValue(error.response ? error.response.data : error.message)
     }
@@ -55,9 +59,12 @@ export const requestPasswordReset = createAsyncThunk(
   async (data: { email: string }, {rejectWithValue}) => {
     try {
       const response = await authService.requestPasswordReset(data)
+      notification.success({message: 'Password reset link sent successfully'})
       return response.data
-    } catch (error: AxiosError) {
-      notification.error(error.response.data.error)
+    } catch (error: any) {
+      notification.error({
+        message: error.response?.data?.error || 'Failed to send password reset link'
+      })
       return rejectWithValue(error.response ? error.response.data : error.message)
     }
   }
@@ -68,9 +75,12 @@ export const resetPassword = createAsyncThunk(
   async (data: { token: string; newPassword: string }, {rejectWithValue}) => {
     try {
       const response = await authService.resetPassword(data)
+      notification.success({message: 'Password reset successful'})
       return response.data
-    } catch (error: AxiosError) {
-      notification.error(error.response.data.error)
+    } catch (error: any) {
+      notification.error({
+        message: error.response?.data?.error || 'Failed to reset password'
+      })
       return rejectWithValue(error.response ? error.response.data : error.message)
     }
   }
