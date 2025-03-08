@@ -12,7 +12,7 @@ const TheoryContent = styled.div`
 `
 
 const musicTheoryConceptDetail: Record<string, React.ReactNode> = {
-  'basic-notation': (
+  'beginner-1': (
     <TheoryContent>
       <Title level={3}>Basic Music Notation</Title>
       <Paragraph>

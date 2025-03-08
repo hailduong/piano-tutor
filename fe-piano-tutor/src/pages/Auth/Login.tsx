@@ -48,7 +48,7 @@ const Login: React.FC = () => {
     return (
       <ProfileContainer>
         <Card className="mb-3">
-          <Typography.Title level={3}>Update Profile</Typography.Title>
+          <Typography.Title level={3}>Profile</Typography.Title>
           {updateError && <Alert type="error" message={updateError} style={{marginBottom: 16}}/>}
           <Form
             name="profileUpdate"

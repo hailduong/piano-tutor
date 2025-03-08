@@ -8,7 +8,7 @@ export interface QuizQuestion {
 }
 
 export const quizzes: Record<string, QuizQuestion[]> = {
-  'basic-notation': [
+  'beginner-1': [
     {
       id: 'bn-q1',
       conceptId: 'basic-notation',
