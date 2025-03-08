@@ -1,10 +1,11 @@
 import React, {useEffect} from 'react'
+import {useState} from 'react'
 import {Form, Input, Button, Typography, Alert, Card} from 'antd'
 import {Link} from 'react-router-dom'
 import {useAppDispatch, useAppSelector} from 'store'
 import {logout} from 'store/slices/auth/auth.slice'
+import {loginUser, updateUserProfile} from 'store/slices/auth/auth.thunks'
 import {LinkContainer, ProfileContainer, LoginContainer} from 'pages/Auth/styles/Login.styled'
-import {loginUser} from 'store/slices/auth/auth.thunks'
 
 // Helper function to check token expiration
 const isTokenExpired = (token: string): boolean => {
@@ -16,30 +17,65 @@ const isTokenExpired = (token: string): boolean => {
   }
 }
 
-interface ILoginProps {
-}
-
-const Login: React.FC<ILoginProps> = () => {
+const Login: React.FC = () => {
   const dispatch = useAppDispatch()
   const {user, token, loading, error} = useAppSelector((state) => state.auth)
+  const [updateError, setUpdateError] = useState<string | null>(null)
 
-  // Auto logout if token is expired
   useEffect(() => {
     if (token && isTokenExpired(token)) {
       dispatch(logout())
     }
   }, [token, dispatch])
 
-  const onFinish = (values: any) => {
+  const onFinishLogin = (values: any) => {
     dispatch(loginUser(values))
   }
 
-  if (token) {
+  const onFinishUpdate = (values: { firstName: string; lastName: string }) => {
+    dispatch(updateUserProfile(values))
+      .unwrap()
+      .catch((err) => {
+        setUpdateError(err.error || err)
+      })
+  }
+
+  if (user) {
     return (
       <ProfileContainer>
-        <Card title="Profile">
+        <Card className='mb-3'>
+          <Typography.Title level={3}>Update Profile</Typography.Title>
+          {updateError && <Alert type="error" message={updateError} style={{marginBottom: 16}}/>}
+          <Form
+            name="profileUpdate"
+            layout="vertical"
+            initialValues={{firstName: user.firstName, lastName: user.lastName}}
+            onFinish={onFinishUpdate}
+          >
+            <Form.Item
+              name="firstName"
+              label="First Name"
+              rules={[{required: true, message: 'Please input your first name!'}]}
+            >
+              <Input placeholder="First Name"/>
+            </Form.Item>
+            <Form.Item
+              name="lastName"
+              label="Last Name"
+              rules={[{required: true, message: 'Please input your last name!'}]}
+            >
+              <Input placeholder="Last Name"/>
+            </Form.Item>
+            <Form.Item>
+              <Button type="primary" htmlType="submit" loading={loading} block>
+                Update Profile
+              </Button>
+            </Form.Item>
+          </Form>
+        </Card>
+        <Card title="Account">
           <p>You are logged in as: {user?.email || 'User'}</p>
-          <Button type="primary" danger onClick={() => dispatch(logout())}>
+          <Button type="primary" danger onClick={() => dispatch(logout())} style={{marginBottom: '16px'}}>
             Logout
           </Button>
         </Card>
@@ -47,7 +83,6 @@ const Login: React.FC<ILoginProps> = () => {
     )
   }
 
-  /* Render */
   return (
     <LoginContainer>
       <Card>
@@ -56,7 +91,7 @@ const Login: React.FC<ILoginProps> = () => {
           Log in now to save your progress, receive the latest updates, and unlock exclusive benefits!
         </Typography.Paragraph>
         {error && <Alert type="error" message={error} style={{marginBottom: 16}}/>}
-        <Form name="login" layout="vertical" onFinish={onFinish}>
+        <Form name="login" layout="vertical" onFinish={onFinishLogin}>
           <Form.Item
             name="email"
             label="Email"
@@ -77,7 +112,7 @@ const Login: React.FC<ILoginProps> = () => {
         </Form>
         <LinkContainer>
           <Typography.Text>
-            Don't have an account? <Link to="/auth/register">Register</Link>
+            Don\\'t have an account? <Link to="/auth/register">Register</Link>
           </Typography.Text>
           <Typography.Text>
             Forgot your password? <Link to="/auth/password-reset">Reset Password</Link>

@@ -5,12 +5,17 @@ import {notification} from 'antd'
 
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
-  async (data: { email: string; password: string }, {rejectWithValue}) => {
+  async (
+    data: { firstName: string; lastName: string; email: string; password: string },
+    {rejectWithValue}
+  ) => {
     try {
       const response = await authService.register(data)
       return response.data
     } catch (error: AxiosError) {
-      notification.error({message: error.response?.data.error || 'Failed to register user'})
+      notification.error({
+        message: error.response?.data.error || 'Failed to register user'
+      })
       return rejectWithValue(error.response ? error.response.data : error.message)
     }
   }
@@ -24,6 +29,22 @@ export const loginUser = createAsyncThunk(
       return response.data
     } catch (error: AxiosError) {
       notification.error({message: error.response?.data.error || 'Failed to login'})
+      return rejectWithValue(error.response ? error.response.data : error.message)
+    }
+  }
+)
+
+export const updateUserProfile = createAsyncThunk(
+  'auth/updateUserProfile',
+  async (data: { firstName: string; lastName: string }, {rejectWithValue}) => {
+    try {
+      const response = await authService.updateProfile(data)
+      notification.success({message: 'Profile updated successfully'})
+      return response.data
+    } catch (error: AxiosError) {
+      notification.error({
+        message: error.response?.data.error || 'Failed to update profile'
+      })
       return rejectWithValue(error.response ? error.response.data : error.message)
     }
   }

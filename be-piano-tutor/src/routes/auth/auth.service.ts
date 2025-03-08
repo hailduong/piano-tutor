@@ -11,6 +11,11 @@ export interface IRegisterData {
   lastName: string;
 }
 
+export interface IProfileUpdate {
+  firstName: string;
+  lastName: string;
+}
+
 export interface ILoginData {
   email: string;
   password: string;
@@ -63,6 +68,21 @@ class AuthService {
     }
     const token = this.generateToken({ id: user.id, email: user.email });
     return { user, token };
+  }
+
+  public async updateUserProfile(userId: number, data: IProfileUpdate) {
+    // Check that the user exists.
+    const user = await this.db.user.findUnique({ where: { id: userId } })
+    if (!user) {
+      throw new Error('User not found')
+    }
+
+    // Update the user's first and last name.
+    const updatedUser = await this.db.user.update({
+      where: { id: userId },
+      data: { firstName: data.firstName, lastName: data.lastName },
+    })
+    return updatedUser
   }
 
   // Handles password reset request by generating and sending a reset token.

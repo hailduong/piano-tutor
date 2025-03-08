@@ -11,6 +11,8 @@ const RegisterContainer = styled.div`
 `
 
 interface IFormValues {
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -34,6 +36,18 @@ const Register: React.FC = () => {
       {error && <Alert type="error" message={error} style={{marginBottom: 16}}/>}
       <Form name="register" layout="vertical" onFinish={onFinish}>
         <Form.Item
+          name="firstName"
+          label="First Name"
+          rules={[{ required: true, message: 'Please input your first name!' }]}>
+          <Input placeholder="First Name" />
+        </Form.Item>
+        <Form.Item
+          name="lastName"
+          label="Last Name"
+          rules={[{ required: true, message: 'Please input your last name!' }]}>
+          <Input placeholder="Last Name" />
+        </Form.Item>
+        <Form.Item
           name="email"
           label="Email"
           rules={[{required: true, message: 'Please input your email!'}, {type: 'email', message: 'Invalid email!'}]}>
@@ -42,10 +56,10 @@ const Register: React.FC = () => {
         <Form.Item
           name="password"
           label="Password"
-          rules={[{required: true, message: 'Please input your password!'}, {
-            min: 6,
-            message: 'Password must be at least 6 characters!'
-          }]}>
+          rules={[
+            { required: true, message: 'Please input your password!' },
+            { min: 6, message: 'Password must be at least 6 characters!' }
+          ]}>
           <Input.Password placeholder="Password"/>
         </Form.Item>
         <Form.Item

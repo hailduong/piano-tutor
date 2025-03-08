@@ -66,6 +66,34 @@ class AuthController {
       return res.status(500).json({error: error.message || 'Failed to reset password.'})
     }
   }
+
+  public async updateProfile(req: Request, res: Response): Promise<Response> {
+    // Assumes request.user is populated by auth middleware with a valid user id.
+    const userId = req.user && req.user.id
+    const { firstName, lastName } = req.body
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    if (!firstName || !lastName) {
+      return res.status(400).json({ error: 'First name and last name are required.' })
+    }
+
+    try {
+      const updatedUser = await authService.updateUserProfile(userId, { firstName, lastName })
+      return res.status(200).json({
+        message: 'Profile updated successfully.',
+        user: {
+          firstName: updatedUser.firstName,
+          lastName: updatedUser.lastName,
+          email: updatedUser.email
+        }
+      })
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message || 'Failed to update profile.' })
+    }
+  }
 }
 
 const authController = new AuthController()

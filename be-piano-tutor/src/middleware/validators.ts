@@ -18,6 +18,12 @@ export const validateRequest = (req: Request, res: Response, next: NextFunction)
 
 // Validate registration inputs: email format and password minimum length.
 export const validateRegister = [
+  body('firstName')
+    .notEmpty()
+    .withMessage('First name is required.'),
+  body('lastName')
+    .notEmpty()
+    .withMessage('Last name is required.'),
   body('email').isEmail().withMessage('A valid email is required.'),
   body('password')
     .isLength({ min: 6 })

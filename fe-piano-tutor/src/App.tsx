@@ -25,6 +25,7 @@ import Settings from 'pages/Settings'
 import Register from 'pages/Auth/Register'
 import Login from 'pages/Auth/Login'
 import PasswordReset from 'pages/Auth/PasswordReset'
+import HeaderUserDisplay from 'pages/Auth/HeaderUserDisplay'
 
 const {Header, Sider, Content} = Layout
 
@@ -49,9 +50,7 @@ function App() {
             <div style={{fontSize: '18px', fontWeight: 700, color: '#fff'}}>
               AI Piano Tutor
             </div>
-            <Link to="/auth/login" style={{fontSize: '20px', color: '#fff'}}>
-              <UserOutlined/>
-            </Link>
+            <HeaderUserDisplay/>
           </Header>
           <Layout style={{minHeight: '100vh'}}>
             {/* Vertical Menu */}

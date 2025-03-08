@@ -6,6 +6,7 @@ import {
   validatePasswordResetRequest,
   validatePasswordResetConfirm
 } from '@src/middleware/validators'
+import { verifyToken } from '@src/middleware/auth.middleware'; // Import the middleware
 
 const router: Router = Router()
 
@@ -14,6 +15,9 @@ router.post('/register', validateRegister, authController.register)
 
 // User login endpoint with validations.
 router.post('/login', validateLogin, authController.login)
+
+// Update profile endpoint
+router.put('/profile', verifyToken, authController.updateProfile)
 
 // User logout endpoint (no input validation required).
 router.post('/logout', authController.logout)
