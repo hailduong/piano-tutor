@@ -42,7 +42,7 @@ interface ILearnSongControlsProps {
   songId: string;
 }
 
-const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
+const Controls: FC<ILearnSongControlsProps> = (props) => {
   /* Props & Store */
   const {onTempoChange, onSeek, currentPosition, totalNotes, isPracticing, onTogglePractice, songId} = props
   const dispatch = useDispatch()
@@ -306,4 +306,4 @@ const LearnSongControls: FC<ILearnSongControlsProps> = (props) => {
   )
 }
 
-export default LearnSongControls
+export default Controls

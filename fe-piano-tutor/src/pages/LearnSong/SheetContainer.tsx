@@ -3,11 +3,11 @@ import {Spin} from 'antd'
 import {useSheetMusicParser} from 'pages/LearnSong/hooks/useSheetMusicParser'
 import {useMIDIHandler} from 'pages/LearnSong/hooks/useMIDIHandler'
 import {useNoteTimingTracking} from 'pages/LearnSong/hooks/useNoteTimingTracking'
-import SheetMusicRenderer from 'pages/LearnSong/SheetMusicRenderer'
+import SheetRenderer from 'pages/LearnSong/SheetRenderer'
 import Vex from 'vexflow'
 import {durationToBeats} from 'pages/LearnSong/sheetUtils'
 import {useSelector} from 'react-redux'
-import {selectIsPracticing, updateProgress} from 'store/slices/learnSongSlice'
+import {selectIsPracticing, updateProgress, selectIsPlaying} from 'store/slices/learnSongSlice'
 import {setSuggestedNote, selectPianoCurrentNote} from 'store/slices/virtualPianoSlice'
 import {IPianoNote} from 'store/slices/types/IPianoNote'
 import {useAppDispatch} from 'store'
@@ -15,21 +15,21 @@ import {useAppDispatch} from 'store'
 interface AdvancedMusicSheetProps {
   songId: string | null;
   sheetMusicXMLString: string;
-  isPlaying: boolean;
   tempo: number;
   currentPosition: number;
   onSongComplete: () => void;
 }
 
-const MusicSheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
+const SheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
   /* Props */
-  const {songId, sheetMusicXMLString, isPlaying, tempo, currentPosition, onSongComplete} = props
+  const {songId, sheetMusicXMLString, tempo, currentPosition, onSongComplete} = props
 
 
   /* Redux State */
   const dispatch = useAppDispatch()
   const isPracticing = useSelector(selectIsPracticing)
   const pianoCurrentNote: null | IPianoNote = useSelector(selectPianoCurrentNote)
+  const isPlaying = useSelector(selectIsPlaying)
 
 
   /* States */
@@ -57,6 +57,10 @@ const MusicSheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
   const {expectedNoteTime, lastNoteTimestamp, handleNotePlay, initializeTiming} = useNoteTimingTracking()
 
   /* Effects */
+
+  /**
+   * Parse sheet music when XML string is ready
+   */
   useEffect(() => {
     if (sheetMusicXMLString) {
       const notes = parseSheetMusic(sheetMusicXMLString)
@@ -69,7 +73,9 @@ const MusicSheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
     isPracticingRef.current = isPracticing
   }, [isPracticing])
 
-  // Update note positions when vexNotes change
+  /**
+   * Calculate note positions when notes are ready
+   */
   useEffect(() => {
     if (vexNotes.length > 0 && scrollContainerRef.current) {
       const positions = calculateNotePositions(noteElements, scrollContainerRef.current)
@@ -91,12 +97,16 @@ const MusicSheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
     }
   }, [vexNotes])
 
-  // Initialize timing when starting to play
+  /**
+   * Initialize timing when isPlaying changes
+   */
   useEffect(() => {
     initializeTiming(isPlaying)
   }, [])
 
-  // Play notes automatically mode
+  /**
+   * Automatically play the next note in the song
+   */
   useEffect(() => {
     let isActive = true
 
@@ -130,7 +140,6 @@ const MusicSheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
         vexNotes,
         isPlaying,
         tempo,
-        onNotePlay,
         playNote,
         convertKeyToMIDINote
       )
@@ -287,7 +296,7 @@ const MusicSheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
           overflowY: 'hidden'
         }}
       >
-        <SheetMusicRenderer
+        <SheetRenderer
           vexNotes={vexNotes}
           onNoteElementsUpdate={handleNoteElementsUpdate}
           currentNote={currentNote}
@@ -298,4 +307,4 @@ const MusicSheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
   )
 }
 
-export default MusicSheetContainer
+export default SheetContainer

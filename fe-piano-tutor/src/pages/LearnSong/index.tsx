@@ -20,8 +20,8 @@ import {
 
 import {selectSongDetails} from 'store/slices/songLibrarySlice'
 import {RootState} from 'store'
-import MusicSheetContainer from 'pages/LearnSong/MusicSheetContainer'
-import LearnSongControls from 'pages/LearnSong/LearnSongControls'
+import SheetContainer from 'pages/LearnSong/SheetContainer'
+import Controls from 'pages/LearnSong/Controls'
 import {IPerformanceSummary} from 'pages/LearnSong/types/LearnSong'
 import {ProgressContainer, LearnSongContainer} from 'pages/LearnSong/styles/LearnSongPage.styled'
 import {updateSongPracticeStats} from 'store/slices/performanceSlice'
@@ -29,9 +29,6 @@ import {updateSongPracticeStats} from 'store/slices/performanceSlice'
 const {Title, Text} = Typography
 
 const LearnSongPage: React.FC = () => {
-  /* Refs */
-  const sessionStartTimeRef = useRef<number | null>(null)
-
   /* Props & Store */
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -39,7 +36,6 @@ const LearnSongPage: React.FC = () => {
 
   const learnSongState = useSelector(selectLearnSongState)
   const sessionProgress = useSelector(selectSessionProgress)
-  const isPlaying = useSelector(selectIsPlaying)
   const isPracticing = useSelector(selectIsPracticing) // Use Redux state
   const songDetails = useSelector((state: RootState) =>
     songId ? selectSongDetails(state, songId) : null
@@ -71,18 +67,6 @@ const LearnSongPage: React.FC = () => {
 
     initializeAndLoadSheetMusic()
   }, [dispatch, songId])
-
-  // Track session time
-  useEffect(() => {
-    if (isPlaying && !sessionStartTimeRef.current) {
-      sessionStartTimeRef.current = Date.now()
-    } else if (!isPlaying && sessionStartTimeRef.current) {
-      // Update session time when paused
-      const elapsedTime = Date.now() - sessionStartTimeRef.current
-      sessionStartTimeRef.current = null
-      // We could dispatch an action here to update total session time
-    }
-  }, [isPlaying])
 
   /* Handlers */
   const handleTempoChange = (tempo: number) => {
@@ -188,7 +172,7 @@ const LearnSongPage: React.FC = () => {
       </Row>
 
       {/* Controls */}
-      <LearnSongControls
+      <Controls
         onTempoChange={handleTempoChange}
         onSeek={handleSeek}
         currentPosition={sessionProgress.currentPosition}
@@ -198,11 +182,10 @@ const LearnSongPage: React.FC = () => {
       />
 
       {/* Sheet Music */}
-      <MusicSheetContainer
+      <SheetContainer
         songId={songId || null}
         sheetMusicXMLString={learnSongState.sheetMusic}
         tempo={learnSongState.tempo}
-        isPlaying={isPlaying}
         currentPosition={sessionProgress.currentPosition}
         onSongComplete={handleSessionComplete}
       />

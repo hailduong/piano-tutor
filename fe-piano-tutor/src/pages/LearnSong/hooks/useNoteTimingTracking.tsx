@@ -13,7 +13,6 @@ interface UseNoteTimingTrackingResult {
     vexNotes: Vex.StaveNote[],
     isPlaying: boolean,
     tempo: number,
-    onNotePlay: (noteId: string, timingDeviation: number) => void,
     playNote: (midiNote: number, duration?: number, velocity?: number) => void,
     convertKeyToMIDINote: (key: string) => number
   ) => void;
@@ -38,7 +37,6 @@ export const useNoteTimingTracking = (): UseNoteTimingTrackingResult => {
     vexNotes: Vex.StaveNote[],
     isPlaying: boolean,
     tempo: number,
-    onNotePlay: (noteId: string, timingDeviation: number) => void,
     playNote: (midiNote: number, duration?: number, velocity?: number) => void,
     convertKeyToMIDINote: (key: string) => number
   ) => {
@@ -56,11 +54,6 @@ export const useNoteTimingTracking = (): UseNoteTimingTrackingResult => {
       isCorrect: true, // We'll assume it's correct here
       duration: 0 // This would be calculated based on note type
     };
-
-    // dispatch(recordNoteTiming(noteTiming));
-
-    // Notify parent component
-    onNotePlay(currentNote, timingDeviation);
 
     // Send MIDI message
     const noteIndex = vexNotes.findIndex(note => note.getAttribute('id') === currentNote);

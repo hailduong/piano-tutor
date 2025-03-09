@@ -4,9 +4,16 @@ import {groupNotesByMeasure} from 'pages/LearnSong/sheetUtils'
 
 /* Types */
 interface IAdvancedMusicSheetRendererProps {
+  // An array of VexFlow StaveNote objects representing the musical notes to be rendered
   vexNotes: Vex.StaveNote[];
+
+  // A callback function that is invoked when the note elements are updated, providing a map of note identifiers to their corresponding HTMLElements
   onNoteElementsUpdate: (elements: Map<string, HTMLElement>) => void;
+
+  // The identifier of the current note that should be highlighted or focused, or null if no note is current
   currentNote: string | null;
+
+  // An optional boolean flag indicating whether an incorrect attempt has been made, which can affect rendering (e.g., highlighting errors)
   incorrectAttempt?: boolean;
 }
 
@@ -16,7 +23,7 @@ const CSS_CLASSES = {
   INCORRECT_ATTEMPT: 'incorrect-attempt'
 }
 
-const SheetMusicRenderer: React.FC<IAdvancedMusicSheetRendererProps> = (props) => {
+const SheetRenderer: React.FC<IAdvancedMusicSheetRendererProps> = (props) => {
   const {vexNotes, onNoteElementsUpdate, currentNote, incorrectAttempt} = props
   const rendererRef = useRef<HTMLDivElement>(null)
   const prevNoteRef = useRef<string | null>(null)
@@ -157,4 +164,4 @@ const SheetMusicRenderer: React.FC<IAdvancedMusicSheetRendererProps> = (props) =
   return <div ref={rendererRef} className="sheet-music-container"/>
 }
 
-export default SheetMusicRenderer
+export default SheetRenderer

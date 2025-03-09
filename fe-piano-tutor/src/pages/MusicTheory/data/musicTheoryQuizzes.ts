@@ -31,7 +31,7 @@ export const quizzes: Record<string, QuizQuestion[]> = {
       correctAnswer: '5',
     }
   ],
-  'rhythm-basics': [
+  'beginner-2': [
     {
       id: 'rb-q1',
       conceptId: 'rhythm-basics',

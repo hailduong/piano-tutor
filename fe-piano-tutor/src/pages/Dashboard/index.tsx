@@ -30,7 +30,7 @@ const Dashboard: FC = () => {
       <Card className="shadow" style={{maxWidth: 768, margin: '0 auto', padding: 20}}>
         <TrophyOutlined style={{fontSize: 48, color: '#faad14', marginBottom: 16}}/>
         <h2>{message}</h2>
-        <p>{user ? 'Check out your stats to continue learning!' : <Link to="/auth/login">Log in to track your progress.</Link>}</p>
+        <p>{user ? 'Check out your stats to continue learning!' : <Link to="/auth/login">Log in to save your progress.</Link>}</p>
         <Tabs defaultActiveKey={sourceActivity === 'learn-music-notes' ? 'learnMusicNotes' : 'musicTheory'} centered>
           {/* Music Theory Stats */}
           <TabPane
