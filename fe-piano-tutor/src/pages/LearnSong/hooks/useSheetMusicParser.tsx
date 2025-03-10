@@ -1,12 +1,4 @@
-// src/hooks/useSheetMusicParser.ts
 import Vex from 'vexflow'
-
-interface NotePosition {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
 
 interface UseSheetMusicParserResult {
   /**
@@ -15,16 +7,6 @@ interface UseSheetMusicParserResult {
    * @returns An array of VexFlow StaveNotes.
    */
   parseSheetMusic: (xmlData: string | Document) => Vex.StaveNote[];
-  /**
-   * Calculates the positions of notes in the rendered sheet music.
-   * @param noteElements - A map of note IDs to their corresponding HTML elements.
-   * @param scrollContainer - The scroll container element for calculating positions.
-   * @returns A map of note IDs to their positions.
-   */
-  calculateNotePositions: (
-    noteElements: Map<string, HTMLElement>,
-    scrollContainer: HTMLDivElement | null
-  ) => Map<string, NotePosition>;
   /**
    * Converts a key string (e.g., 'C/4') to a MIDI note number.
    * @param key - The key string to convert.
@@ -104,31 +86,8 @@ export const useSheetMusicParser = (): UseSheetMusicParserResult => {
     return parsedNotes
   }
 
-  // Calculate the positions of notes for highlighting
-  const calculateNotePositions = (
-    noteElements: Map<string, HTMLElement>,
-    scrollContainer: HTMLDivElement | null
-  ): Map<string, NotePosition> => {
-    const positions = new Map<string, NotePosition>()
-
-    noteElements.forEach((element, noteId) => {
-      const rect = element.getBoundingClientRect()
-      const containerRect = scrollContainer?.getBoundingClientRect() || {left: 0, top: 0}
-
-      positions.set(noteId, {
-        x: rect.left - containerRect.left + (scrollContainer?.scrollLeft || 0),
-        y: rect.top - containerRect.top,
-        width: rect.width,
-        height: rect.height
-      })
-    })
-
-    return positions
-  }
-
   return {
     parseSheetMusic,
-    calculateNotePositions,
     convertKeyToMIDINote
   }
 }

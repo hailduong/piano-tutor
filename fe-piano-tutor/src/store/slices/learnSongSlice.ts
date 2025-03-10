@@ -1,5 +1,5 @@
 import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit'
-import {ILearnSongState, INoteTiming, ISessionProgress, ILearnSongSettings} from 'pages/LearnSong/types/LearnSong'
+import {ILearnSongState, ISessionProgress, ILearnSongSettings} from 'pages/LearnSong/types/LearnSong'
 import {RootState} from 'store/index'
 
 
@@ -11,7 +11,12 @@ const initialState: ILearnSongState = {
   tempo: 100,
   currentNote: null,
   nextNote: null,
-  noteTimings: [],
+  timings: {
+    expectedTiming: 0,
+    actualTiming: 0,
+    timingAccuracy: 0,
+    timingDiffInSeconds: 0
+  },
   sessionProgress: {
     totalNotes: 0,
     notesPlayed: 0,
@@ -47,7 +52,6 @@ const learnSongSlice = createSlice({
       state.songId = action.payload.songId
       state.isPlaying = false
       state.isPaused = false
-      state.noteTimings = []
       state.sessionProgress = {
         totalNotes: 0,
         notesPlayed: 0,
@@ -112,26 +116,30 @@ const learnSongSlice = createSlice({
       state.nextNote = action.payload
     },
 
-    // TODO: Record a played note's timing information
-    recordNoteTiming: (state, action: PayloadAction<INoteTiming>) => {
-      state.noteTimings.push(action.payload)
-      state.sessionProgress.notesPlayed += 1
 
-      if (action.payload.isCorrect) {
-        state.sessionProgress.correctNotes += 1
-      } else {
-        state.sessionProgress.incorrectNotes += 1
+    updateTiming: (state, action: PayloadAction<{
+      expectedTiming?: number;
+      actualTiming?: number;
+      timingAccuracy?: number;
+      timingDiffInSeconds?: number;
+    }>) => {
+      if (action.payload.expectedTiming !== undefined) {
+        state.timings.expectedTiming = action.payload.expectedTiming;
       }
-
-      // Update accuracy
-      state.sessionProgress.accuracy =
-        state.sessionProgress.correctNotes / state.sessionProgress.notesPlayed
+      if (action.payload.actualTiming !== undefined) {
+        state.timings.actualTiming = action.payload.actualTiming;
+      }
+      if (action.payload.timingAccuracy !== undefined) {
+        state.timings.timingAccuracy = action.payload.timingAccuracy;
+      }
+      if (action.payload.timingDiffInSeconds !== undefined) {
+        state.timings.timingDiffInSeconds = action.payload.timingDiffInSeconds;
+      }
     },
 
     // Update session progress
     updateProgress: (state, action: PayloadAction<Partial<ISessionProgress>>) => {
       const {correctNotes, incorrectNotes} = action.payload
-      debugger
       if (correctNotes !== undefined) {
         state.sessionProgress.notesPlayed += correctNotes
         state.sessionProgress.correctNotes += correctNotes
@@ -191,8 +199,8 @@ export const {
   togglePracticing,
   setCurrentNote,
   setNextNote,
-  recordNoteTiming,
   updateProgress,
+  updateTiming,
   updateSettings,
   setTotalNotes,
   seekToPosition

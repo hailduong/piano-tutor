@@ -38,7 +38,7 @@ interface ILearnSongControlsProps {
   totalNotes: number;
   isPracticing: boolean;
   onTogglePractice: () => void;
-  songId: string;
+  songId?: string;
 }
 
 const Controls: FC<ILearnSongControlsProps> = (props) => {

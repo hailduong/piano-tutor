@@ -2,15 +2,6 @@
  * Types and interfaces for the Learn Song feature
  */
 
-// Note timing information for performance tracking
-export interface INoteTiming {
-  noteId: string;
-  expectedTime: number;
-  actualTime?: number;
-  isCorrect: boolean;
-  duration: number;
-}
-
 // Song learning progress tracking
 export interface ISessionProgress {
   totalNotes: number;
@@ -21,6 +12,13 @@ export interface ISessionProgress {
   currentPosition: number;
 }
 
+export interface INoteTimings {
+  expectedTiming: number;  // in milliseconds since start
+  actualTiming: number;    // in milliseconds since start
+  timingAccuracy: number;  // in milliseconds difference (negative = early, positive = late)
+  timingDiffInSeconds: number; // human-readable seconds difference
+}
+
 // Main learning session state
 export interface ILearnSongState {
   songId: string | null;
@@ -29,7 +27,7 @@ export interface ILearnSongState {
   tempo: number;
   currentNote: string | null;
   nextNote: string | null;
-  noteTimings: INoteTiming[];
+  timings: INoteTimings;
   sessionProgress: ISessionProgress;
   startTime: number | null;
   elapsedTime: number;

@@ -1,6 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react'
 import {Spin} from 'antd'
-import {useSheetMusicParser} from 'pages/LearnSong/hooks/useSheetMusicParser'
 import {useMIDIHandler} from 'pages/LearnSong/hooks/useMIDIHandler'
 import {useNoteTimingTracking} from 'pages/LearnSong/hooks/useNoteTimingTracking'
 import SheetRenderer from 'pages/LearnSong/SheetRenderer'
@@ -15,15 +14,19 @@ import usePracticeSong from './hooks/usePracticeSong'
 
 interface AdvancedMusicSheetProps {
   songId: string | null;
-  sheetMusicXMLString: string;
   tempo: number;
   currentPosition: number;
   onSongPracticeComplete: () => void;
+  vexNotes: Vex.StaveNote[];
 }
 
 const SheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
   /* Props */
-  const {songId, sheetMusicXMLString, tempo, currentPosition, onSongPracticeComplete} = props
+  const {
+    songId, tempo, currentPosition,
+    onSongPracticeComplete, vexNotes
+  } = props
+
 
   /* Redux State */
   const dispatch = useAppDispatch()
@@ -35,15 +38,12 @@ const SheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
   /* States */
   const [currentNote, setCurrentNote] = useState<string | null>(null)
   const [nextNote, setNextNote] = useState<string | null>(null)
-  const [notePositions, setNotePositions] = useState<Map<string, any>>(new Map())
   const [noteElements, setNoteElements] = useState<Map<string, HTMLElement>>(new Map())
   const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [vexNotes, setVexNotes] = useState<Vex.StaveNote[]>([])
   const [incorrectAttempt, setIncorrectAttempt] = useState<boolean>(false)
 
   /* Refs */
   const containerRef = useRef<HTMLDivElement>(null)
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
   const currentNoteRef = useRef(currentNote)
   currentNoteRef.current = currentNote
   const isPracticingRef = useRef(isPracticing)
@@ -52,22 +52,15 @@ const SheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
 
 
   /* Hooks */
-  const {parseSheetMusic, calculateNotePositions, convertKeyToMIDINote} = useSheetMusicParser()
   const {midiAccess, playNote, hasSupport} = useMIDIHandler()
   const {expectedNoteTime, lastNoteTimestamp, handleNotePlay, initializeTiming} = useNoteTimingTracking()
 
   /* Effects */
-
-  /**
-   * Parse sheet music when XML string is ready
-   */
   useEffect(() => {
-    if (sheetMusicXMLString) {
-      const notes = parseSheetMusic(sheetMusicXMLString)
-      setVexNotes(notes)
+    if (vexNotes.length > 0) {
       setIsLoading(false)
     }
-  }, [sheetMusicXMLString])
+  }, [vexNotes])
 
   useEffect(() => {
     isPracticingRef.current = isPracticing
@@ -77,9 +70,7 @@ const SheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
    * Calculate note positions when notes are ready
    */
   useEffect(() => {
-    if (vexNotes.length > 0 && scrollContainerRef.current) {
-      const positions = calculateNotePositions(noteElements, scrollContainerRef.current)
-      setNotePositions(positions)
+    if (vexNotes.length > 0) {
 
       // Set initial current and next notes
       if (vexNotes.length > 0) {
@@ -118,7 +109,6 @@ const SheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
     nextNote
   })
 
-
   /**
    * Practice the song
    */
@@ -129,7 +119,8 @@ const SheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
     setCurrentNote,
     setNextNote,
     onSongPracticeComplete,
-    setIncorrectAttempt
+    setIncorrectAttempt,
+    tempo
   })
 
 
@@ -158,7 +149,6 @@ const SheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
           : <span><strong>Playback Mode:</strong> Listen to the song</span>}
       </div>
       <div
-        ref={scrollContainerRef}
         style={{
           position: 'relative',
           width: '100%',

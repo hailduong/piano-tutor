@@ -4,7 +4,6 @@ import {togglePlaying} from 'store/slices/learnSongSlice'
 import {durationToBeats} from 'pages/LearnSong/sheetUtils'
 import {useSheetMusicParser} from 'pages/LearnSong/hooks/useSheetMusicParser'
 import {useMIDIHandler} from 'pages/LearnSong/hooks/useMIDIHandler'
-import {useNoteTimingTracking} from 'pages/LearnSong/hooks/useNoteTimingTracking'
 import {Vex} from 'vexflow'
 
 interface UseAutoPlayNotesProps {
@@ -37,7 +36,6 @@ const usePlaySong = ({
 
   const {convertKeyToMIDINote} = useSheetMusicParser()
   const {playNote} = useMIDIHandler()
-  const {initializeTiming} = useNoteTimingTracking()
 
   useEffect(() => {
     let isActive = true
@@ -124,7 +122,7 @@ const usePlaySong = ({
     return () => {
       isActive = false // Clean up on unmount
     }
-  }, [isPlaying, currentNote])
+  }, [isPlaying, currentNote, vexNotes])
 }
 
 export default usePlaySong

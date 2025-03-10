@@ -1,7 +1,7 @@
-import React, {useEffect, useState, useRef} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useParams, useNavigate} from 'react-router-dom'
 import {useSelector, useDispatch} from 'react-redux'
-import {Typography, Spin, Button, Row, Col, Alert, Card, Modal} from 'antd'
+import {Typography, Spin, Button, Row, Col, Card, Modal} from 'antd'
 import {ArrowLeftOutlined} from '@ant-design/icons'
 
 import {
@@ -9,7 +9,6 @@ import {
   loadSheetMusicThunk,
   selectLearnSongState,
   selectSessionProgress,
-  selectIsPlaying,
   pauseSession,
   setCurrentNote,
   setNextNote,
@@ -23,8 +22,11 @@ import {RootState} from 'store'
 import SheetContainer from 'pages/LearnSong/SheetContainer'
 import Controls from 'pages/LearnSong/Controls'
 import {IPerformanceSummary} from 'pages/LearnSong/types/LearnSong'
-import {ProgressContainer, LearnSongContainer} from 'pages/LearnSong/styles/LearnSongPage.styled'
+import {LearnSongContainer} from 'pages/LearnSong/styles/LearnSongPage.styled'
 import {updateSongPracticeStats} from 'store/slices/performanceSlice'
+import SessionProgress from './SessionProgress'
+import Vex from 'vexflow'
+import {useSheetMusicParser} from 'pages/LearnSong/hooks/useSheetMusicParser'
 
 const {Title, Text} = Typography
 
@@ -36,6 +38,7 @@ const LearnSongPage: React.FC = () => {
 
   const learnSongState = useSelector(selectLearnSongState)
   const sessionProgress = useSelector(selectSessionProgress)
+  const timings = useSelector((state: RootState) => state.learnSong.timings)
   const isPracticing = useSelector(selectIsPracticing) // Use Redux state
   const songDetails = useSelector((state: RootState) =>
     songId ? selectSongDetails(state, songId) : null
@@ -45,8 +48,12 @@ const LearnSongPage: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [showSummary, setShowSummary] = useState(false)
   const [performanceSummary, setPerformanceSummary] = useState<IPerformanceSummary | null>(null)
+  const [vexNotes, setVexNotes] = useState<Vex.StaveNote[]>([]);
+
 
   /* Effects */
+  const {parseSheetMusic} = useSheetMusicParser()
+
   // Initialize the learning session when the component mounts
   useEffect(() => {
     const initializeAndLoadSheetMusic = async () => {
@@ -68,10 +75,21 @@ const LearnSongPage: React.FC = () => {
     initializeAndLoadSheetMusic()
   }, [dispatch, songId])
 
+  /**
+   * Parse sheet music when XML string is ready
+   */
+  useEffect(() => {
+    if (learnSongState.sheetMusic) {
+      const notes = parseSheetMusic(learnSongState.sheetMusic)
+      setVexNotes(notes)
+    }
+  }, [learnSongState.sheetMusic])
+
   /* Handlers */
   const handleTempoChange = (tempo: number) => {
     // Additional handling if needed beyond what's in the controls
   }
+
 
   const handleSeek = (position: number) => {
     // Set the current note based on position
@@ -179,50 +197,25 @@ const LearnSongPage: React.FC = () => {
         totalNotes={sessionProgress.totalNotes}
         isPracticing={isPracticing}
         onTogglePractice={handleTogglePractice}
+        songId={songId}
       />
 
       {/* Sheet Music */}
       <SheetContainer
         songId={songId || null}
-        sheetMusicXMLString={learnSongState.sheetMusic}
         tempo={learnSongState.tempo}
         currentPosition={sessionProgress.currentPosition}
         onSongPracticeComplete={handleSessionComplete}
+        vexNotes={vexNotes}
       />
 
-      {/* Progress Information */}
-      <ProgressContainer>
-        <Row gutter={16}>
-          <Col span={6}>
-            <Alert
-              message="Notes Played"
-              description={`${sessionProgress.notesPlayed} / ${sessionProgress.totalNotes}`}
-              type="info"
-            />
-          </Col>
-          <Col span={6}>
-            <Alert
-              message="Correct Notes"
-              description={sessionProgress.correctNotes || '0'}
-              type="success"
-            />
-          </Col>
-          <Col span={6}>
-            <Alert
-              message="Incorrect Notes"
-              description={sessionProgress.incorrectNotes || '0'}
-              type="error"
-            />
-          </Col>
-          <Col span={6}>
-            <Alert
-              message="Accuracy"
-              description={`${(sessionProgress.accuracy * 100).toFixed(1)}%`}
-              type="warning"
-            />
-          </Col>
-        </Row>
-      </ProgressContainer>
+      {/* Session Progress */}
+      <SessionProgress
+        sessionProgress={sessionProgress}
+        timings={timings}
+        tempo={learnSongState.tempo}
+        vexNotes={vexNotes}
+      />
 
       {/* Performance Summary Modal */}
       <Modal

@@ -1,15 +1,6 @@
 // src/slices/performanceSlice.ts
 import {createSlice, PayloadAction} from '@reduxjs/toolkit'
 
-export interface INotePerformance {
-  noteAttempted: string;  // The note that was played (e.g., "C4")
-  noteExpected: string;   // The note that should have been played
-  isCorrect: boolean;     // Whether the correct note was played
-  timingDeviation: number; // Millisecond ds deviation from expected timing
-  difficultyLevel: number; // Current difficulty level
-  timestamp: number;      // When the note was attempted
-}
-
 export interface IMusicTheoryQuizStats {
   answered: number;
   total: number;
@@ -31,7 +22,6 @@ export interface ISongPracticeStats {
 }
 
 export interface IPerformanceState {
-  currentSessionPerformance: INotePerformance[];  // Current practice session data
   accuracyRate: number;    // Percentage of correct notes in session
   averageTiming: number;   // Average timing deviation in ms
   totalNotesPlayed: number; // Total number of notes attempted in session
@@ -47,7 +37,6 @@ export interface IPerformanceState {
 }
 
 const initialState: IPerformanceState = {
-  currentSessionPerformance: [],
   accuracyRate: 0,
   averageTiming: 0,
   totalNotesPlayed: 0,
@@ -73,7 +62,6 @@ const performanceSlice = createSlice({
     startSession: (state) => {
       state.sessionStart = Date.now()
       state.sessionEnd = null
-      state.currentSessionPerformance = []
       state.accuracyRate = 0
       state.averageTiming = 0
       state.totalNotesPlayed = 0
