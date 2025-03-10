@@ -90,6 +90,12 @@ const learnSongSlice = createSlice({
       state.startTime = null
     },
 
+    // Toggle Playing state
+    togglePlaying: (state, action: PayloadAction<boolean | undefined>) => {
+      // If a specific value is provided, use it, otherwise toggle the current value
+      state.isPlaying = action.payload !== undefined ? action.payload : !state.isPlaying
+    },
+
     // Toggle practicing state
     togglePracticing: (state, action: PayloadAction<boolean | undefined>) => {
       // If a specific value is provided, use it, otherwise toggle the current value
@@ -181,6 +187,7 @@ export const {
   pauseSession,
   resumeSession,
   endSession,
+  togglePlaying,
   togglePracticing,
   setCurrentNote,
   setNextNote,

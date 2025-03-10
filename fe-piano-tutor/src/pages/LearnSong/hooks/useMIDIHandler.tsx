@@ -3,7 +3,7 @@ import Soundfont from 'soundfont-player'
 
 interface UseMIDIHandlerResult {
   midiAccess: WebMidi.MIDIAccess | null;
-  playNote: (midiNote: number, duration?: number, velocity?: number) => void;
+  playNote: (midiNote: number, duration?: number, velocity?: number) => Promise<void>;
   playMetronomeSound: (velocity?: number) => boolean;
   hasSupport: boolean;
   instrumentLoading: boolean;
@@ -55,32 +55,42 @@ export const useMIDIHandler = (): UseMIDIHandlerResult => {
   }, [])
 
   // Function to play a note using Soundfont or fallback to oscillator
-  const playNote = (midiNote: number, duration = 500, velocity = 0x7f) => {
-    // First try to play using Soundfont instrument
-    console.log('Playing note:', midiNote, instrument.current)
-    if (instrument.current) {
-      const options = {
-        duration: duration / 1000,
-        gain: velocity / 127
+  const playNote = async (midiNote: number, duration = 500, velocity = 0x7f): Promise<void> => {
+    return new Promise((resolve) => {
+      // First try to play using Soundfont instrument
+      console.log('Playing note:', midiNote, instrument.current)
+      if (instrument.current) {
+        const options = {
+          duration: duration / 1000,
+          gain: velocity / 127
+        }
+        instrument.current.play(midiNote, audioContext.current?.currentTime, options)
+
+        // Resolve the Promise after the note's duration
+        setTimeout(() => {
+          resolve()
+        }, duration)
+      } else {
+        // Handle the case where the instrument is not available
+        console.error('Instrument not available')
+        resolve()
       }
-      instrument.current.play(midiNote, audioContext.current?.currentTime, options)
-      return
-    }
+    })
   }
 
   const playMetronomeSound = (velocity = 0.7) => {
     if (instrument.current && audioContext.current) {
       // Use a higher pitch note (B4 = 71) for the metronome sound
-      const metronomeNote = 71;
+      const metronomeNote = 71
       const options = {
         duration: 0.1, // Short duration for click sound
         gain: velocity
-      };
-      instrument.current.play(metronomeNote, audioContext.current.currentTime, options);
-      return true;
+      }
+      instrument.current.play(metronomeNote, audioContext.current.currentTime, options)
+      return true
     }
-    return false;
-  };
+    return false
+  }
 
   return {
     midiAccess,

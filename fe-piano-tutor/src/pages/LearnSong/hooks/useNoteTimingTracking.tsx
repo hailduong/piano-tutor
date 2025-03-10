@@ -40,20 +40,11 @@ export const useNoteTimingTracking = (): UseNoteTimingTrackingResult => {
     playNote: (midiNote: number, duration?: number, velocity?: number) => void,
     convertKeyToMIDINote: (key: string) => number
   ) => {
-    if (!isPlaying || !currentNote || !expectedNoteTime) return;
+    if (!isPlaying || !currentNote) return;
 
     // Calculate timing
-    const now = Date.now();
-    const timingDeviation = now - expectedNoteTime;
+    const now = Date.now();;
 
-    // Record note timing in Redux store
-    const noteTiming: INoteTiming = {
-      noteId: currentNote,
-      expectedTime: expectedNoteTime,
-      actualTime: now,
-      isCorrect: true, // We'll assume it's correct here
-      duration: 0 // This would be calculated based on note type
-    };
 
     // Send MIDI message
     const noteIndex = vexNotes.findIndex(note => note.getAttribute('id') === currentNote);
@@ -65,7 +56,6 @@ export const useNoteTimingTracking = (): UseNoteTimingTrackingResult => {
 
     // Update expected time for next note based on tempo
     const beatDuration = 60000 / tempo;
-    setExpectedNoteTime(expectedNoteTime + beatDuration);
     setLastNoteTimestamp(now);
   };
 

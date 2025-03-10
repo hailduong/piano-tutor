@@ -11,7 +11,7 @@ interface IAdvancedMusicSheetRendererProps {
   onNoteElementsUpdate: (elements: Map<string, HTMLElement>) => void;
 
   // The identifier of the current note that should be highlighted or focused, or null if no note is current
-  currentNote: string | null;
+  highlightNote: string | null;
 
   // An optional boolean flag indicating whether an incorrect attempt has been made, which can affect rendering (e.g., highlighting errors)
   incorrectAttempt?: boolean;
@@ -24,7 +24,7 @@ const CSS_CLASSES = {
 }
 
 const SheetRenderer: React.FC<IAdvancedMusicSheetRendererProps> = (props) => {
-  const {vexNotes, onNoteElementsUpdate, currentNote, incorrectAttempt} = props
+  const {vexNotes, onNoteElementsUpdate, highlightNote, incorrectAttempt} = props
   const rendererRef = useRef<HTMLDivElement>(null)
   const prevNoteRef = useRef<string | null>(null)
 
@@ -117,8 +117,8 @@ const SheetRenderer: React.FC<IAdvancedMusicSheetRendererProps> = (props) => {
       })
 
     // Highlight current note
-    if (currentNote) {
-      const currentElement = noteElements.get(currentNote)
+    if (highlightNote) {
+      const currentElement = noteElements.get(highlightNote)
       if (currentElement) {
         currentElement.classList.add(CSS_CLASSES.CURRENT_NOTE)
 
@@ -157,9 +157,9 @@ const SheetRenderer: React.FC<IAdvancedMusicSheetRendererProps> = (props) => {
     }
 
     // Remember current note for future renders
-    prevNoteRef.current = currentNote
+    prevNoteRef.current = highlightNote
 
-  }, [currentNote])
+  }, [highlightNote])
 
   return <div ref={rendererRef} className="sheet-music-container"/>
 }
