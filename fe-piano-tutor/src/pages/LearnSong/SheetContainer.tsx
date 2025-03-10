@@ -5,32 +5,25 @@ import {useMIDIHandler} from 'pages/LearnSong/hooks/useMIDIHandler'
 import {useNoteTimingTracking} from 'pages/LearnSong/hooks/useNoteTimingTracking'
 import SheetRenderer from 'pages/LearnSong/SheetRenderer'
 import Vex from 'vexflow'
-import {durationToBeats} from 'pages/LearnSong/sheetUtils'
 import {useSelector} from 'react-redux'
-import {
-  selectIsPracticing,
-  updateProgress,
-  selectIsPlaying,
-  togglePlayPractice,
-  togglePracticing,
-  togglePlaying
-} from 'store/slices/learnSongSlice'
-import {setSuggestedNote, selectPianoCurrentNote} from 'store/slices/virtualPianoSlice'
+import {selectIsPracticing, selectIsPlaying} from 'store/slices/learnSongSlice'
+import {selectPianoCurrentNote} from 'store/slices/virtualPianoSlice'
 import {IPianoNote} from 'store/slices/types/IPianoNote'
 import {useAppDispatch} from 'store'
+import usePlaySong from 'pages/LearnSong/hooks/usePlaySong'
+import usePracticeSong from './hooks/usePracticeSong'
 
 interface AdvancedMusicSheetProps {
   songId: string | null;
   sheetMusicXMLString: string;
   tempo: number;
   currentPosition: number;
-  onSongComplete: () => void;
+  onSongPracticeComplete: () => void;
 }
 
 const SheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
   /* Props */
-  const {songId, sheetMusicXMLString, tempo, currentPosition, onSongComplete} = props
-
+  const {songId, sheetMusicXMLString, tempo, currentPosition, onSongPracticeComplete} = props
 
   /* Redux State */
   const dispatch = useAppDispatch()
@@ -72,7 +65,6 @@ const SheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
     if (sheetMusicXMLString) {
       const notes = parseSheetMusic(sheetMusicXMLString)
       setVexNotes(notes)
-      debugger
       setIsLoading(false)
     }
   }, [sheetMusicXMLString])
@@ -91,7 +83,6 @@ const SheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
 
       // Set initial current and next notes
       if (vexNotes.length > 0) {
-        debugger
         const firstNoteId = vexNotes[0].getAttribute('id')
         setCurrentNote(firstNoteId)
 
@@ -116,176 +107,31 @@ const SheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
   /**
    * Automatically play the next note in the song
    */
-  useEffect(() => {
-    let isActive = true
-
-    const playNextNoteAutomatically = async (): Promise<void> => {
-      if (!isActive || !isPlaying || !currentNoteRef.current) return Promise.resolve()
-
-      const thisNote = currentNoteRef.current
-      const currentIndex = vexNotes.findIndex(note => note.getAttribute('id') === thisNote)
-      if (currentIndex === -1) return Promise.resolve()
-
-      const currentVexNote = vexNotes[currentIndex]
-      console.log(`Playing note at index ${currentIndex} of ${vexNotes.length}`)
-
-      // Get the duration from the VexFlow note
-      const rawDuration = currentVexNote.getDuration()
-      const noteBeats = durationToBeats(rawDuration)
-
-      // Check if note is dotted (increases duration by 50%)
-      const isDotted = currentVexNote.isDotted()
-
-      // Apply dotted note adjustment (1.5x)
-      const adjustedBeats = isDotted ? noteBeats * 1.5 : noteBeats
-
-      // Calculate actual duration in milliseconds
-      const noteBeatDuration = (60000 / tempo) * adjustedBeats
-      console.log(`Note duration: ${noteBeatDuration}ms`)
-
-      // Directly play the note using playNote
-      const key = currentVexNote.getKeys()[0]
-      const midiNote = convertKeyToMIDINote(key)
-      await playNote(midiNote, noteBeatDuration)
-
-      // Advance to next note
-      if (currentIndex < vexNotes.length - 1) {
-        const nextNoteId = vexNotes[currentIndex + 1].getAttribute('id')
-        setCurrentNote(nextNoteId)
-        console.log(`Setting currentNote to ${nextNoteId}`)
-
-        // Update next note reference
-        if (currentIndex + 2 < vexNotes.length) {
-          const nextNextNoteId = vexNotes[currentIndex + 2].getAttribute('id')
-          setNextNote(nextNextNoteId)
-          console.log(`Setting nextNote to ${nextNextNoteId}`)
-        } else {
-          setNextNote(null)
-          console.log(`Setting nextNote to null`)
-        }
-
-        // Schedule the next note based on this note's duration
-        setTimeout(() => {
-          if (isActive && isPlaying) playNextNoteAutomatically()
-        }, noteBeatDuration)
-      } else {
-        // Set playing to false when the song ends
-        dispatch(togglePlaying(false))
-
-        // Reset currentNote and nextNote to initial values
-        if (vexNotes.length > 0) {
-          const firstNoteId = vexNotes[0].getAttribute('id')
-          setCurrentNote(firstNoteId)
-          console.log(`Resetting currentNote to ${firstNoteId}`)
-
-          if (vexNotes.length > 1) {
-            const secondNoteId = vexNotes[1].getAttribute('id')
-            setNextNote(secondNoteId)
-            console.log(`Resetting nextNote to ${secondNoteId}`)
-          } else {
-            setNextNote(null)
-            console.log(`Setting nextNote to null`)
-          }
-        } else {
-          setCurrentNote(null)
-          setNextNote(null)
-        }
-      }
-    }
-
-    // Start playing only when isPlaying changes to true and we're not in practice mode
-    if (isPlaying && !isPracticingRef.current) {
-      playNextNoteAutomatically()
-    }
-
-    return () => {
-      isActive = false // Clean up on unmount
-    }
-  }, [isPlaying])
+  usePlaySong({
+    vexNotes,
+    isPlaying,
+    isPracticing,
+    tempo,
+    setCurrentNote,
+    currentNote,
+    setNextNote,
+    nextNote
+  })
 
 
   /**
-   * Play a note > Check if the played note matches the expected note
+   * Practice the song
    */
-  useEffect(() => {
-    if (!isPracticing || !currentNote || !pianoCurrentNote) {
-      return
-    }
+  usePracticeSong({
+    vexNotes,
+    isPracticing,
+    currentNote,
+    setCurrentNote,
+    setNextNote,
+    onSongPracticeComplete,
+    setIncorrectAttempt
+  })
 
-    // Update ref to prevent duplicate processing
-    lastPianoNoteRef.current = pianoCurrentNote
-
-    // Get expected note information
-    const currentIndex = vexNotes.findIndex(note => note.getAttribute('id') === currentNote)
-    if (currentIndex === -1) return
-
-    const currentVexNote = vexNotes[currentIndex]
-    const key = currentVexNote.getKeys()[0]
-    const expectedMidiNote = convertKeyToMIDINote(key)
-
-    // Get the MIDI note number from the piano note object
-    const playedNote = pianoCurrentNote.note
-    const playedOctave = pianoCurrentNote.octave
-    const playedMidiNote = convertKeyToMIDINote(`${playedNote}/${playedOctave}`)
-
-    // Compare the played note with the expected note
-    if (playedMidiNote === expectedMidiNote) {
-      // Correct note was played
-      setIncorrectAttempt(false)
-      dispatch(setSuggestedNote(null))
-
-      // Move to next note
-      if (currentIndex < vexNotes.length - 1) {
-        const nextNoteId = vexNotes[currentIndex + 1].getAttribute('id')
-        setCurrentNote(nextNoteId)
-        console.log(`Setting currentNote to ${nextNoteId} after correct play`)
-
-        // Update next note reference
-        if (currentIndex + 2 < vexNotes.length) {
-          const nextNextNoteId = vexNotes[currentIndex + 2].getAttribute('id')
-          setNextNote(nextNextNoteId)
-          console.log(`Setting nextNote to ${nextNextNoteId} after correct play`)
-        } else {
-          setNextNote(null)
-          console.log(`Setting nextNote to null after correct play`)
-        }
-
-        // Set expected time for next note based on tempo
-        initializeTiming(false)
-      } else {
-        // End of song
-        onSongComplete()
-        setCurrentNote(null)
-        setNextNote(null)
-      }
-
-      // Update correct notes count
-      dispatch(updateProgress({correctNotes: 1}))
-    } else {
-      // Incorrect note
-      setIncorrectAttempt(true)
-
-      // Suggest the correct note in the piano UI
-      const nextKey = currentVexNote.getKeys()[0]
-
-      // Parse the key to get note name and octave
-      // Example key format: "C/4" where "C" is the note and "4" is the octave
-      const [noteName, octaveStr] = nextKey.split('/')
-
-      // Create a proper IPianoNote object
-      const suggestedNote: IPianoNote = {
-        note: noteName.toUpperCase(),           // e.g., "C", "C#", etc.
-        length: 'q',              // Default to quarter note
-        timestamp: Date.now(),    // Current timestamp
-        octave: parseInt(octaveStr, 10)  // Parse octave number
-      }
-
-      dispatch(setSuggestedNote(suggestedNote))
-
-      // Update incorrect notes count
-      dispatch(updateProgress({incorrectNotes: 1}))
-    }
-  }, [pianoCurrentNote])
 
   /* Handlers */
   // Store note element references from the rendered sheet
@@ -297,8 +143,6 @@ const SheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
   if (isLoading) {
     return <Spin/>
   }
-
-  const highlightNote = isPracticing ? nextNote : currentNote
   return (
     <div
       ref={containerRef}
@@ -325,7 +169,7 @@ const SheetContainer: React.FC<AdvancedMusicSheetProps> = (props) => {
         <SheetRenderer
           vexNotes={vexNotes}
           onNoteElementsUpdate={handleNoteElementsUpdate}
-          highlightNote={highlightNote}
+          highlightNote={currentNote}
           incorrectAttempt={incorrectAttempt}
         />
       </div>

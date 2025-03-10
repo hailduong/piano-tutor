@@ -187,7 +187,7 @@ const LearnSongPage: React.FC = () => {
         sheetMusicXMLString={learnSongState.sheetMusic}
         tempo={learnSongState.tempo}
         currentPosition={sessionProgress.currentPosition}
-        onSongComplete={handleSessionComplete}
+        onSongPracticeComplete={handleSessionComplete}
       />
 
       {/* Progress Information */}

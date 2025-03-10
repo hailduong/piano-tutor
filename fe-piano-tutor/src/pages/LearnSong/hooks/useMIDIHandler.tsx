@@ -55,7 +55,7 @@ export const useMIDIHandler = (): UseMIDIHandlerResult => {
   }, [])
 
   // Function to play a note using Soundfont or fallback to oscillator
-  const playNote = async (midiNote: number, duration = 500, velocity = 0x7f): Promise<void> => {
+  const playNote = async (midiNote: number, duration = 500, velocity = 120): Promise<void> => {
     return new Promise((resolve) => {
       // First try to play using Soundfont instrument
       console.log('Playing note:', midiNote, instrument.current)
