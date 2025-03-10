@@ -1,13 +1,12 @@
 import React, {FC, useRef, useState, useEffect} from 'react'
 import {useSelector, useDispatch} from 'react-redux'
-import {Button, Space, Radio, Tooltip, Divider, Switch} from 'antd'
+import {Button, Space, Tooltip, Switch} from 'antd'
 import {
   PlayCircleOutlined,
   PauseCircleOutlined,
   StepForwardOutlined,
   StepBackwardOutlined,
   RedoOutlined,
-  SettingOutlined,
   InfoCircleOutlined,
   SoundOutlined,
   LoadingOutlined
@@ -257,51 +256,19 @@ const Controls: FC<ILearnSongControlsProps> = (props) => {
           onChange={handleTempoChange}
         />
 
-        {/* Advanced Options */}
-        <Button
-          className="ms-auto"
-          type="text"
-          icon={<SettingOutlined/>}
-          onClick={() => setShowAdvanced(!showAdvanced)}
-        >
-          {showAdvanced ? 'Hide' : 'Advanced Options'}
-        </Button>
+        {/* Metronome Toggle */}
+        <div className="ms-auto">
+          <span style={{marginRight: 10}}>Metronome:</span>
+          <Switch
+            checked={learnSongState.metronomeEnabled}
+            onChange={handleMetronomeToggle}
+          />
+          <Tooltip title="Enable metronome during playback">
+            <InfoCircleOutlined style={{marginLeft: 8}}/>
+          </Tooltip>
+        </div>
 
       </ControlSection>
-
-      {/* Advanced Controls (conditional) */}
-      {showAdvanced && (
-        <ControlSection>
-          <SectionTitle>Advanced Settings</SectionTitle>
-          <Space direction="vertical">
-            <div>
-              <span style={{marginRight: 10}}>Metronome:</span>
-              <Switch
-                checked={learnSongState.metronomeEnabled}
-                onChange={handleMetronomeToggle}
-              />
-              <Tooltip title="Enable metronome during playback">
-                <InfoCircleOutlined style={{marginLeft: 8}}/>
-              </Tooltip>
-            </div>
-
-            <Divider style={{margin: '12px 0'}}/>
-
-            <div>
-              <span style={{marginRight: 10}}>Mode:</span>
-              <Radio.Group
-                value={learnSongState.mode}
-                onChange={handleModeChange}
-                buttonStyle="solid"
-              >
-                <Radio.Button value="practice">Practice</Radio.Button>
-                <Radio.Button value="play">Play</Radio.Button>
-                <Radio.Button value="learn">Learn</Radio.Button>
-              </Radio.Group>
-            </div>
-          </Space>
-        </ControlSection>
-      )}
     </ControlsContainer>
   )
 }
